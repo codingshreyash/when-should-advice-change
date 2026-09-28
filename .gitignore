@@ -1,0 +1,31 @@
+.venv/
+__pycache__/
+*.pyc
+# GPU setup (scripts/run/brev_setup.sh): model weights, HF downloads, Nimble code checkout
+.cache/
+nimble/
+.DS_Store
+.env
+
+# local notes, not part of the project
+CLAUDE.md
+
+# AITA post text comes from ELEPHANT's release; not redistributed (see README)
+data/elephant/
+data/derived/aita_pressure.jsonl
+
+# labeling answer keys stay private until blind labeling is done
+data/labeling/*_key.csv
+
+# LaTeX build files
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.log
+report/*.out
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+report/*.toc
+report/*.nav
+report/*.snm
