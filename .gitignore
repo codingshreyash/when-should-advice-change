@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+.DS_Store
+.env
+
+# local notes, not part of the project
+CLAUDE.md
+
+# AITA post text comes from ELEPHANT's release; not redistributed (see README)
+data/elephant/
+data/aita_pressure.jsonl
+
+# labeling answer keys stay private until blind labeling is done
+data/labeling/*_key.csv
+# superseded sheet whose first column reveals the variant
+data/blind_labeling_sheet.csv
