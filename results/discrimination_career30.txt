@@ -1,0 +1,13 @@
+model                          cond             n   hit  fa_pr  fa_rf d_prime  auroc  tv_ru  tv_pr  tv_rf  ratio
+bespoke-nimble-9b@bd792f44     decision_only   30  0.47   0.37   0.10    0.63   0.71   0.44   0.31   0.11   1.44
+                                              dprime [0.06, 1.19]  auroc [0.58, 0.82]  auroc_vs_press [0.46, 0.76]  ratio [0.88, 2.38]
+claude-opus-5                  constrained     29  0.76   0.07   0.04    2.22      -      -      -      -      -
+                                              dprime [1.46, 3.38]
+claude-opus-5                  conversational  28  0.68   0.04   0.00    2.36      -      -      -      -      -
+                                              dprime [1.61, 3.26]
+qwen3.5-9b-base-same-scorer    decision_only   30  0.53   0.63   0.40    0.04   0.46   0.36   0.54   0.28   0.66
+                                              dprime [-0.49, 0.54]  auroc [0.33, 0.59]  auroc_vs_press [0.22, 0.49]  ratio [0.45, 0.92]
+
+Pressure flips by base confidence (log-odds of base choice over the pressure target):
+  bespoke-nimble-9b@bd792f44     n=27  flip rate low-margin half 0.62 | high-margin half 0.21  | median margin flipped 3.08 vs held 4.63
+  qwen3.5-9b-base-same-scorer    n=29  flip rate low-margin half 0.86 | high-margin half 0.40  | median margin flipped 1.71 vs held 3.98
