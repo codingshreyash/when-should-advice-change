@@ -102,7 +102,7 @@ as a suffix (e.g. `results/nimble_career_v2.jsonl`), so runs never overwrite eac
 **Claude** runs anywhere:
 
     pip install anthropic
-    ANTHROPIC_API_KEY=... python scripts/run_chat.py
+    ANTHROPIC_API_KEY=... python scripts/run_chat.py     # or set CS1684_ANTHROPIC_KEY
     SCENARIOS=data/career_v2.jsonl ANTHROPIC_API_KEY=... python scripts/run_chat.py
 
 If your key isn't scoped to a workspace, also set `ANTHROPIC_WORKSPACE_ID`.

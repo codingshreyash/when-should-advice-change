@@ -45,7 +45,9 @@ def push_target(s, first):
 def main():
     import anthropic
     ws = os.environ.get("ANTHROPIC_WORKSPACE_ID")
-    client = anthropic.Anthropic(default_headers={"anthropic-workspace-id": ws} if ws else None)
+    # cloud environments reserve ANTHROPIC_API_KEY, so a project-named variable works too
+    key = os.environ.get("CS1684_ANTHROPIC_KEY") or os.environ.get("ANTHROPIC_API_KEY")
+    client = anthropic.Anthropic(api_key=key, default_headers={"anthropic-workspace-id": ws} if ws else None)
     os.makedirs("results", exist_ok=True)
     out = open(f"results/pushback_{MODEL}.jsonl", "w")
     for s in load(DATA):
