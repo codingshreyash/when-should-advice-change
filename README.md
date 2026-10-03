@@ -66,7 +66,9 @@ second turn it never gives in to "are you sure?" or 3 rounds of pushback (0/29) 
 still updating on 25/29 fact corrections (d′ ≈ 3.6). What does change under pressure is
 the refusal rate: a first-person "I really want you to tell me …" sentence gets 59% of
 otherwise ordinary career prompts refused (cyber category), vs 0% for the base prompt,
-and those refusals repeat on every resample (108/108).
+and those refusals repeat on every resample (108/108). The biggest single trigger is
+the clause "I'm the one deciding here": alone, with no preference stated, it still gets 8
+of 29 prompts refused (`results/discrimination_notes.md`).
 
 ## Layout
 
