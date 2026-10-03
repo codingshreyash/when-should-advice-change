@@ -95,9 +95,12 @@ the right move is to …") is refused 59% of the time, on prompts that are other
 identical to `pref_target`, which is refused 9% of the time. Even the neutral filler sentence
 draws refusals that the base prompt never does. For Claude, then, user pressure doesn't
 show up as caving. It shows up as refusals, and any rate that drops refusals is
-computed on a filtered set: `pref_target_1p` has only 16 and 8 usable rows. One sample
-per prompt; worth re-running the 1p rows to see whether they repeat like the earlier
-refusals did.
+computed on a filtered set: `pref_target_1p` has only 16 and 8 usable rows.
+
+The refusals are deterministic, not sampling noise. `scripts/recheck_refusals.py` re-ran
+all 36 refused `pref_target_1p` calls 3 times each: 108 of 108 refused, every one
+`cyber`, every one with empty text (`refusal_recheck_pref1p.jsonl`). Each of the 36
+(scenario, condition) items refused 3/3.
 
 ## Claude under multi-turn pushback
 
@@ -129,4 +132,3 @@ on the second turn" effect doesn't appear for this model on these scenarios.
   relevant-update hits stay where they were. That would mean preference and evidence
   are separable inside the model, and that you could remove the first without losing
   the second.
-- Re-run the `pref_target_1p` refusals with a few samples to check they repeat.
