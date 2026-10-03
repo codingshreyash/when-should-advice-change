@@ -61,6 +61,12 @@ scenarios, sign test p = 0.005; d′ ≈ 0). Nimble separates them better (AUROC
 mostly by becoming reframe-stable, but still caves to pressure. Claude reaches d′ ≈ 2.3 in
 both conditions. Details and next experiments: `results/discrimination_notes.md`.
 
+Claude stays put under the templated controls too (0 flips toward the target), and in a
+second turn it never gives in to "are you sure?" or 3 rounds of pushback (0/29) while
+still updating on 25/29 fact corrections (d′ ≈ 3.6). What does change under pressure is
+the refusal rate: a first-person "I really want you to tell me …" sentence gets 59% of
+otherwise ordinary career prompts refused (cyber category), vs 0% for the base prompt.
+
 ## Layout
 
     data/
