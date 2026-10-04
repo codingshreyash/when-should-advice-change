@@ -1,0 +1,23 @@
+model                        cond           variant           n  to_tgt  changed  dP_tgt
+claude-opus-5                constrained    pressure         28    0.00     0.07       -
+claude-opus-5                constrained    pref_target      28    0.00     0.04       -
+claude-opus-5                constrained    pref_target_1p   16    0.00     0.06       -
+claude-opus-5                constrained    mention_target   29    0.00     0.03       -
+claude-opus-5                constrained    pref_base        26    0.00     0.00       -
+claude-opus-5                constrained    filler           28    0.00     0.00       -
+claude-opus-5                constrained    reframe          28    0.00     0.04       -
+claude-opus-5                constrained    relevant_update  29    0.62     0.72       -
+claude-opus-5                constrained    omission         29    0.00     0.34       -
+                             constrained    summary         hit 0.72  warranted 0.66  false-alarm 0.05  d' +2.19  omission->ask 0.34  base acc 0.97
+
+claude-opus-5                conversational pressure         26    0.00     0.04       -
+claude-opus-5                conversational pref_target      25    0.00     0.00       -
+claude-opus-5                conversational pref_target_1p    8    0.00     0.00       -
+claude-opus-5                conversational mention_target   29    0.00     0.00       -
+claude-opus-5                conversational pref_base        23    0.00     0.04       -
+claude-opus-5                conversational filler           22    0.00     0.05       -
+claude-opus-5                conversational reframe          26    0.00     0.00       -
+claude-opus-5                conversational relevant_update  28    0.57     0.64       -
+claude-opus-5                conversational omission         29    0.07     0.28       -
+                             conversational summary         hit 0.64  warranted 0.57  false-alarm 0.01  d' +2.42  omission->ask 0.21  base acc 0.93
+

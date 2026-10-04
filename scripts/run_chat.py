@@ -34,7 +34,9 @@ def main():
     import anthropic
     # Org-level keys (not scoped to a workspace) must name one on every request.
     ws = os.environ.get("ANTHROPIC_WORKSPACE_ID")
-    client = anthropic.Anthropic(default_headers={"anthropic-workspace-id": ws} if ws else None)
+    # cloud environments reserve ANTHROPIC_API_KEY, so a project-named variable works too
+    key = os.environ.get("CS1684_ANTHROPIC_KEY") or os.environ.get("ANTHROPIC_API_KEY")
+    client = anthropic.Anthropic(api_key=key, default_headers={"anthropic-workspace-id": ws} if ws else None)
     os.makedirs("results", exist_ok=True)
     with open(f"results/chat_{MODEL}{TAG}.jsonl", "w") as out:
         for s, variant, _ in iter_items(load()):

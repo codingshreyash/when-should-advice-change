@@ -52,6 +52,24 @@ Two things worth knowing if you look at the raw results:
   (16 of 300 career calls). Those rows have `stop_reason: "refusal"` and are excluded
   from rates and counted separately. `results/refusal_recheck.jsonl` shows they repeat.
 
+### Discrimination reanalysis
+
+Putting all four variants on one axis (how far did the answer move?) and asking whether
+that movement separates relevant updates from pressure/reframe: the Qwen3.5-9B base model
+moves *more* for a stated preference than for a decision-relevant fact (23 of 30
+scenarios, sign test p = 0.005; d′ ≈ 0). Nimble separates them better (AUROC 0.71 vs 0.46),
+mostly by becoming reframe-stable, but still caves to pressure. Claude reaches d′ ≈ 2.3 in
+both conditions. Details and next experiments: `results/discrimination_notes.md`.
+
+Claude stays put under the templated controls too (0 flips toward the target), and in a
+second turn it never gives in to "are you sure?" or 3 rounds of pushback (0/29) while
+still updating on 25/29 fact corrections (d′ ≈ 3.6). What does change under pressure is
+the refusal rate: a first-person "I really want you to tell me …" sentence gets 59% of
+otherwise ordinary career prompts refused (cyber category), vs 0% for the base prompt,
+and those refusals repeat on every resample (108/108). The biggest single trigger is
+the clause "I'm the one deciding here": alone, with no preference stated, it still gets 8
+of 29 prompts refused (`results/discrimination_notes.md`).
+
 ## Layout
 
     data/
@@ -65,6 +83,12 @@ Two things worth knowing if you look at the raw results:
       build_career_v2.py        source for career_v2.jsonl
       build_aita.py             builds the AITA pressure set from ELEPHANT's data
       validate_scenarios.py     checks the variant-writing rules
+      analyze_discrimination.py relevant-vs-irrelevant movement: d', AUROC, bootstrap CIs
+      build_pressure_controls.py  templated preference / neutral mention / agreeing pressure / filler controls
+      run_steering.py           "user wants X" direction in the 9B models + cross-validated ablation (GPU)
+      run_gpu_experiments.sh    all GPU work for the controls + steering study in one go
+      run_pushback.py           multi-turn pushback / correction / escalation for Claude
+      analyze_steering.py, analyze_pushback.py   tables for the two above
       brev_setup.sh             one-shot GPU box setup (deps, model download, adapter merge)
       run_nimble.py             Nimble + base model, same scorer
       run_chat.py               Claude, conversational + constrained
@@ -87,7 +111,7 @@ as a suffix (e.g. `results/nimble_career_v2.jsonl`), so runs never overwrite eac
 **Claude** runs anywhere:
 
     pip install anthropic
-    ANTHROPIC_API_KEY=... python scripts/run_chat.py
+    ANTHROPIC_API_KEY=... python scripts/run_chat.py     # or set CS1684_ANTHROPIC_KEY
     SCENARIOS=data/career_v2.jsonl ANTHROPIC_API_KEY=... python scripts/run_chat.py
 
 If your key isn't scoped to a workspace, also set `ANTHROPIC_WORKSPACE_ID`.

@@ -27,7 +27,12 @@ def chat_prompt_conversational(s, variant):
 def chat_prompt_constrained(s, variant):
     return (f"{s['prompts'][variant]}\n\n{s['question']} Answer with exactly one code and nothing else:\n{option_block(s)}")
 
+# VARIANTS=base,pressure,... limits a run to some prompt keys (e.g. skip the pref_t*
+# phrasings in pressure_controls.jsonl, which only run_steering.py needs)
+ONLY = set(os.environ["VARIANTS"].split(",")) if os.environ.get("VARIANTS") else None
+
 def iter_items(scenarios):
     for s in scenarios:
         for variant, text in s["prompts"].items():
-            yield s, variant, text
+            if ONLY is None or variant in ONLY:
+                yield s, variant, text
