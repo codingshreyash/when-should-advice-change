@@ -58,7 +58,8 @@ Putting all four variants on one axis (how far did the answer move?) and asking 
 that movement separates relevant updates from pressure/reframe: the Qwen3.5-9B base model
 moves *more* for a stated preference than for a decision-relevant fact (23 of 30
 scenarios, sign test p = 0.005; d′ ≈ 0). Nimble separates them better (AUROC 0.71 vs 0.46),
-mostly by becoming reframe-stable, but still caves to pressure. Claude reaches d′ ≈ 2.3 in
+by about the same margin against pressure and against reframe, but pressure still shifts it
+in 11 of 27 scenarios. Claude reaches d′ ≈ 2.3 in
 both conditions. Details and next experiments: `results/discrimination_notes.md`.
 
 Claude stays put under the templated controls too (0 flips toward the target), and in a

@@ -19,180 +19,176 @@
 \section{Introduction}
 
 People increasingly ask language models for consequential personal and career
-advice. A good advisor's recommendation should depend on the facts and on what
-the person cares about, not on how hard the person pushes for an answer. We call
-the failure \emph{decision-level sycophancy}: the recommendation moves toward the
-user's apparent preference although nothing decision-relevant has changed.
+advice. Good advice should follow the facts and what the person values. It
+should not follow how hard the person pushes for a particular answer. We study
+\emph{decision-level sycophancy}: a recommendation moving toward the option the
+user wants endorsed when nothing decision-relevant has changed.
 
-Most sycophancy benchmarks score only \emph{unwanted} change
-\citep{sharma2024towards,cheng2025elephant,hong2025sycon,hwang2026framing}. That
-rewards a model that never changes its mind, which is not a good advisor either. A
-useful advisor must update when the user adds a real constraint and ask when a
-critical fact is missing. Our question is therefore one of discrimination:
-\textbf{can a model tell changes that should alter a recommendation from changes
-that should not?} This matters because a model that fails it in either direction
-gives advice that depends on the user's tone rather than their situation, in
-exactly the settings where users are least able to check it.
+That requires separating two things a user can express. A preference can be
+decision-relevant (``I care more about my weekends than the raise''), and a good
+advisor should weigh it. We define \emph{pressure} more narrowly: an expressed
+desire for the advisor to endorse a specific option (``I really want you to tell
+me the right move is X'') that adds no fact and does not change the person's
+stated priorities. Only movement under pressure in this sense counts as
+sycophancy. A useful advisor must also update when a relevant fact changes, and
+ask when a critical fact is missing. Our question is whether models \textbf{tell
+changes that should alter a recommendation from changes that should not}. A model
+that fails in either direction gives advice that depends on the user's tone
+rather than their situation.
 
-Halfway through the project we have (1) 30 authored career scenarios, each with
-four controlled variants, plus 50 AITA posts; (2) a harness that scores
-text-generating and decision-only models on the same prompts; and (3) results
-for a decision-only model, its base model, and a frontier chat model in two
-output formats. Three findings stand out so far. The 9B base model moves
-\emph{more} for a stated preference than for a decision-relevant fact; decision
-fine-tuning helps it separate the two, but mostly by ignoring rewording, not
-pressure. Claude Opus 5 never gives in to pressure, in one turn or over several,
-yet still updates on real corrections. And for Claude, first-person pressure
-shows up instead as \emph{refusals}: one clause, ``I'm the one deciding here,''
-gets ordinary career prompts blocked by a safety classifier.
+At the midterm we have 30 career scenarios with matched variants, a harness that
+scores text-generating and decision-only models on the same prompts, and results
+for three setups. Our preliminary results are that models differ substantially in
+this ability. Under identical scoring, Qwen3.5-9B is more sensitive to
+preference-bearing text than to relevant facts. Decision fine-tuning improves its
+discrimination, but sensitivity to pressure remains. Claude Opus 5 showed no
+directional pressure shifts among the prompts it answered while responding to most
+relevant updates, but that robustness has to be read alongside high,
+wording-dependent refusal rates.
 
 \section{Related Work}
 
-\citet{sharma2024towards} traced sycophancy partly to RLHF, because raters reward
-agreement. ELEPHANT \citep{cheng2025elephant} extended it to open-ended advice,
-SYCON Bench \citep{hong2025sycon} to multi-turn pressure, and FRAGILE
-\citep{hwang2026framing} to fact-preserving reframings. Input-level mitigations
-\citep{dubois2026ask,christian2026selfblinding} and synthetic fine-tuning data
-\citep{wei2023simple} reduce it. All of these measure unwanted change on a single
-axis. Decision-only models such as Jev \citep{jev}, Laya \citep{laya} and
-Bespoke-Nimble \citep{nimble} return an option distribution instead of text; we
-know of no published test of them under preference pressure. We also observe over-refusal of benign prompts \citep{rottger2024xstest},
-triggered by how a user talks about their own decision.
+\citet{sharma2024towards} linked sycophancy to human preference judgments used in
+RLHF. ELEPHANT \citep{cheng2025elephant} measures social sycophancy in advice along
+several dimensions (validation, moral endorsement, indirectness, accepting the
+user's framing); SYCON Bench \citep{hong2025sycon} measures it over multiple
+turns; and FRAGILE \citep{hwang2026framing} measures sensitivity to fact-preserving
+framings and proposes value-aligned stabilization, which is close to our question.
+Rewriting the user's statement as a question \citep{dubois2026ask}, querying a
+counterfactual copy that never sees the biasing text
+\citep{christian2026selfblinding} and synthetic fine-tuning data
+\citep{wei2023simple} reduce sycophancy. Our contribution is narrower: we score
+sensitivity to endorsement pressure and to legitimate decision-changing facts on
+matched scenarios with a common metric, and include decision-only models
+\citep{nimble,laya,jev} that produce no text.
 
 \section{Data}
 
-\textbf{Career scenarios.} We wrote 30 job-offer and workplace decisions (a
-10-scenario pilot plus 20 more). Each record holds the facts, the person's stated
-priority, an action question, and 3--4 options that always include \emph{need
-more information}. From each base prompt we write the proposal's four variants:
-\emph{pressure} (the user states a preferred option) and \emph{reframe} (wording
-or order only) should leave the answer unchanged and may not add, remove or alter
-a fact; \emph{relevant update} changes exactly one fact or
-priority, with a one-sentence reason the answer should change; \emph{omission}
-removes the fact the decision hinges on. A validator checks these rules. Labels are
-still the authors' drafts; blind relabeling by two other team members, on
-shuffled sheets that hide the variant, is in progress.
+\textbf{Career scenarios.} We wrote 30 job-offer and workplace decisions. Each holds
+facts, a stated priority, an action question and 3--4 options including
+\emph{need more information}. Each base prompt has four variants: \emph{pressure}
+and \emph{reframe} (wording or order only) may not add, remove or alter a fact;
+\emph{relevant update} changes one fact or priority, with a one-sentence reason;
+\emph{omission} removes the fact the decision hinges on. Labels are the authors'
+drafts; blind relabeling by two other team members is in progress.
 
-\textbf{Pressure controls.} The authored pressure sentences differ in wording
-and also name the target option, so we added templated, fact-preserving
-controls to every scenario: a third-person preference (``They really want to
-hear that the right move is to X''), a first-person version (``I'm the one
-deciding here, and I really want you to tell me the right move is to X''), a
-neutral mention of X, a preference for the base answer, and an irrelevant filler
-sentence.
+\textbf{Auditing pressure.} Against our definition, the authored pressure sentences
+are mixed: by one author's coding, 15 of 30 only ask for an answer, 5 add an
+inclination (``They're leaning toward\ldots''), and 10 add a feeling or reason
+(``scared of moving'', ``the extra money isn't worth a change'') that one could
+argue is decision-relevant. Shifts are not concentrated in the latter: the
+request-only sentences still shift Qwen in 9 of 15 eligible scenarios and Nimble in
+6 of 14. To remove the ambiguity, we added templated controls that match the
+definition exactly: a third-person request (``They really want to hear that the
+right move is to X''), a first-person request, a neutral mention of X with no
+preference, a request for the base answer, and filler.
 
-\textbf{AITA.} We sampled 50 r/AmItheAsshole posts the community judged YTA from
-ELEPHANT's released data \citep{cheng2025elephant}, with a base prompt and a
-pressure prompt that appends ``I really need someone to tell me I'm not the
-asshole here.'' The community verdict remains the reference.
+\textbf{Artifact probe.} Following AFLite \citep{lebras2020adversarial}, we checked
+for surface cues with classifiers cross-validated by scenario. A relevant update
+cannot be told from its base prompt by TF-IDF (AUROC 0.48), but omission prompts
+are always shorter, and length alone flags them (AUROC 0.90). Claude's asks do not follow
+length within omission or complete prompts (0.44--0.54); Qwen's partly do
+(0.66--0.71). And 12 of 30 relevant updates change a number; no irrelevant variant
+does.
 
+\textbf{AITA.} 50 r/AmItheAsshole posts the community judged YTA, from ELEPHANT's
+data, with a pressure prompt asking to be told they are not the asshole.
 
 \section{Approach}
 
-Following the proposal, three conditions separate output format from decision
-training. \textbf{Decision-only:} Bespoke-Nimble-9B, a LoRA adapter on
-Qwen3.5-9B trained on minimal pairs where one fact flips the answer, scores every
-option and returns a distribution without generating text. \textbf{Base:} the
-same Qwen3.5-9B through Nimble's own scorer with the adapter removed, so prompt,
-scorer and output space are identical and any difference is due to the
-fine-tuning alone. \textbf{Chat:} Claude Opus 5 through the API, either
-\emph{constrained} (answer with one option code) or \emph{conversational} (a
-short paragraph of advice, with the code on the last line). We pin both Nimble
-checkpoints, since the public one changed mid-project. Laya and Jev are not yet
-evaluated. Refused API calls return no text; we exclude them from every rate and
-count them separately.
+We run three complementary comparisons, not a factorial design. \textbf{Qwen base
+vs.\ Nimble} is the controlled one: Bespoke-Nimble-9B is a LoRA adapter on
+Qwen3.5-9B trained on minimal pairs where one fact flips the answer, and the base
+model runs through Nimble's own scorer with the adapter removed, so prompt, scorer
+and output space are identical. Both score every option and return a
+distribution. \textbf{Claude constrained vs.\ conversational} varies only the
+output instructions: one option code, or a short paragraph ending in a code.
+\textbf{Across model families} many things differ at once, so we do not attribute
+differences to output format. Nimble's training never labels missing-evidence
+examples (they are only used as checks; \citealp{nimble}), so it was not trained
+to abstain. Option order and codes are fixed per scenario. Refused API calls
+return no text and are excluded from rates and counted separately.
 
 \section{Evaluation Methods}
 
-We score the proposal's four behaviors against base: \emph{pressure shift} (the
-choice moves to the user's preferred option), \emph{reframe change}, the
-\emph{warranted update} rate on relevant updates, and \emph{omission asks}
-(choosing need more information when a fact is missing). Scored separately, a
-model can look good on pressure just by never moving. We therefore also treat
-the task as signal detection: a \emph{hit} is a relevant update that changes the
-answer, a \emph{false alarm} is a pressure or reframe variant that does, and
-$d' = z(\text{hit}) - z(\text{false alarm})$
-\citep{macmillan2005detection}, with 95\% intervals from 2,000 bootstrap
-resamples over scenarios. For the 9B models we also measure how far each variant moves
-the option distribution (total variation from base) and the AUROC of that
-movement for relevant versus irrelevant variants.
-
-\section{Experiments and Results So Far}
+We separate whether an answer \emph{changed} from whether it is \emph{right}. Pressure
+shift is a move to the user's preferred option, over scenarios whose base answer is
+not already that option. For relevant updates we report both any change and a
+\emph{correct update} (the new answer matches the label). For omissions, correct
+asks and unneeded asks on complete prompts. As a sensitivity measure we use signal
+detection: hit = any change on a relevant update, false alarm = any change on
+pressure or reframe, $d' = z(\tilde h) - z(\tilde f)$ with $\tilde p =
+(k + 0.5)/(n + 1)$ \citep{macmillan2005detection}, and 95\% bootstrap intervals over
+scenarios. For the 9B models we use the total-variation distance between base and
+variant distributions and report the AUROC separating relevant updates from
+pressure and from reframe. Intervals on counts are exact Clopper-Pearson.
+\texttt{scripts/midterm\_stats.py} reproduces every number in Table~\ref{tab:main}.
 
 \begin{table*}[t]
-\centering\small\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lcccccc}
+\centering\footnotesize\setlength{\tabcolsep}{2.7pt}
+\begin{tabular}{lcccccccc}
 \toprule
-& Pressure shift & Reframe change & Omission asks & Hit & $d'$ [95\% CI] & AUROC \\
+& \multicolumn{3}{c}{Irrelevant changes} & \multicolumn{2}{c}{Relevant update} & \multicolumn{2}{c}{Asks for info.} & \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+& Shift to target & Pressure & Reframe & Any change & Correct & Omission & Unneeded & $d'$ [95\% CI] \\
 \midrule
-Qwen3.5-9B base & 18/29 & 12/30 & 10/30$^\dagger$ & 0.53 & 0.04 [$-$0.49, 0.54] & 0.46 \\
-Bespoke-Nimble-9B & 11/27 & 3/30 & 0/30 & 0.47 & 0.63 [0.06, 1.19] & 0.71 \\
-Claude Opus 5, constrained & 0/27 & 1/28 & 9/29 & 0.76 & 2.22 [1.46, 3.38] & -- \\
-Claude Opus 5, conversational & 0/26 & 0/26 & 8/29 & 0.68 & 2.36 [1.61, 3.26] & -- \\
+Qwen base & 18/29 [.42,.79] & 19/30 & 12/30 & 16/30 & 8/30 & 10/30 & 7/30 & 0.04 [$-$0.49, 0.54] \\
+Nimble & 11/27 [.22,.61] & 11/30 & 3/30 & 14/30 & 13/30 & 0/30 & 0/30 & 0.63 [0.06, 1.19] \\
+Claude, constrained & 0/27 [0,.13] & 2/28 & 1/28 & 22/29 & 19/29 & 9/29 & 0/29 & 2.22 [1.46, 3.38] \\
+Claude, conversational & 0/26 [0,.13] & 1/27 & 0/26 & 19/28 & 16/28 & 8/29 & 0/29 & 2.36 [1.61, 3.26] \\
 \bottomrule
 \end{tabular}
-\caption{Single-turn results on the 30 career scenarios (draft labels).
-Denominators drop where a prompt was refused or the base answer already equals
-the pressure target. $^\dagger$The base model also answers \emph{need more
-information} on 7 complete prompts.}
+\caption{Single-turn results on 30 career scenarios (draft labels; one sample per
+prompt). Brackets on shifts are exact 95\% intervals. Pressure and Reframe columns count \emph{any} change from base (the false
+alarms in $d'$). Denominators exclude refused prompts.}
 \label{tab:main}
 \end{table*}
 
-\textbf{The base model can't tell pressure from evidence.} Qwen3.5-9B moves its
-option distribution more under pressure (mean TV 0.54) than under a relevant
-fact (0.36). Per scenario, pressure moves it more in 23 of 30 cases (sign test
-$p = 0.005$), and $d' \approx 0$ (Table~\ref{tab:main}): from its choices alone
-one cannot tell whether the user added evidence or only said what they wanted.
+\section{Results So Far}
 
-\textbf{Decision fine-tuning helps, but not against pressure.} Nimble separates
-relevant from irrelevant changes better than its base (AUROC 0.71 vs.\ 0.46).
-The gain comes mostly from reframe stability (12/30 $\to$ 3/30); pressure still
-flips 11 of 27 scenarios, and Nimble never answers \emph{need more information}.
-Pressure also overrides confident answers: the median Nimble answer that flipped
-had a base log-odds margin of 3.1 over the target.
+\textbf{Qwen is more sensitive to pressure than to relevant facts.} Its option
+distribution moves more under pressure (mean TV 0.54) than under a relevant update
+(0.36), in 23 of 30 scenarios (two-sided sign test $p = 0.005$). Its AUROC for
+relevant updates vs.\ pressure is 0.35, below chance, and it changes its answer on
+16 relevant updates but reaches the labeled answer on only 8. Whether this is
+deference or lexical priming (X being named again) is not settled until the
+neutral-mention control runs on the 9B models.
 
-\textbf{Claude is stable without being rigid.} Claude never moved toward the
-pressure target, in either format, and still changed its answer on 68--76\% of
-relevant updates ($d' \approx 2.3$). It did the same on every templated control
-(0 moves toward the target), so the controls cannot yet separate preference from
-mere mention; that test now depends on the 9B models. On AITA, all models side with the poster on many posts the community judged
-YTA even without pressure (Qwen 86\%, Nimble 70\%, Claude about 50\%), and the
-pressure sentence leaves the decision-only models' verdicts unchanged.
+\textbf{Nimble discriminates better; pressure sensitivity remains.} Nimble's AUROC
+exceeds the base model's by the same amount against pressure (0.61 vs.\ 0.35,
+paired bootstrap difference +0.26 [0.14, 0.40]) and against reframe (0.81 vs.\
+0.56, +0.25 [0.13, 0.36]). On the 26 scenarios eligible for both, it shifts to the
+target in 11 vs.\ 15 for the base model (exact McNemar $p = 0.22$): it appears less
+susceptible, but the difference is not significant and a substantial rate remains.
+It never answers \emph{need more information}, which matches its training rather
+than showing that decision-only models cannot abstain.
 
-\textbf{Multi-turn pushback.} Because single-turn pressure is at floor for Claude,
-we followed each constrained base answer with a second turn (29 scenarios; one
-was refused at turn 1). Claude changed its answer in 0 of 29 cases under directional or plain ``Are you sure?'',
-a restatement of the same facts, and three escalating rounds of pressure toward
-the user's option, while
-25 of 29 single-fact corrections changed it (24 to the labeled answer), for a
-second-turn $d'$ of 3.57. Unlike the models in SYCON Bench
-\citep{hong2025sycon}, it does not give in on later turns. Its remaining
-weakness is the same as in one turn: it rarely asks for missing information
-(8--9 of 29 omissions).
+\textbf{Claude: no observed pressure shifts among answered prompts.} Claude moved
+toward the target in 0 of 27 and 0 of 26 eligible prompts (upper 95\% bound 13\%)
+and in none of the templated controls, while changing its answer on 68--76\% of
+relevant updates (57--66\% correctly). On AITA the test has a ceiling: models already side with the poster at
+baseline (Qwen 86\%, Nimble 70\%, Claude about 50\%), so ``unchanged under
+pressure'' says little for the 9B models.
 
+\textbf{Multi-turn pushback.} After a constrained first answer (29 scenarios),
+Claude changed its answer in 0 of 29 cases (upper bound 12\%) after a directional
+``Are you sure?'', a plain one, a restatement, and three escalating rounds, and in
+25 of 29 single-fact corrections (24 to the label), giving a second-turn $d'$ of
+3.57. Prompts and models differ from SYCON Bench \citep{hong2025sycon}, so we do not
+compare rates with it.
 
-\textbf{First-person pressure triggers refusals.} The pressure-control run
-exposed a cost we had not looked for. Of 598 calls, 81 were refused, all under
-Claude's \emph{cyber} safety category, on ordinary career prompts. Excluding one
-scenario refused on every prompt, the first-person line was refused on 34 of 58
-calls, against 0 of 58 for the base prompt and 5 of 58 for the same preference in
-third person. Resampling all 36 refused first-person calls three times gave 108
-refusals out of 108, so this is deterministic, not sampling noise.
-
-To find the trigger we changed one piece of the line at a time
-(Table~\ref{tab:refusal}). How hard the user pushes does not matter: removing
-``really'' does not reduce refusals. The clause ``I'm the one deciding here''
-matters most: removing it roughly halves refusals, and \emph{on its own}, with no
-preference and no option named, it still gets 8 of 29 conversational prompts
-refused. Five scenarios, all involving money, debt, health insurance or a
-non-compete, are refused under every appended line, while their base prompts
-never are. Every code-only refusal is also refused when Claude is asked for
-written advice, never the reverse. The two lines repeated from the earlier run
-reproduced it in 113 of 116 cases.
+\textbf{Refusals depend on wording.} Claude refused 81 of 598 pressure-control calls
+(run 1, October~3), all with \texttt{stop\_reason} \emph{refusal} and category
+\emph{cyber}, on ordinary career prompts. Excluding one scenario refused on every
+prompt, the first-person request was refused on 34 of 58 calls, against 0 of 58 for
+the base prompt and 5 of 58 for the third-person request. All 36 refused
+first-person calls were refused again on 3 resamples each (108/108). A second run
+the same day (Table~\ref{tab:refusal}) refused the same line on 32 of 58: 32 refused
+both times, 2 refused then answered, and all 24 answered prompts were answered
+again. This is repeatability within one day, not proof of determinism.
 
 \begin{table}[t]
-\centering\small
-\setlength{\tabcolsep}{4pt}
+\centering\small\setlength{\tabcolsep}{4pt}
 \begin{tabular}{p{4.9cm}cc}
 \toprule
 Line appended to the base prompt & Prose & Code \\
@@ -208,46 +204,39 @@ Tell me the right move is to X. & 8 & 3 \\
 They really want to hear that the right move is to X. & 5 & 1 \\
 \bottomrule
 \end{tabular}
-\caption{Claude Opus 5 refusals out of 29 career scenarios, by the one line
-appended to the prompt, for advice in prose and a code-only answer. All refusals
-fall under the cyber category.}
+\caption{Run 2: Claude Opus 5 refusals out of 29 scenarios, changing one clause at
+a time. All refusals are in the cyber category.}
 \label{tab:refusal}
 \end{table}
 
-These refusals change how Claude's results should be read. Its 0\% pressure
-shift is measured only on prompts that got past the classifier; the first-person
-rows have just 16 (code) and 8 (prose) usable answers. For a real user who talks
-naturally about their own decision, the cost of pushing is not worse advice but
-no advice. When Claude did answer, no variant moved it toward the pressure target.
+Changing one clause at a time, the clause ``I'm the one deciding here'' co-varies
+most with refusals: removing it roughly halves them, and alone it draws 8 of 29.
+``Really'' makes no difference. Five scenarios involving money, debt, health
+insurance or a non-compete are refused under every appended line, and prose
+answers are refused whenever code answers are. This identifies phrases that
+co-vary with refusals, not why the classifier fires. Its practical consequence is
+that Claude's pressure results are conditional on answered prompts: the
+first-person rows have only 16 and 8 usable answers.
 
-\section{Discussion and Next Steps}
+\section{Next Steps and Ethics}
 
-Against the proposal's plan, the scenarios, harness and all four variant runs
-are done. Three caveats apply. Labels are still drafts; the update and omission rates
-depend on them, though hits and false alarms only need the answer to
-\emph{change}. Thirty scenarios is small: the base-model finding survives
-bootstrap and a sign test, but the Nimble-vs.-base AUROC gap is suggestive only.
-And most Claude numbers come from one sample per prompt.
+In priority order: (1) run the controls on the 9B models, with option order and
+codes randomized, to separate deference from lexical priming; (2) finish blind
+labels, including whether each pressure sentence fits our definition; (3) run the
+five-sample noise baseline, so reframe and pressure effects are measured against
+sampling variation; (4) add an \emph{irrelevant update} (one fact that should not
+matter) as the proper control for relevant updates, and length-matched omissions;
+(5) extend AITA with NTA posts and flipped perspectives; (6) re-run refusals with
+logged timestamps and repeated samples of answered prompts; (7) test whether a
+``user wants X'' direction exists in the 9B models before trying to remove it, in
+the spirit of the refusal direction of \citet{arditi2024refusal}; (8) add Laya and Jev. So
+far we have shown differences in sensitivity to kinds of input change; showing
+that they are sycophancy, not priming or legitimate preference interpretation, is
+the work of the second half.
 
-For the rest of the term we will:
-(1) finish blind relabeling and report agreement and Cohen's $\kappa$ per variant;
-(2) run the pressure controls on the 9B models to test whether naming an option
-moves them as much as wanting it, i.e.\ whether their ``sycophancy'' is lexical
-priming;
-(3) estimate a ``user wants X'' direction in each 9B model's activations from six
-held-out phrasings and project it out \citep{arditi2024refusal}, testing whether
-pressure flips fall while warranted updates stay (scripts are ready, pending GPU
-time);
-(4) add Laya and, if access is granted, Jev;
-(5) add the five-sample reframe noise baseline and blind scoring of
-conversational answers' quality.
-
-\section{Ethical Considerations}
-
-AITA posts come from a released research dataset of public posts; we collect no
-new personal data and do not redistribute the posts. The refusal finding describes one deployed model in October 2026 and may change
-with its classifiers; we report it so over-refusal is counted alongside
-sycophancy.
+\textbf{Ethics.} AITA posts come from a released research dataset; we collect no
+personal data and do not redistribute them. Refusal results describe one deployed
+model on one day.
 
 \bibliography{references}
 

@@ -31,10 +31,13 @@ resamples over scenarios.
    can't tell whether the user added evidence or just said what they wanted.
 2. **The adapter fixes discrimination partly, not pressure.** Nimble was trained on
    minimal pairs where one relevant fact flips the answer, and it does separate relevant
-   from irrelevant changes better than its base (AUROC 0.71 vs 0.46). But the gain comes
-   mostly from reframe stability (false alarms 0.40 → 0.10); pressure still flips it 37%
-   of the time, and its pressure-vs-relevant ratio is not significantly above 1.
-   Training on "this fact matters" did not teach "this preference doesn't."
+   from irrelevant changes better than its base (AUROC 0.71 vs 0.46). *Corrected
+   2026-10-14:* this note first said the gain came mostly from reframe stability. Split
+   by variant (`scripts/midterm_stats.py`), the AUROC gain is the same against pressure
+   (0.61 vs 0.35, paired bootstrap +0.26 [0.14, 0.40]) and against reframe (0.81 vs 0.56,
+   +0.25 [0.13, 0.36]). Pressure still flips it 37% of the time; on the 26 scenarios
+   eligible for both models it shifts 11 vs 15 for base (exact McNemar p = 0.22), so it
+   looks less susceptible, but not significantly.
 3. **Pressure overrides confident answers.** Pressure flips happen more when the base
    margin is small, but not only then: the median Nimble answer that flipped under
    pressure had a base log-odds margin of 3.1 over the target (about 95% vs 5%), and for
@@ -172,3 +175,40 @@ on the second turn" effect doesn't appear for this model on these scenarios.
   relevant-update hits stay where they were. That would mean preference and evidence
   are separable inside the model, and that you could remove the first without losing
   the second.
+
+## Artifact probe (AFLite-style)
+
+`scripts/artifact_probe.py`, full output in `artifact_probe.txt`. Can shallow cues tell
+the variants apart, and would a model using only those cues score well on our metrics?
+30 career scenarios, leave-one-scenario-out cross-validation throughout. Too few items
+to filter the way AFLite does, so this only diagnoses.
+
+- **Relevant updates don't leak from the text a model sees.** A TF-IDF classifier on the
+  single prompt can't tell a relevant update from its base prompt (AUROC 0.48).
+  Pressure is trivially detectable (0.97), but that's by design: it adds a preference
+  sentence.
+- **Omission prompts are detectable by length.** They are always shorter than base
+  (by 2–27 words), and absolute length alone separates them from all other prompts with
+  AUROC 0.90. A model that says "need more information" on short prompts would look
+  good on omission. Claude doesn't do this: within omission prompts and within complete
+  prompts its asks are unrelated to length (AUROC 0.44–0.54). Qwen base partly does
+  (0.71 within omissions, 0.66 on complete prompts), so some of its 10/30 omission asks
+  may be length rather than noticing the missing fact.
+- **Length can't fake our d′.** "Change the answer whenever the text changed by k+
+  words" gets d′ between −1.1 and −0.7, because pressure always adds the most words.
+- **Numbers are the real gap.** 12 of 30 relevant updates change a number; reframes and
+  pressure (almost) never do. "Change the answer iff a number changed" scores
+  d′ = +1.72 (hit 0.40, false alarm 0.02), above Nimble and close to Claude. Changing
+  a number is often exactly the relevant fact, so this isn't a leak, but it means we
+  never test whether models also move on *irrelevant* fact changes. Models aren't
+  leaning on it, though: hit rates on numeric vs. non-numeric updates are similar
+  (Claude 10/12 vs 12/17 constrained, 9/12 vs 10/16 conversational; Nimble 4/12 vs 10/18;
+  Qwen 6/12 vs 10/18).
+- **The 9B models' movement doesn't track how much text changed** (Spearman between
+  words changed and distribution shift, within variant: −0.38 to +0.24, n = 30).
+
+Fix for the next batch of scenarios: add an **irrelevant-update** variant that changes
+one fact that shouldn't matter (same surface form as a relevant update, e.g. a number
+or detail unrelated to the stated priority), and make omissions length-matched by
+replacing the removed fact with neutral text. The irrelevant update is the proper
+control for the relevant update; reframe and pressure differ from it in form.
