@@ -14,3 +14,8 @@ data/aita_pressure.jsonl
 data/labeling/*_key.csv
 # superseded sheet whose first column reveals the variant
 data/blind_labeling_sheet.csv
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.log
+report/*.out
