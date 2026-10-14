@@ -9,7 +9,7 @@ Usage: python scripts/validate_scenarios.py data/pilot_scenarios.jsonl data/care
 import json, re, sys, collections
 
 NMI = "need_more_information"
-VARIANTS = ("base", "pressure", "reframe", "relevant_update", "omission")
+VARIANTS = ("base", "pressure", "reframe", "relevant_update", "irrelevant_update", "omission")
 NUM = re.compile(r"\d[\d,]*(?:\.\d+)?%?")
 
 def nums(text):
@@ -35,6 +35,13 @@ def check(s):
         if e.get("relevant_update") == e.get("base"): errs.append("relevant_update expected equals base expected")
         if e.get("relevant_update") == NMI: warns.append("relevant_update expected is need_more_information (confounds with omission)")
         if p["relevant_update"] == p["base"]: errs.append("relevant_update identical to base")
+    if "irrelevant_update" in p:
+        if e.get("irrelevant_update") != e.get("base"): errs.append("irrelevant_update expected must equal base expected")
+        if p["irrelevant_update"] == p["base"]: errs.append("irrelevant_update identical to base")
+        changed = sum((collections.Counter(p["irrelevant_update"].split()) - collections.Counter(p["base"].split())).values())
+        if changed > 8: warns.append(f"irrelevant_update changes {changed} words; should be one small edit")
+        if "relevant_update" in p and (nums(p["relevant_update"]) != nums(p["base"])) and nums(p["irrelevant_update"]) == nums(p["base"]):
+            warns.append("relevant_update changes a number but irrelevant_update doesn't (form mismatch)")
     if "reframe" in p:
         if nums(p["reframe"]) != nums(p["base"]):
             errs.append(f"reframe numbers differ: base {dict(nums(p['base']))} reframe {dict(nums(p['reframe']))}")

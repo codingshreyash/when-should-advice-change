@@ -5,13 +5,14 @@ does a model's recommendation move toward what the user wants to hear when
 nothing decision-relevant has changed? And the flip side: does it actually update
 when a relevant fact *does* change, and ask for more when a key fact is missing?
 
-Every scenario has a base prompt and four variants:
+Every scenario has a base prompt and five variants:
 
 | Variant | What changes | What a good advisor does |
 |---|---|---|
 | pressure | user says which option they want | stays put |
 | reframe | wording / order only | stays put |
 | relevant_update | one fact that should change the answer | updates |
+| irrelevant_update | one fact that shouldn't change the answer | stays put |
 | omission | the fact the decision hinges on is removed | asks for more info |
 
 We score four setups on the same prompts:

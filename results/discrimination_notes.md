@@ -212,3 +212,29 @@ one fact that shouldn't matter (same surface form as a relevant update, e.g. a n
 or detail unrelated to the stated priority), and make omissions length-matched by
 replacing the removed fact with neutral text. The irrelevant update is the proper
 control for the relevant update; reframe and pressure differ from it in form.
+
+## Irrelevant-update variant (added 2026-10-14)
+
+Every career scenario now has an `irrelevant_update`: one fact of the base prompt
+edited without changing the expected answer, usually in the slot the relevant update
+edits (career_30: the outside offer goes from $12,000 to $15,000 a year, still short
+of the $40,000 retention bonus over two years, where the relevant update takes it to
+$30,000). Edits and reasons are in `scripts/irrelevant_updates.py`; expected = base.
+No model has been run on it yet. `analyze_discrimination.py` reports `fa_irr`,
+`d'_matched` and `auroc_vs_irr` once results include it; `analyze.py` reports `iu_chg`.
+
+What the artifact probe says about it:
+
+- It closes the number shortcut. "Change iff a number changed" scored d′ +1.72 against
+  pressure and reframe; against irrelevant updates it scores −0.95, because 23 of 30
+  irrelevant updates change a number too.
+- It opens an edit-size gap. The irrelevant edits change 1–3 words; relevant updates
+  change about 8 words on average (0–24). "Change iff 3+ words changed" scores
+  d′ +1.81 against it, and a diff classifier picks out every irrelevant update. A
+  single-prompt model never sees the diff, but larger rewrites change more content,
+  so also compare on the size-matched subset: the five scenarios whose relevant update
+  is as small as the irrelevant one (at most 4 words changed: career_14, 18, 20, 27,
+  30). Five is too few to test on its own; a second irrelevant-update set with larger
+  edits would close the gap properly.
+- Blind labels: the existing labeling sheets were left untouched (relabeling is in
+  progress); the 30 irrelevant_update rows still need a blind label each.

@@ -27,7 +27,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import StandardScaler
 
 SOURCES = ["data/pilot_scenarios.jsonl", "data/career_v2.jsonl"]
-VARIANTS = ["pressure", "reframe", "relevant_update", "omission"]
+VARIANTS = ["pressure", "reframe", "relevant_update", "irrelevant_update", "omission"]
 NMI = "need_more_information"
 PREF = {"want", "wants", "hope", "hoping", "really", "prefer", "prefers", "rather", "wish",
         "told", "already", "decided", "sure", "convinced", "leaning", "feel", "feels"}
@@ -134,8 +134,10 @@ def main(result_files):
     def score(name, moves):
         hit = [moves(s, "relevant_update") for s in S]
         fa = [moves(s, v) for s in S for v in ("pressure", "reframe")]
-        h, f = np.mean(hit), np.mean(fa)
-        print(f"   {name:44} hit {h:.2f}  fa {f:.2f}  d' {z(h, len(hit)) - z(f, len(fa)):+.2f}")
+        iu = [moves(s, "irrelevant_update") for s in S]
+        h, f, fi = np.mean(hit), np.mean(fa), np.mean(iu)
+        print(f"   {name:44} hit {h:.2f}  fa {f:.2f}  d' {z(h, len(hit)) - z(f, len(fa)):+.2f}"
+              f"   | vs irrelevant_update: fa {fi:.2f}  d' {z(h, len(hit)) - z(fi, len(iu)):+.2f}")
     for k in (1, 3, 5, 10):
         score(f"move iff |length change| >= {k} words", lambda s, v, k=k: abs(F[(s['id'], v)]['len_delta']) >= k)
     score("move iff any number changed", lambda s, v: F[(s["id"], v)]["num_added"] + F[(s["id"], v)]["num_removed"] > 0)
