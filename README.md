@@ -1,16 +1,18 @@
 # When Should AI Advice Change?
 
-Course project for CS 1684 at Pitt. We're measuring **decision-level sycophancy**:
-does a model's recommendation move toward what the user wants to hear when
-nothing decision-relevant has changed? And the flip side: does it actually update
-when a relevant fact *does* change, and ask for more when a key fact is missing?
+Course project for CS 1684 at Pitt. We measure **warranted decision updating**:
+can a model distinguish input changes that should alter a recommendation from
+changes that should not? Decision-level sycophancy is one failure mode, not the
+whole construct. A useful adviser must resist endorsement pressure and irrelevant
+facts, respond to relevant evidence, and ask when critical evidence is missing.
 
-Every scenario has a base prompt and four variants:
+Every scenario has a base prompt and five variants:
 
 | Variant | What changes | What a good advisor does |
 |---|---|---|
 | pressure | user says which option they want | stays put |
 | reframe | wording / order only | stays put |
+| irrelevant_update | one factual detail changes, but it does not bear on the decision | stays put |
 | relevant_update | one fact that should change the answer | updates |
 | omission | the fact the decision hinges on is removed | asks for more info |
 
@@ -24,7 +26,22 @@ We score four setups on the same prompts:
 The Nimble vs. base comparison is the controlled one: same prompt, same scorer, same
 output space, only the adapter differs.
 
-## Results so far
+## Primary evaluation
+
+The main comparison is movement under `relevant_update` versus movement under
+`irrelevant_update`. We report choice-change sensitivity (d′) and, when full option
+distributions are available, AUROC of base-to-variant total-variation distance.
+Pressure and reframe remain secondary false-alarm diagnostics. This prevents a
+model from looking good merely because it never changes its mind.
+
+The irrelevant-update stimuli were added after the results below and still need
+blind labels and model runs. Until then, the existing pressure/reframe discrimination
+numbers are legacy evidence, not the final primary result.
+
+The frozen-run checklist, replication settings, and reporting order are in
+[`PROTOCOL.md`](PROTOCOL.md).
+
+## Existing results (legacy five-variant batch)
 
 30 career scenarios, scored against our draft labels (blind relabeling is in progress,
 so treat these as provisional):
@@ -39,8 +56,10 @@ so treat these as provisional):
 On 50 r/AmItheAsshole posts the community judged YTA, the models sided with the poster
 86% (Qwen base), 70% (Nimble), and about 50% (Claude) of the time.
 
-Short version: the model that generates no text still caves to pressure, the chat model
-doesn't, and Nimble never says "need more information." Details are in our midterm report.
+Short version: these runs motivated the warranted-updating design. The decision-only
+model remains pressure-sensitive and never asks for missing information, while the chat
+model distinguishes relevant updates from pressure more cleanly. Details are in the
+midterm report; refusals, AITA, and steering are secondary analyses.
 
 Two things worth knowing if you look at the raw results:
 
@@ -52,7 +71,7 @@ Two things worth knowing if you look at the raw results:
   (16 of 300 career calls). Those rows have `stop_reason: "refusal"` and are excluded
   from rates and counted separately. `results/refusal_recheck.jsonl` shows they repeat.
 
-### Discrimination reanalysis
+### Legacy discrimination reanalysis
 
 Putting all four variants on one axis (how far did the answer move?) and asking whether
 that movement separates relevant updates from pressure/reframe: the Qwen3.5-9B base model
@@ -82,9 +101,11 @@ of 29 prompts refused (`results/discrimination_notes.md`).
     scripts/
       build_prompts.py          turns a record into the text each model sees
       build_career_v2.py        source for career_v2.jsonl
+      add_irrelevant_updates.py source for the factual negative controls
       build_aita.py             builds the AITA pressure set from ELEPHANT's data
       validate_scenarios.py     checks the variant-writing rules
       analyze_discrimination.py relevant-vs-irrelevant movement: d', AUROC, bootstrap CIs
+      analyze_replicates.py     confirmatory analysis clustered by scenario
       build_pressure_controls.py  templated preference / neutral mention / agreeing pressure / filler controls
       run_steering.py           "user wants X" direction in the 9B models + cross-validated ablation (GPU)
       run_gpu_experiments.sh    all GPU work for the controls + steering study in one go

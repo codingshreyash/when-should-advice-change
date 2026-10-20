@@ -10,6 +10,7 @@ Expected labels are the author's drafts and must be relabeled blind.
 Run: python scripts/build_career_v2.py && python scripts/validate_scenarios.py data/career_v2.jsonl
 """
 import json
+from add_irrelevant_updates import ADDITIONS
 
 NMI = ("need_more_information", "Need more information before deciding")
 
@@ -223,14 +224,16 @@ def build():
     out = []
     for (sid, opts, q, base, press, tgt, reframe, upd, omit, e_base, e_upd, notes) in S:
         options = [c for c, _ in opts] + [NMI[0]]
+        irrelevant = f"{base} {ADDITIONS[sid]}"
         out.append({
             "id": sid, "domain": "career", "options": options,
             "option_text": {**dict(opts), NMI[0]: NMI[1]}, "question": q,
             "prompts": {"base": base, "pressure": f"{base} {press}", "reframe": reframe,
-                        "relevant_update": upd, "omission": omit},
+                        "relevant_update": upd, "irrelevant_update": irrelevant, "omission": omit},
             "expected": {"base": e_base, "pressure": e_base, "reframe": e_base,
-                         "relevant_update": e_upd, "omission": NMI[0]},
-            "pressure_target": tgt, "notes": notes})
+                         "relevant_update": e_upd, "irrelevant_update": e_base, "omission": NMI[0]},
+            "pressure_target": tgt,
+            "notes": f"{notes} Irrelevant update: {ADDITIONS[sid]} This should not affect the decision."})
     return out
 
 

@@ -8,10 +8,11 @@ chosen option and the probability of every option.
 """
 import json, os, sys, time, gc
 sys.path.insert(0, "scripts")
-from build_prompts import load, nimble_schema, iter_items, TAG
+from build_prompts import load, nimble_schema, iter_items, ordered_scenario, TAG
 
 NIMBLE_CFG = ".cache/nimble-model.json"   # written by brev_setup.sh / Nimble quickstart
 BASE_CFG   = ".cache/base-model.json"     # written by brev_setup.sh (pinned base, no adapter)
+SAMPLES = int(os.environ.get("SAMPLES", "1"))
 
 def run_one(cfg_path, label, out):
     import torch
@@ -20,12 +21,15 @@ def run_one(cfg_path, label, out):
     scorer = CudaCandidateScorer(**cfg)
     n = 0
     for s, variant, text in iter_items(load()):
-        r = scorer.score(text, nimble_schema(s))
-        probs = r["fields"]["decision"]["scores"]
-        out.write(json.dumps({"model": label, "revision": r["revision"], "condition": "decision_only",
-                              "id": s["id"], "variant": variant, "choice": r["output"]["decision"],
-                              "probs": probs}) + "\n")
-        n += 1
+        for sample in range(SAMPLES):
+            ordered = ordered_scenario(s, variant, sample)
+            r = scorer.score(text, nimble_schema(ordered))
+            probs = r["fields"]["decision"]["scores"]
+            out.write(json.dumps({"model": label, "revision": r["revision"], "condition": "decision_only",
+                                  "id": s["id"], "variant": variant, "sample": sample,
+                                  "option_order": ordered["options"],
+                                  "choice": r["output"]["decision"], "probs": probs}) + "\n")
+            n += 1
     out.flush()
     del scorer; gc.collect(); torch.cuda.empty_cache()
     print(f"{label}: {n} prompts scored")

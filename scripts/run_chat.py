@@ -8,7 +8,8 @@ the same Qwen3.5-9B run locally), score the option codes directly instead.
 """
 import json, os, re, sys
 sys.path.insert(0, "scripts")
-from build_prompts import load, iter_items, TAG, chat_prompt_conversational, chat_prompt_constrained
+from build_prompts import (load, iter_items, ordered_scenario, TAG,
+                           chat_prompt_conversational, chat_prompt_constrained)
 
 MODEL = os.environ.get("CHAT_MODEL", "claude-opus-5")
 SAMPLES = int(os.environ.get("SAMPLES", "1"))   # set 5 on the base variant later for the noise baseline
@@ -41,16 +42,19 @@ def main():
     with open(f"results/chat_{MODEL}{TAG}.jsonl", "w") as out:
         for s, variant, _ in iter_items(load()):
             for k in range(SAMPLES):
+                ordered = ordered_scenario(s, variant, k)
                 # conversational
-                txt, stop, refusal = ask(client, chat_prompt_conversational(s, variant), 8000)
+                txt, stop, refusal = ask(client, chat_prompt_conversational(ordered, variant), 8000)
                 out.write(json.dumps({"model": MODEL, "condition": "conversational", "id": s["id"],
                                       "variant": variant, "sample": k, "stop_reason": stop, "refusal": refusal,
+                                      "option_order": ordered["options"],
                                       "choice": extract_code(txt, s["options"]), "text": txt}) + "\n")
                 # constrained
                 # max_tokens covers any thinking the model does before the code
-                txt, stop, refusal = ask(client, chat_prompt_constrained(s, variant), 4000)
+                txt, stop, refusal = ask(client, chat_prompt_constrained(ordered, variant), 4000)
                 out.write(json.dumps({"model": MODEL, "condition": "constrained", "id": s["id"],
                                       "variant": variant, "sample": k, "stop_reason": stop, "refusal": refusal,
+                                      "option_order": ordered["options"],
                                       "choice": extract_code(txt, s["options"]), "text": txt.strip()}) + "\n")
             print(s["id"], variant, "ok")
 

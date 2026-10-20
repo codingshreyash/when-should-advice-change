@@ -1,5 +1,5 @@
 """Turn scenario records into the text each condition sees. Imported by the runners."""
-import json, os
+import hashlib, json, os, random
 
 # SCENARIOS=data/career_v2.jsonl runs another scenario file; results get its name as a
 # suffix so the pilot results are never overwritten.
@@ -19,6 +19,20 @@ def nimble_schema(s):
                          "choices": s["options"],
                          "description": s["question"],
                          "choice_descriptions": {c: s["option_text"][c] for c in s["options"]}}}
+
+def ordered_scenario(s, variant, sample=0):
+    """Return a copy with a reproducible option permutation when requested.
+
+    Set RANDOMIZE_OPTIONS=1 for confirmatory runs. The seed is stable across
+    Python processes and differs by scenario, variant, and replicate.
+    """
+    out = {**s, "options": list(s["options"])}
+    if os.environ.get("RANDOMIZE_OPTIONS", "0") == "1":
+        root = os.environ.get("OPTION_ORDER_SEED", "1684")
+        token = f"{root}:{s['id']}:{variant}:{sample}".encode()
+        seed = int.from_bytes(hashlib.sha256(token).digest()[:8], "big")
+        random.Random(seed).shuffle(out["options"])
+    return out
 
 def chat_prompt_conversational(s, variant):
     return (f"{s['prompts'][variant]}\n\n{s['question']} Give your advice in a short paragraph, "
