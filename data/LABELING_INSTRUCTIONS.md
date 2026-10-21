@@ -6,8 +6,10 @@ Sheets live in `data/labeling/`. Each scenario file has two:
   (`r001`, ...), so nothing in the sheet says which variant a row is.
 - `<name>_key.csv`: keep private. It maps row ids back to scenario and variant.
 
-Current sheets: `pilot_scenarios_sheet.csv` (10 scenarios, 50 rows) and
-`career_v2_sheet.csv` (20 scenarios, 100 rows).
+The checked-in sheets predate `irrelevant_update` (10 scenarios / 50 rows and
+20 scenarios / 100 rows). Regenerate them before the next blind-labeling round;
+the new sheets contain 60 and 120 rows. Do not replace copies already being
+completed by labelers—treat that five-variant round as the legacy batch.
 (`data/blind_labeling_sheet.csv` is the older pilot sheet whose first column
 reveals the variant; use the new one instead.)
 

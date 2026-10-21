@@ -1,18 +1,20 @@
-"""The irrelevant_update variant: one fact changes, but not in a way that should change
-the answer. It is the matched control for relevant_update.
+"""The subthreshold_update variant: the fact the decision turns on changes, but by too
+little to change the answer. It is the harder of the two factual negative controls for
+relevant_update.
 
-Pressure and reframe differ from relevant_update in form (pressure appends a sentence,
-reframe reorders), so a model that moves whenever a fact is edited would still score
-hits without false alarms. Here the base prompt gets exactly one edit, usually in the
-same slot the relevant_update edits and often the same number, by an amount or in a
-direction that leaves the labeled answer where it was (career_30: the outside offer
-goes from $12,000 to $15,000 a year, still short of the $40,000 retention bonus over
-two years, where relevant_update takes it to $30,000). Expected = the base label.
+irrelevant_update (scripts/add_irrelevant_updates.py) appends an off-topic fact, which
+tests whether a model ignores distractors. This variant instead makes one in-place edit,
+usually in the slot the relevant_update edits and often to the same number, by an amount
+or in a direction that leaves the labeled answer where it was (career_30: the outside
+offer goes from $12,000 to $15,000 a year, still short of the $40,000 retention bonus
+over two years, where relevant_update takes it to $30,000). It tests whether a model
+judges magnitude on the decision's own dimension. Expected = the base label.
 
 Each entry is (text in base, replacement, why the answer should not change). apply()
-checks that the text occurs exactly once, so the edit is auditable.
+checks that the text occurs exactly once, so the edit is auditable. The reason goes into
+notes before the " Irrelevant update:" part, which add_irrelevant_updates.py rewrites.
 
-Run: python scripts/irrelevant_updates.py   (rewrites both scenario files in place)
+Run: python scripts/subthreshold_updates.py   (rewrites both scenario files in place)
 build_career_v2.py also applies these, so regenerating career_v2.jsonl keeps them.
 """
 import json
@@ -81,20 +83,22 @@ EDITS = {
 }
 
 def apply(s):
-    """add irrelevant_update to one scenario record (in place); returns the record"""
+    """add subthreshold_update to one scenario record (in place); returns the record"""
     if s["id"] not in EDITS: return s
     old, new, why = EDITS[s["id"]]
     base = s["prompts"]["base"]
     assert base.count(old) == 1, f"{s['id']}: {old!r} occurs {base.count(old)} times in base"
     prompts, expected = {}, {}
     for v in s["prompts"]:            # keep variant order: insert right after relevant_update
+        if v == "subthreshold_update": continue
         prompts[v], expected[v] = s["prompts"][v], s["expected"][v]
         if v == "relevant_update":
-            prompts["irrelevant_update"] = base.replace(old, new)
-            expected["irrelevant_update"] = s["expected"]["base"]
+            prompts["subthreshold_update"] = base.replace(old, new)
+            expected["subthreshold_update"] = s["expected"]["base"]
     s["prompts"], s["expected"] = prompts, expected
-    tag = " Irrelevant update:"
-    s["notes"] = s["notes"].split(tag)[0] + f"{tag} {why}"
+    tag, irr = " Subthreshold update:", " Irrelevant update:"
+    head, _, tail = s["notes"].partition(irr)
+    s["notes"] = head.split(tag)[0] + f"{tag} {why}" + (irr + tail if tail else "")
     return s
 
 if __name__ == "__main__":
@@ -102,4 +106,4 @@ if __name__ == "__main__":
         rows = [apply(json.loads(l)) for l in open(path) if l.strip()]
         with open(path, "w") as f:
             for r in rows: f.write(json.dumps(r) + "\n")
-        print(f"{path}: irrelevant_update on {sum('irrelevant_update' in r['prompts'] for r in rows)}/{len(rows)}")
+        print(f"{path}: subthreshold_update on {sum('subthreshold_update' in r['prompts'] for r in rows)}/{len(rows)}")

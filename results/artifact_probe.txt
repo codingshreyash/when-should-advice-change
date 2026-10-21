@@ -1,47 +1,49 @@
 30 scenarios
 
 A. Surface change vs. base, per variant (min / mean / max over scenarios)
-   len_delta    pressure   10/ 13.1/  18   reframe  -10/ -2.0/   2   relevant  -18/  0.0/  14   irreleva   -1/  0.0/   1   omission  -27/-12.3/  -2
-   added        pressure   10/ 13.1/  18   reframe    1/  4.9/  14   relevant    0/  7.8/  22   irreleva    0/  0.4/   2   omission    0/  0.2/   4
-   removed      pressure    0/  0.0/   0   reframe    0/  6.9/  21   relevant    0/  7.8/  24   irreleva    0/  0.4/   3   omission    2/ 12.6/  27
-   num_added    pressure    0/  0.0/   0   reframe    0/  0.0/   1   relevant    0/  0.2/   1   irreleva    0/  0.8/   1   omission    0/  0.0/   0
-   num_removed  pressure    0/  0.0/   0   reframe    0/  0.0/   1   relevant    0/  0.4/   2   irreleva    0/  0.7/   1   omission    0/  0.6/   3
-   pref_added   pressure    0/  1.3/   3   reframe    0/  0.0/   1   relevant    0/  0.1/   1   irreleva    0/  0.0/   0   omission    0/  0.0/   0
-   opt_added    pressure    0/  0.9/   3   reframe    0/  0.1/   1   relevant    0/  0.2/   2   irreleva    0/  0.0/   0   omission    0/  0.0/   0
-   sent_delta   pressure    1/  1.0/   1   reframe   -1/ -0.5/   0   relevant    0/  0.0/   1   irreleva    0/  0.0/   0   omission   -1/ -0.2/   1
+   len_delta    pressure   10/ 13.1/  18   reframe  -10/ -2.0/   2   relevant  -18/  0.0/  14   subthres   -1/  0.0/   1   irreleva    6/  9.6/  13   omission  -27/-12.3/  -2
+   added        pressure   10/ 13.1/  18   reframe    1/  4.9/  14   relevant    0/  7.8/  22   subthres    0/  0.4/   2   irreleva    6/  9.6/  13   omission    0/  0.2/   4
+   removed      pressure    0/  0.0/   0   reframe    0/  6.9/  21   relevant    0/  7.8/  24   subthres    0/  0.4/   3   irreleva    0/  0.0/   0   omission    2/ 12.6/  27
+   num_added    pressure    0/  0.0/   0   reframe    0/  0.0/   1   relevant    0/  0.2/   1   subthres    0/  0.8/   1   irreleva    0/  0.5/   2   omission    0/  0.0/   0
+   num_removed  pressure    0/  0.0/   0   reframe    0/  0.0/   1   relevant    0/  0.4/   2   subthres    0/  0.7/   1   irreleva    0/  0.0/   0   omission    0/  0.6/   3
+   pref_added   pressure    0/  1.3/   3   reframe    0/  0.0/   1   relevant    0/  0.1/   1   subthres    0/  0.0/   0   irreleva    0/  0.0/   1   omission    0/  0.0/   0
+   opt_added    pressure    0/  0.9/   3   reframe    0/  0.1/   1   relevant    0/  0.2/   2   subthres    0/  0.0/   0   irreleva    0/  0.6/   3   omission    0/  0.0/   0
+   sent_delta   pressure    1/  1.0/   1   reframe   -1/ -0.5/   0   relevant    0/  0.0/   1   subthres    0/  0.0/   0   irreleva    1/  1.0/   1   omission   -1/ -0.2/   1
 
-   4-way variant type from diff features: accuracy 0.85 (chance 0.25)
-      true \ pred   pressure   reframe relevant_ irrelevan  omission
-          pressure         30         0         0         0         0
-           reframe          0        20         7         2         1
-   relevant_update          0         3        19         5         3
-   irrelevant_update          0         0         0        30         0
-          omission          0         1         1         0        28
+   variant type from diff features: accuracy 0.84 (chance 0.17)
+      true \ pred   pressure   reframe relevant_ subthresh irrelevan  omission
+          pressure         27         0         0         0         3         0
+           reframe          0        21         6         2         0         1
+   relevant_update          0         4        18         5         0         3
+   subthreshold_update          0         0         0        30         0         0
+   irrelevant_update          2         0         0         0        28         0
+          omission          0         1         1         0         0        28
    relevant_update vs reframe: accuracy 0.75, AUROC 0.84
    relevant_update vs pressure: accuracy 1.00, AUROC 1.00
 
 B. The prompt text alone (what a model sees), TF-IDF unigrams+bigrams
-   5-way variant type: accuracy 0.34 (chance 0.20)
-      true \ pred       base  pressure   reframe relevant_ irrelevan  omission
-              base          1         5         9        14         1         0
-          pressure          0        29         0         1         0         0
-           reframe          0         3        18         9         0         0
-   relevant_update          1         5        12        11         0         1
-   irrelevant_update          1         5         9        13         2         0
-          omission          2         4        12        11         0         1
-   omission vs all other prompts: AUROC 0.71
+   5-way variant type: accuracy 0.32 (chance 0.20)
+      true \ pred       base  pressure   reframe relevant_ subthresh irrelevan  omission
+              base          0         5         9        13         1         2         0
+          pressure          0        28         0         1         0         1         0
+           reframe          0         3        15         8         0         4         0
+   relevant_update          1         4        12         9         0         3         1
+   subthreshold_update          0         5         9        11         1         4         0
+   irrelevant_update          0         2         6         8         0        14         0
+          omission          0         4        11        10         0         4         1
+   omission vs all other prompts: AUROC 0.69
    relevant_update vs base: AUROC 0.48
    pressure vs base: AUROC 0.97
-   absolute length, omission vs other prompts: AUROC 0.90 (shorter = omission)
-   numbers in prompt, omission vs other prompts: AUROC 0.62 (fewer = omission)
+   absolute length, omission vs other prompts: AUROC 0.91 (shorter = omission)
+   numbers in prompt, omission vs other prompts: AUROC 0.63 (fewer = omission)
 
 C. Shortcut policies scored like a model (hit = relevant_update moves; false alarm = pressure or reframe moves)
-   move iff |length change| >= 1 words          hit 0.83  fa 0.98  d' -1.04   | vs irrelevant_update: fa 0.07  d' +2.33
-   move iff |length change| >= 3 words          hit 0.37  fa 0.65  d' -0.71   | vs irrelevant_update: fa 0.00  d' +1.81
-   move iff |length change| >= 5 words          hit 0.27  fa 0.60  d' -0.85   | vs irrelevant_update: fa 0.00  d' +1.54
-   move iff |length change| >= 10 words         hit 0.13  fa 0.52  d' -1.10   | vs irrelevant_update: fa 0.00  d' +1.08
-   move iff any number changed                  hit 0.40  fa 0.02  d' +1.72   | vs irrelevant_update: fa 0.77  d' -0.95
-   move iff words changed but no preference words hit 0.80  fa 0.52  d' +0.77   | vs irrelevant_update: fa 0.07  d' +2.21
+   move iff |length change| >= 1 words          hit 0.83  d' vs pressure+reframe -1.04  vs irrelevant -1.22 (fa 1.00)  vs subthreshold +2.33 (fa 0.07)
+   move iff |length change| >= 3 words          hit 0.37  d' vs pressure+reframe -0.71  vs irrelevant -2.47 (fa 1.00)  vs subthreshold +1.81 (fa 0.00)
+   move iff |length change| >= 5 words          hit 0.27  d' vs pressure+reframe -0.85  vs irrelevant -2.74 (fa 1.00)  vs subthreshold +1.54 (fa 0.00)
+   move iff |length change| >= 10 words         hit 0.13  d' vs pressure+reframe -1.10  vs irrelevant -1.06 (fa 0.50)  vs subthreshold +1.08 (fa 0.00)
+   move iff any number changed                  hit 0.40  d' vs pressure+reframe +1.72  vs irrelevant +0.00 (fa 0.40)  vs subthreshold -0.95 (fa 0.77)
+   move iff words changed but no preference words hit 0.80  d' vs pressure+reframe +0.77  vs irrelevant -0.85 (fa 0.97)  vs subthreshold +2.21 (fa 0.07)
    for comparison (analyze_discrimination.py): Qwen base +0.04, Nimble +0.63, Claude +2.2 to +2.4
    need_more_information iff >= 1 words shorter: omission asks 1.00, false asks reframe 0.67 / relevant_update 0.33 / pressure 0.00
    need_more_information iff >= 4 words shorter: omission asks 0.97, false asks reframe 0.23 / relevant_update 0.13 / pressure 0.00

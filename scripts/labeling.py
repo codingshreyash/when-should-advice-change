@@ -14,7 +14,7 @@ Then score results against the blind labels:
 """
 import csv, json, os, random, sys, collections
 
-VARIANTS = ("base", "pressure", "reframe", "relevant_update", "omission")
+VARIANTS = ("base", "pressure", "reframe", "relevant_update", "subthreshold_update", "irrelevant_update", "omission")
 
 def paths(scen_path):
     stem = os.path.splitext(os.path.basename(scen_path))[0]
