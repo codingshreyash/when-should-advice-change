@@ -1,0 +1,162 @@
+career_01 base ok
+career_01 pressure ok
+career_01 reframe ok
+career_01 relevant_update ok
+career_01 subthreshold_update ok
+career_01 omission ok
+career_01 irrelevant_update ok
+career_02 base ok
+career_02 pressure ok
+career_02 reframe ok
+career_02 relevant_update ok
+career_02 subthreshold_update ok
+career_02 omission ok
+career_02 irrelevant_update ok
+career_03 base ok
+career_03 pressure ok
+career_03 reframe ok
+career_03 relevant_update ok
+career_03 subthreshold_update ok
+career_03 omission ok
+career_03 irrelevant_update ok
+career_04 base ok
+career_04 pressure ok
+career_04 reframe ok
+career_04 relevant_update ok
+career_04 subthreshold_update ok
+career_04 omission ok
+career_04 irrelevant_update ok
+career_05 base ok
+career_05 pressure ok
+career_05 reframe ok
+career_05 relevant_update ok
+career_05 subthreshold_update ok
+career_05 omission ok
+career_05 irrelevant_update ok
+career_06 base ok
+career_06 pressure ok
+career_06 reframe ok
+career_06 relevant_update ok
+career_06 subthreshold_update ok
+career_06 omission ok
+career_06 irrelevant_update ok
+career_07 base ok
+career_07 pressure ok
+career_07 reframe ok
+career_07 relevant_update ok
+career_07 subthreshold_update ok
+career_07 omission ok
+career_07 irrelevant_update ok
+career_08 base ok
+career_08 pressure ok
+career_08 reframe ok
+career_08 relevant_update ok
+career_08 subthreshold_update ok
+career_08 omission ok
+career_08 irrelevant_update ok
+career_09 base ok
+career_09 pressure ok
+career_09 reframe ok
+career_09 relevant_update ok
+career_09 subthreshold_update ok
+career_09 omission ok
+career_09 irrelevant_update ok
+career_10 base ok
+career_10 pressure ok
+career_10 reframe ok
+career_10 relevant_update ok
+claude-opus-5 chat_claude-opus-5_career30.jsonl: keep 128 rows, 146 prompts to run
+career_10 pressure ok
+career_10 reframe ok
+career_10 relevant_update ok
+career_10 subthreshold_update ok
+career_10 omission ok
+career_10 irrelevant_update ok
+career_11 base ok
+career_11 pressure ok
+career_11 reframe ok
+career_11 relevant_update ok
+career_11 subthreshold_update ok
+career_11 irrelevant_update ok
+career_11 omission ok
+career_12 base ok
+career_12 pressure ok
+career_12 reframe ok
+career_12 relevant_update ok
+career_12 subthreshold_update ok
+career_12 irrelevant_update ok
+career_12 omission ok
+career_13 base ok
+career_13 pressure ok
+career_13 reframe ok
+career_13 relevant_update ok
+career_13 subthreshold_update ok
+career_13 irrelevant_update ok
+career_13 omission ok
+career_14 base ok
+career_14 pressure ok
+career_14 reframe ok
+career_14 relevant_update ok
+career_14 subthreshold_update ok
+career_14 irrelevant_update ok
+career_14 omission ok
+career_15 base ok
+career_15 pressure ok
+career_15 reframe ok
+career_15 relevant_update ok
+career_15 subthreshold_update ok
+career_15 irrelevant_update ok
+career_15 omission ok
+career_16 base ok
+career_16 pressure ok
+career_16 reframe ok
+career_16 relevant_update ok
+career_16 subthreshold_update ok
+career_16 irrelevant_update ok
+career_16 omission ok
+career_17 base ok
+career_17 pressure ok
+career_17 reframe ok
+career_17 relevant_update ok
+career_17 subthreshold_update ok
+career_17 irrelevant_update ok
+career_17 omission ok
+career_18 base ok
+career_18 pressure ok
+career_18 reframe ok
+career_18 relevant_update ok
+career_18 subthreshold_update ok
+career_18 irrelevant_update ok
+career_18 omission ok
+career_19 base ok
+career_19 pressure ok
+career_19 reframe ok
+career_19 relevant_update ok
+career_19 subthreshold_update ok
+Traceback (most recent call last):
+  File "/home/user/when-should-advice-change/scripts/run_chat.py", line 62, in <module>
+    main()
+  File "/home/user/when-should-advice-change/scripts/run_chat.py", line 54, in main
+    txt, stop, refusal = ask(client, chat_prompt_constrained(ordered, variant), 4000)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/when-should-advice-change/scripts/run_chat.py", line 27, in ask
+    r = client.messages.create(model=MODEL, max_tokens=max_tokens,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/anthropic/_utils/_utils.py", line 294, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/anthropic/resources/messages/messages.py", line 1029, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/anthropic/_base_client.py", line 1543, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/anthropic/_base_client.py", line 1208, in request
+    raise self._make_status_error_from_response(response) from None
+anthropic.BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CgFqoCmCDcuTSjXAAakQm'}
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-when-should-advice-change/8a7350ea-e66f-5d08-b9d1-5055c660c7d8/scratchpad/resume/resume.py", line 26, in <module>
+    subprocess.run([sys.executable, "scripts/run_chat.py"], env=env, check=True)
+  File "/usr/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/usr/bin/python3', 'scripts/run_chat.py']' returned non-zero exit status 1.

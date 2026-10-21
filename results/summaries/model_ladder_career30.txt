@@ -1,0 +1,19 @@
+model                          condition        n reps    hit  fa_iu  fa_pr  fa_rf  d_fact  auc_f  tv_ru  tv_iu
+claude-haiku-4-5-20251001      constrained     30    1   0.47   0.13   0.10   0.20    0.98      -      -      -
+                                                  vs subthreshold_update: fa_sub 0.10  d_sub 1.13
+                                                  d_fact [0.37, 1.82]  d_sub [0.39, 2.14]
+claude-haiku-4-5-20251001      conversational  30    1   0.60   0.23   0.17   0.17    0.95      -      -      -
+                                                  vs subthreshold_update: fa_sub 0.17  d_sub 1.17
+                                                  d_fact [0.34, 1.66]  d_sub [0.51, 2.08]
+claude-opus-5                  constrained     18    1   0.72   0.00   0.06   0.06    2.47      -      -      -
+                                                  vs subthreshold_update: fa_sub 0.00  d_sub 2.49
+                                                  d_fact [1.91, 3.06]  d_sub [1.94, 3.11]
+claude-opus-5                  conversational  17    1   0.65   0.00   0.00   0.00    2.27      -      -      -
+                                                  vs subthreshold_update: fa_sub 0.00  d_sub 2.29
+                                                  d_fact [1.73, 2.96]  d_sub [1.73, 3.02]
+claude-sonnet-5-5              constrained     30    1   0.77   0.03   0.10   0.03    2.36      -      -      -
+                                                  vs subthreshold_update: fa_sub 0.03  d_sub 2.36
+                                                  d_fact [1.73, 3.20]  d_sub [1.73, 3.20]
+claude-sonnet-5-5              conversational  30    1   0.70   0.00   0.07   0.03    2.65      -      -      -
+                                                  vs subthreshold_update: fa_sub 0.00  d_sub 2.65
+                                                  d_fact [2.22, 3.20]  d_sub [2.22, 3.20]

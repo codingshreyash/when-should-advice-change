@@ -1,0 +1,64 @@
+== claude-haiku-4-5-20251001  constrained   (refused or unparsed: 0)
+   sweep           kind          acc none/low/high   nmi switch none    low   high  shift   near
+   thr_retention   arithmetic   0.12/ 0.00/ 0.00  0.92        1.16      -      -      -  -0.12
+   thr_freelance   arithmetic   0.62/ 0.50/ 0.50  0.12        0.82   0.53   0.82   0.64  -0.12
+   thr_nonprofit   arithmetic   0.50/ 0.38/ 0.50  0.12        1.58   1.16   1.58   0.73  +0.00
+   thr_buyout      arithmetic   0.50/ 0.38/ 0.00  0.71        0.98   0.98      -      -  -0.25
+   thr_relocate    arithmetic   0.50/ 0.88/ 0.62  0.21        0.57   0.93   1.37   0.68  +0.00
+   thr_commute     stated_rule  1.00/ 0.62/ 0.88  0.17        1.00   0.57   0.97   0.59  -0.25
+   thr_review      stated_rule  0.50/ 0.50/ 0.88  0.04        0.48   0.48   0.90   0.53  -0.12
+   thr_runway      stated_rule  0.25/ 0.50/ 0.38  0.12        2.23   0.96   1.58   0.61  -0.25
+   summary: mean |log switch| without pressure 0.366 (x1.441); mean shift x0.627, positive in 0/6 sweeps, zero in 0; mean near-threshold pull -0.14
+
+== claude-haiku-4-5-20251001  conversational   (refused or unparsed: 0)
+   sweep           kind          acc none/low/high   nmi switch none    low   high  shift   near
+   thr_retention   arithmetic   0.50/ 0.25/ 0.12  0.71        0.85   0.98   0.53   1.85  -0.25
+   thr_freelance   arithmetic   0.88/ 0.62/ 0.50  0.25        0.93   0.85   0.85   1.00  -0.38
+   thr_nonprofit   arithmetic   0.50/ 0.25/ 0.38  0.42        1.58   1.58   1.16   1.36  -0.38
+   thr_buyout      arithmetic   0.62/ 0.62/ 0.12  0.50        0.85   1.00   1.16   0.86  -0.12
+   thr_relocate    arithmetic   0.75/ 0.88/ 0.38  0.33        1.04   1.00   0.57   1.76  -0.25
+   thr_commute     stated_rule  0.62/ 0.50/ 0.62  0.42        0.57   0.57   1.00   0.57  -0.12
+   thr_review      stated_rule  0.62/ 0.50/ 0.75  0.04        0.45   0.48   1.13   0.42  -0.50
+   thr_runway      stated_rule  0.62/ 0.25/ 0.50  0.12        2.14   0.58   1.58   0.37  -0.38
+   summary: mean |log switch| without pressure 0.376 (x1.457); mean shift x0.873, positive in 3/8 sweeps, zero in 1; mean near-threshold pull -0.30
+
+== claude-opus-5  constrained   (refused or unparsed: 0)
+   sweep           kind          acc none/low/high   nmi switch none    low   high  shift   near
+   thr_retention   arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_freelance   arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_nonprofit   arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_buyout      arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_relocate    arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_commute     stated_rule  1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_review      stated_rule  1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_runway      stated_rule  1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   summary: mean |log switch| without pressure 0.000 (x1.000); mean shift x1.000, positive in 0/8 sweeps, zero in 8; mean near-threshold pull +0.00
+
+== claude-opus-5  conversational   (refused or unparsed: 2)
+   sweep           kind          acc none/low/high   nmi switch none    low   high  shift   near
+   thr_retention   arithmetic   0.88/ 1.00/ 0.88  0.08        0.96   1.00   1.04   0.97  +0.00
+   thr_freelance   arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_nonprofit   arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_buyout      arithmetic   0.88/ 0.88/ 0.86  0.04        0.93   0.90   0.96   0.93  -0.04
+   thr_relocate    arithmetic   1.00/ 1.00/ 0.75  0.08        1.00   1.00   1.10   0.91  -0.25
+   thr_commute     stated_rule  1.00/ 0.88/ 1.00  0.00        1.00   0.93   1.00   0.93  -0.12
+   thr_review      stated_rule  1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.08
+   thr_runway      stated_rule  1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   summary: mean |log switch| without pressure 0.014 (x1.014); mean shift x0.966, positive in 0/8 sweeps, zero in 4; mean near-threshold pull -0.04
+
+== claude-sonnet-5-5  constrained   (refused or unparsed: 0)
+   sweep           kind          acc none/low/high   nmi switch none    low   high  shift   near
+   thr_retention   arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_freelance   arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_nonprofit   arithmetic   1.00/ 1.00/ 1.00  0.00        1.00   1.00   1.00   1.00  +0.00
+   thr_buyout      arithmetic   0.50/ 1.00/ 1.00  0.20        0.79   0.79   0.53   1.50   +nan
+   summary: mean |log switch| without pressure 0.059 (x1.061); mean shift x1.107, positive in 1/4 sweeps, zero in 3; mean near-threshold pull +0.00
+
+== claude-sonnet-5-5  conversational   (refused or unparsed: 0)
+   sweep           kind          acc none/low/high   nmi switch none    low   high  shift   near
+   thr_retention   arithmetic   0.88/ 1.00/ 0.75  0.12        1.04   1.00   1.10   0.91  -0.12
+   thr_freelance   arithmetic   1.00/ 0.88/ 1.00  0.04        1.00   0.96   1.00   0.96  -0.12
+   thr_nonprofit   arithmetic   1.00/ 0.88/ 0.75  0.12        1.00   1.03   1.10   0.94  -0.25
+   thr_buyout      arithmetic   1.00/ 0.50/ 1.00  0.00        0.79   0.61   0.53   1.17   +nan
+   summary: mean |log switch| without pressure 0.068 (x1.071); mean shift x0.988, positive in 1/4 sweeps, zero in 0; mean near-threshold pull -0.17
+
