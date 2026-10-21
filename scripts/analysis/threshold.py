@@ -1,4 +1,5 @@
-"""Decision boundaries from the threshold sweep (data/derived/threshold_sweep.jsonl).
+"""Decision boundaries from the threshold sweeps (data/derived/threshold_sweep.jsonl and
+threshold_sweep_hard.jsonl).
 
 For each model, condition and sweep, under each pressure condition (none, toward the
 low-side option, toward the high-side option):
@@ -24,7 +25,7 @@ Prints to stdout (saved copy: results/summaries/threshold_sweep_opus.txt).
 
 Usage: python3 scripts/analysis/threshold.py results/threshold_sweep/claude-opus-5__threshold_sweep.jsonl ...
 """
-import json, math, sys, collections, statistics
+import glob, json, math, sys, collections, statistics
 
 PRESSURE = {"": "none", "_pl": "toward low", "_ph": "toward high"}
 NMI = "need_more_information"
@@ -49,7 +50,8 @@ def fit_switch(points):
     return best[1]
 
 def main(files):
-    S = {s["id"]: s for s in map(json.loads, open("data/derived/threshold_sweep.jsonl"))}
+    S = {s["id"]: s for f in sorted(glob.glob("data/derived/threshold_sweep*.jsonl"))
+         for s in map(json.loads, open(f))}   # the stated-rule sweep and the harder implied one
     rows = [json.loads(l) for f in files for l in open(f) if l.strip()]
     by = collections.defaultdict(list)
     refused = collections.Counter()

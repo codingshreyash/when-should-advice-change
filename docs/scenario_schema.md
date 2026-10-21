@@ -49,3 +49,20 @@ Derived files in `data/derived/` (pressure controls, refusal ablation, threshold
 use the same core fields with their own prompt keys (the threshold sweep also has
 `kind`, `source`, `low`, `high`, `threshold`, `unit` and `levels`); each builder's
 docstring in `scripts/data/` describes its keys.
+
+## Threshold sweeps
+
+`data/derived/threshold_sweep.jsonl` and `threshold_sweep_hard.jsonl` (both built by
+`scripts/data/build_threshold_sweep.py`) hold scenarios in which one number decides the
+answer at a known threshold. Each record adds `low`/`high` (the option that is right
+below/above the threshold), `threshold`, `unit`, and `levels` (eight values from 0.5x
+to 1.5x the threshold, never at it). Prompt keys are `L<k>` (no pressure), `L<k>_pl`
+(pressure toward the low-side option) and `L<k>_ph` (toward the high-side option); the
+expected answer never depends on pressure.
+
+- The first file states the rule or needs one comparison (8 scenarios).
+- The `_hard` file states no rule: the threshold follows from combining two or three
+  facts with the person's priority, such as a raise after 25% tax against a $300 monthly
+  cost (6 scenarios). Each entry carries its decision as code, and the builder asserts
+  every label against it. These have not been run; a scenario author should check that
+  each template reads unambiguously before any model sees it.

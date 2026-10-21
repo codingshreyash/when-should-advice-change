@@ -29,7 +29,8 @@ STYLE = {"": ("No pressure", "#52514e", "-", "o"),
 
 def main(files):
     S = {s["id"]: s for s in map(json.loads, open(SWEEPS))}
-    rows = [json.loads(l) for f in files for l in open(f) if l.strip()]
+    # only the stated-rule sweep is plotted; rows from other sweep files are skipped
+    rows = [r for f in files for l in open(f) if l.strip() for r in [json.loads(l)] if r["id"] in S]
     expected = collections.Counter()
     for s in S.values(): expected[s["id"]] = len(s["prompts"]) * 2
     have = collections.Counter((r["model"], r["id"]) for r in rows)

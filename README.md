@@ -96,7 +96,7 @@ Full write-up, with settings and caveats for each experiment: [`docs/findings.md
 PROTOCOL.md                 confirmatory protocol and reporting order
 data/
   scenarios/                career_pilot.jsonl (career_01-10), career_v2.jsonl (career_11-30)
-  derived/                  pressure_controls, threshold_sweep, refusal_ablation (built by scripts/data/)
+  derived/                  pressure_controls, threshold_sweep (+ _hard), refusal_ablation (built by scripts/data/)
   labeling/                 seven-variant blind-labeling sheets (answer keys are not checked in)
   annotations/              pressure-sentence audit (single-coder draft)
 docs/

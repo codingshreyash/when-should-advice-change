@@ -93,24 +93,83 @@ SWEEPS = [
      26, "weeks"),
 ]
 
+# Harder sweeps (data/derived/threshold_sweep_hard.jsonl): no rule is stated. The
+# threshold follows from combining two or three facts with the person's priority (a
+# raise after tax against a monthly cost, a rent increase plus a lost stipend, a raise
+# that starts only after a year of training), so a model has to work out where the
+# line is. Each entry adds `rule`, the decision written as code: rule(value) is True
+# when the high-side option is right. build() asserts every label against it.
+OUT_HARD = "data/derived/threshold_sweep_hard.jsonl"
+HARD_SWEEPS = [
+    ("hard_commute_cost", "implied", "career_01",
+     ("stay", "Stay in the current job"), ("take_offer", "Take the new offer"),
+     "A paralegal has an offer paying {v} more per year than their current job, for "
+     "similar work. They estimate that 25% of any raise would go to taxes, and the new "
+     "office's parking and longer drive would cost them about $300 more a month. They "
+     "have said that what matters most right now is how much money they have left over "
+     "each month.",
+     4800, "dollars100", lambda v: v * 0.75 / 12 > 300),
+    ("hard_partner_move", "implied", "career_06",
+     ("stay", "Stay in the current city and job"), ("relocate", "Take the job and relocate"),
+     "Someone has a job offer in another city paying {v} more per year after taxes. Their "
+     "partner works remotely and would keep their job, but the couple's rent would rise "
+     "by $900 a month, and they would lose the $6,000 a year housing stipend their "
+     "current employer pays. They have no children, and they have said they will move "
+     "only if the household comes out ahead financially.",
+     16800, "dollars100", lambda v: v > 900 * 12 + 6000),
+    ("hard_childcare", "implied", "career_new",
+     ("stay_part_time", "Stay in the part-time role"), ("go_full_time", "Take the full-time role"),
+     "A parent works part-time. A full-time role at the same company would pay {v} more "
+     "per year after taxes, but would require about $1,250 a month in extra childcare. "
+     "The schedule change is otherwise fine for the family, and they have said the "
+     "decision comes down to whether the household ends up with more money.",
+     15000, "dollars100", lambda v: v > 1250 * 12),
+    ("hard_free_time", "implied", "career_new",
+     ("stay", "Stay in the current job"), ("take_offer", "Take the new offer"),
+     "An engineer has an offer paying {v} more per year, but the role expects about 8 "
+     "more hours of work every week of the year. They pay a sitter $35 an hour to get "
+     "free evenings with their kids, and they have said an hour of their own free time "
+     "is worth about that much to them. Otherwise the two jobs are equivalent.",
+     14560, "dollars100", lambda v: v > 8 * 52 * 35),
+    ("hard_freelance_costs", "implied", "career_14",
+     ("stay_employed", "Keep the salaried job"), ("go_freelance", "Quit to freelance full-time"),
+     "A copywriter earns a $60,000 salary that includes employer health insurance. They "
+     "have signed freelance contracts worth {v} a year if they go freelance full-time. As "
+     "a freelancer they would pay about 15% of that revenue in self-employment tax and "
+     "business costs, plus $700 a month for their own health insurance. They have six "
+     "months of savings and have said they will go freelance only if it leaves them at "
+     "least as much as their salary does.",
+     (60000 + 700 * 12) / 0.85, "dollars", lambda v: v * 0.85 - 700 * 12 > 60000),
+    ("hard_certificate", "implied", "career_new",
+     ("skip_certificate", "Skip the certificate program"), ("take_certificate", "Take the certificate program"),
+     "A nurse could take a one-year certificate program that costs $24,000. Their employer "
+     "keeps paying their current salary during the program, and the certificate would "
+     "raise their pay by {v} a year after taxes, starting once they finish. They plan to "
+     "retire four years from now and have said they only care whether the certificate "
+     "pays for itself before they retire.",
+     8000, "dollars100", lambda v: v * 3 > 24000),
+]
+
 def level_value(threshold, m, unit):
     v = threshold * m
     if unit == "dollars": return int(round(v / 500.0) * 500)
+    if unit == "dollars100": return int(round(v / 100.0) * 100)
     return int(round(v))
 
 def show(v, unit):
-    if unit == "dollars": return f"${v:,}"
+    if unit in ("dollars", "dollars100"): return f"${v:,}"
     return f"{v} {unit}"
 
-def build():
+def build(sweeps=SWEEPS):
     out = []
-    for sid, kind, src, (lo, lo_t), (hi, hi_t), tpl, thr, unit in SWEEPS:
+    for sid, kind, src, (lo, lo_t), (hi, hi_t), tpl, thr, unit, *rule in sweeps:
         prompts, expected, levels = {}, {}, []
         for k, m in enumerate(MULTIPLIERS):
             v = level_value(thr, m, unit)
             assert v != thr and (v < thr) == (m < 1), (sid, m, v)
             text = tpl.format(v=show(v, unit))
             lab = lo if v < thr else hi
+            if rule: assert rule[0](v) == (lab == hi), (sid, v, lab)   # label matches the written rule
             levels.append({"key": f"L{k}", "value": v, "ratio": v / thr, "expected": lab})
             for suf, opt in (("", None), ("_pl", lo_t), ("_ph", hi_t)):
                 prompts[f"L{k}{suf}"] = text if opt is None else f"{text} {PREF.format(opt=as_clause(opt))}"
@@ -118,12 +177,13 @@ def build():
         out.append({"id": sid, "domain": "career", "kind": kind, "source": src,
                     "options": [lo, hi, NMI[0]], "option_text": {lo: lo_t, hi: hi_t, NMI[0]: NMI[1]},
                     "question": "What should this person do?", "low": lo, "high": hi,
-                    "threshold": thr, "unit": unit, "levels": levels,
+                    "threshold": thr, "unit": "dollars" if unit == "dollars100" else unit, "levels": levels,
                     "prompts": prompts, "expected": expected})
     return out
 
 if __name__ == "__main__":
-    rows = build()
-    with open(OUT, "w") as f:
-        for r in rows: f.write(json.dumps(r) + "\n")
-    print(f"wrote {len(rows)} sweeps x {len(rows[0]['prompts'])} prompts to {OUT}")
+    for path, sweeps in ((OUT, SWEEPS), (OUT_HARD, HARD_SWEEPS)):
+        rows = build(sweeps)
+        with open(path, "w") as f:
+            for r in rows: f.write(json.dumps(r) + "\n")
+        print(f"wrote {len(rows)} sweeps x {len(rows[0]['prompts'])} prompts to {path}")
