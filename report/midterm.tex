@@ -166,77 +166,78 @@ than showing that decision-only models cannot abstain.
 \textbf{Claude: no observed pressure shifts among answered prompts.} Claude moved
 toward the target in 0 of 27 and 0 of 26 eligible prompts (upper 95\% bound 13\%)
 and in none of the templated controls, while changing its answer on 68--76\% of
-relevant updates (57--66\% correctly). On AITA the test has a ceiling: models already side with the poster at
-baseline (Qwen 86\%, Nimble 70\%, Claude about 50\%), so ``unchanged under
-pressure'' says little for the 9B models.
+relevant updates (57--66\% correctly). AITA has a ceiling: at baseline Qwen, Nimble and Claude already side with
+the poster on 86\%, 70\% and about 50\% of YTA posts.
 
-\textbf{Multi-turn pushback.} After a constrained first answer (29 scenarios),
-Claude changed its answer in 0 of 29 cases (upper bound 12\%) after a directional
-``Are you sure?'', a plain one, a restatement, and three escalating rounds, and in
-25 of 29 single-fact corrections (24 to the label), giving a second-turn $d'$ of
-3.57. Prompts and models differ from SYCON Bench \citep{hong2025sycon}, so we do not
-compare rates with it.
+\textbf{Multi-turn pushback.} In a second turn (29 scenarios), Claude changed its
+answer in 0 of 29 cases (upper bound 12\%) after a directional or plain ``Are you
+sure?'', a restatement, or three escalating rounds, and in 25 of 29 single-fact
+corrections (24 to the label): second-turn $d' = 3.57$.
 
 \textbf{Refusals depend on wording.} Claude refused 81 of 598 pressure-control calls
-(run 1, October~3), all with \texttt{stop\_reason} \emph{refusal} and category
-\emph{cyber}, on ordinary career prompts. Excluding one scenario refused on every
-prompt, the first-person request was refused on 34 of 58 calls, against 0 of 58 for
-the base prompt and 5 of 58 for the third-person request. All 36 refused
-first-person calls were refused again on 3 resamples each (108/108). A second run
-the same day (Table~\ref{tab:refusal}) refused the same line on 32 of 58: 32 refused
-both times, 2 refused then answered, and all 24 answered prompts were answered
-again. This is repeatability within one day, not proof of determinism.
+(category \emph{cyber}) on ordinary career prompts. The first-person request (``I'm
+the one deciding here, and I really want you to tell me the right move is to X'') was
+refused on 34 of 58 calls, against 0 of 58 at base and 5 of 58 in third person. All
+36 refused calls were refused again on 3 resamples (108/108), and a second run the
+same day answered all 24 previously answered prompts. Changing one clause at a time,
+``I'm the one deciding here'' co-varies most with refusals (alone it draws 8 of 29);
+``really'' makes no difference. This locates the phrase, not the mechanism.
+
+\textbf{Threshold sweep: where is the decision boundary?} Flip counts cannot show a
+bias in a model that never flips. In eight scenarios one number decides the answer
+at a known threshold, by arithmetic (an offer paying \$$X$ more a year beats a
+\$40,000 two-year retention bonus once $X >$ \$20,000) or by a stated rule (a commute
+over 50 minutes is a deal-breaker). Each number takes eight values from 0.5$\times$
+to 1.5$\times$ the threshold, with no pressure and with the templated request toward
+each side, in randomized option order. Sycophancy would move the fitted switch point
+toward the pushed option. Scenarios and analysis were committed before the run; we
+then found one scenario's labels inverted and corrected them without changing any
+prompt.
 
 \begin{table}[t]
 \centering\small\setlength{\tabcolsep}{4pt}
-\begin{tabular}{p{4.9cm}cc}
+\begin{tabular}{lcc}
 \toprule
-Line appended to the base prompt & Prose & Code \\
+Pressure & Code only & Prose (asks) \\
 \midrule
-(none) & 0 & 0 \\
-I'm the one deciding here, and I really want you to tell me the right move is to X. & 19 & 13 \\
-\quad \ldots without ``really'' & 22 & 16 \\
-\quad \ldots ``want to hear that'' for ``want you to tell me'' & 17 & 13 \\
-\quad \ldots in third person (``They're the one deciding'') & 12 & 8 \\
-\quad \ldots without ``I'm the one deciding here'' & 11 & 5 \\
-I'm the one deciding here. & 8 & 0 \\
-Tell me the right move is to X. & 8 & 3 \\
-They really want to hear that the right move is to X. & 5 & 1 \\
+None & 64/64 & 62/64 (1) \\
+Toward low-side option & 64/64 & 62/64 (0) \\
+Toward high-side option & 64/64 & 58/62 (4) \\
 \bottomrule
 \end{tabular}
-\caption{Run 2: Claude Opus 5 refusals out of 29 scenarios, changing one clause at
-a time. All refusals are in the cyber category.}
-\label{tab:refusal}
+\caption{Claude Opus 5 on the threshold sweep: answers matching the rule-derived
+label, over 8 scenarios $\times$ 8 values. Prose had 2 refusals; ``asks'' counts
+\emph{need more information}.}
+\label{tab:sweep}
 \end{table}
 
-Changing one clause at a time, the clause ``I'm the one deciding here'' co-varies
-most with refusals: removing it roughly halves them, and alone it draws 8 of 29.
-``Really'' makes no difference. Five scenarios involving money, debt, health
-insurance or a non-compete are refused under every appended line, and prose
-answers are refused whenever code answers are. This identifies phrases that
-co-vary with refusals, not why the classifier fires. Its practical consequence is
-that Claude's pressure results are conditional on answered prompts: the
-first-person rows have only 16 and 8 usable answers.
+Answering with a code, Claude Opus 5 was right on all 192 prompts
+(Table~\ref{tab:sweep}), all 96 near the threshold included: its switch point is
+exactly at the threshold in all eight scenarios, and pressure never moves it. In
+prose it missed 8 of 190: five \emph{need more information}, four within 11\% of
+the threshold (``about 1\% of the stakes''), and two overcorrections, where under pressure toward the
+correct option it refused to ``tell you what you want to hear'' and chose the other.
+Pressure moved Claude, if at all, \emph{away} from the requested option (mean
+switch-point shift $\times$0.97). On an in-place edit too small to matter
+(\emph{subthreshold update}), an exploratory run changed Claude's answer in 1 and 0
+of 29 scenarios.
 
 \section{Next Steps and Ethics}
 
-In priority order: (1) run the controls on the 9B models, with option order and
-codes randomized, to separate deference from lexical priming; (2) finish blind
-labels, including whether each pressure sentence fits our definition; (3) run the
-five-sample noise baseline, so reframe and pressure effects are measured against
-sampling variation; (4) add an \emph{irrelevant update} (one fact that should not
-matter) as the proper control for relevant updates, and length-matched omissions;
-(5) extend AITA with NTA posts and flipped perspectives; (6) re-run refusals with
-logged timestamps and repeated samples of answered prompts; (7) test whether a
-``user wants X'' direction exists in the 9B models before trying to remove it, in
-the spirit of the refusal direction of \citet{arditi2024refusal}; (8) add Laya and Jev. So
-far we have shown differences in sensitivity to kinds of input change; showing
-that they are sycophancy, not priming or legitimate preference interpretation, is
-the work of the second half.
+In priority order: (1) blind labels for all seven
+variants, including whether each pressure sentence fits our definition; (2) the
+controls, both factual negatives and the sweep on the 9B models, with randomized
+options and five samples, to separate deference from lexical priming; (3) the same
+on Claude Haiku~4.5 and Sonnet~5.5 (queued), so behavior can be read against model
+size, not only frontier vs.\ 9B; (4) length-matched omissions; (5) AITA with NTA
+posts and flipped perspectives; (6) test whether a ``user wants X'' direction exists
+in the 9B models before removing it, after \citet{arditi2024refusal}; (7) Laya and
+Jev. So far we have shown differences in sensitivity to kinds of input change;
+showing that they are sycophancy rather than priming or legitimate preference
+interpretation is the work of the second half.
 
-\textbf{Ethics.} AITA posts come from a released research dataset; we collect no
-personal data and do not redistribute them. Refusal results describe one deployed
-model on one day.
+\textbf{Ethics.} AITA posts come from a released dataset and are not
+redistributed; refusal results describe one deployed model on one day.
 
 \bibliography{references}
 
