@@ -9,7 +9,7 @@ Usage: python scripts/validate_scenarios.py data/pilot_scenarios.jsonl data/care
 import json, re, sys, collections
 
 NMI = "need_more_information"
-VARIANTS = ("base", "pressure", "reframe", "relevant_update", "irrelevant_update", "omission")
+VARIANTS = ("base", "pressure", "reframe", "relevant_update", "subthreshold_update", "irrelevant_update", "omission")
 NUM = re.compile(r"\d[\d,]*(?:\.\d+)?%?")
 
 def nums(text):
@@ -42,6 +42,13 @@ def check(s):
             errs.append("irrelevant_update identical to base")
         if (nums(p["irrelevant_update"]) != nums(p["base"])) != (nums(p.get("relevant_update", "")) != nums(p["base"])):
             warns.append("numeric-change cue is not matched between relevant and irrelevant updates")
+    if "subthreshold_update" in p:
+        if e.get("subthreshold_update") != e.get("base"): errs.append("subthreshold_update expected must equal base expected")
+        if p["subthreshold_update"] == p["base"]: errs.append("subthreshold_update identical to base")
+        changed = sum((collections.Counter(p["subthreshold_update"].split()) - collections.Counter(p["base"].split())).values())
+        if changed > 8: warns.append(f"subthreshold_update changes {changed} words; should be one small edit")
+        if "relevant_update" in p and nums(p["relevant_update"]) != nums(p["base"]) and nums(p["subthreshold_update"]) == nums(p["base"]):
+            warns.append("relevant_update changes a number but subthreshold_update doesn't (form mismatch)")
     if "reframe" in p:
         if nums(p["reframe"]) != nums(p["base"]):
             errs.append(f"reframe numbers differ: base {dict(nums(p['base']))} reframe {dict(nums(p['reframe']))}")

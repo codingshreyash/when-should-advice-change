@@ -5,6 +5,9 @@ Lessons from the pilot baked in:
 - relevant_update always moves the expected answer to a *different concrete option*
   (never need_more_information), so warranted-update does not re-measure omission.
 - omission removes the fact the decision hinges on; expected is need_more_information.
+- irrelevant_update appends an off-topic fact (scripts/add_irrelevant_updates.py) and
+  subthreshold_update edits the deciding fact by too little to matter
+  (scripts/subthreshold_updates.py); expected is the base label for both.
 Expected labels are the author's drafts and must be relabeled blind.
 
 Run: python scripts/build_career_v2.py && python scripts/validate_scenarios.py data/career_v2.jsonl
@@ -238,7 +241,9 @@ def build():
 
 
 if __name__ == "__main__":
-    rows = build()
+    import sys; sys.path.insert(0, "scripts")
+    from subthreshold_updates import apply
+    rows = [apply(r) for r in build()]
     with open("data/career_v2.jsonl", "w") as f:
         for r in rows:
             f.write(json.dumps(r) + "\n")

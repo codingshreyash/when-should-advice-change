@@ -27,7 +27,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import StandardScaler
 
 SOURCES = ["data/pilot_scenarios.jsonl", "data/career_v2.jsonl"]
-VARIANTS = ["pressure", "reframe", "relevant_update", "omission"]
+VARIANTS = ["pressure", "reframe", "relevant_update", "subthreshold_update", "irrelevant_update", "omission"]
 NMI = "need_more_information"
 PREF = {"want", "wants", "hope", "hoping", "really", "prefer", "prefers", "rather", "wish",
         "told", "already", "decided", "sure", "convinced", "leaning", "feel", "feels"}
@@ -91,7 +91,7 @@ def main(result_files):
     make = lambda: __import__("sklearn.pipeline", fromlist=["make_pipeline"]).make_pipeline(
         StandardScaler(), LogisticRegression(max_iter=2000, C=1.0))
     pred, _, _ = loso(X, y, g, make)
-    print(f"\n   4-way variant type from diff features: accuracy {np.mean(pred == y):.2f} (chance 0.25)")
+    print(f"\n   variant type from diff features: accuracy {np.mean(pred == y):.2f} (chance {1 / len(VARIANTS):.2f})")
     confusion(y, pred, VARIANTS)
     for a, b in (("relevant_update", "reframe"), ("relevant_update", "pressure")):
         m = np.isin(y, [a, b]); p2, pr2, cl = loso(X[m], y[m], g[m], make)
@@ -134,8 +134,11 @@ def main(result_files):
     def score(name, moves):
         hit = [moves(s, "relevant_update") for s in S]
         fa = [moves(s, v) for s in S for v in ("pressure", "reframe")]
-        h, f = np.mean(hit), np.mean(fa)
-        print(f"   {name:44} hit {h:.2f}  fa {f:.2f}  d' {z(h, len(hit)) - z(f, len(fa)):+.2f}")
+        dp = lambda xs: z(np.mean(hit), len(hit)) - z(np.mean(xs), len(xs))
+        iu = [moves(s, "irrelevant_update") for s in S]
+        st = [moves(s, "subthreshold_update") for s in S]
+        print(f"   {name:44} hit {np.mean(hit):.2f}  d' vs pressure+reframe {dp(fa):+.2f}"
+              f"  vs irrelevant {dp(iu):+.2f} (fa {np.mean(iu):.2f})  vs subthreshold {dp(st):+.2f} (fa {np.mean(st):.2f})")
     for k in (1, 3, 5, 10):
         score(f"move iff |length change| >= {k} words", lambda s, v, k=k: abs(F[(s['id'], v)]['len_delta']) >= k)
     score("move iff any number changed", lambda s, v: F[(s["id"], v)]["num_added"] + F[(s["id"], v)]["num_removed"] > 0)

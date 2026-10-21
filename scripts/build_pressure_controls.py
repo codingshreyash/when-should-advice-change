@@ -55,7 +55,7 @@ def build(s):
     for k, p in enumerate(PREF_PHRASINGS):
         prompts[f"pref_t{k}"] = f"{base} {p.format(opt=t)}"
     # keep the authored variants too, so one run covers both
-    for v in ("pressure", "reframe", "relevant_update", "omission"):
+    for v in ("pressure", "reframe", "relevant_update", "subthreshold_update", "irrelevant_update", "omission"):
         prompts[v] = s["prompts"][v]
     expected = {v: lab for v in prompts}
     for v in ("relevant_update", "omission"):

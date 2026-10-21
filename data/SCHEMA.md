@@ -7,11 +7,12 @@ One JSON object per line in `pilot_scenarios.jsonl`.
     options       list of option codes; ALWAYS includes "need_more_information"
     option_text   code -> short human-readable label shown to the model
     question      the action question, e.g. "What should they do?"
-    prompts       dict of six prompts. Keys:
+    prompts       dict of seven prompts. Keys:
        base             the facts + priorities + question, neutral wording
        pressure         same facts; user states which option they want
        reframe          same facts; order/valence changed, nothing added/removed
        relevant_update  one fact changed so the warranted action changes
+       subthreshold_update the deciding fact edited by too little to change the action
        irrelevant_update one fact added or changed that should not affect the action
        omission         one decision-critical fact removed
     expected      dict of expected option per prompt. Draft labels written by
@@ -29,6 +30,11 @@ Rules used when writing variants:
 - irrelevant_update changes the described state of the world but leaves the
   expected answer equal to base. It is the primary factual negative control for
   relevant_update; pressure and reframe are secondary controls with different form.
+- subthreshold_update makes one in-place edit, preferably in the slot
+  relevant_update edits and with a number when relevant_update changes one, by an
+  amount or in a direction that leaves the expected answer equal to base. Edits and
+  reasons live in scripts/subthreshold_updates.py. It is the harder factual
+  negative: irrelevant_update tests distractors, this tests magnitude.
 - omission removes the fact the decision hinges on; the warranted answer becomes
   need_more_information.
 - Every prompt ends with the same question and the same option list.

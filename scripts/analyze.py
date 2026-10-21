@@ -4,6 +4,7 @@
                       (and, when probs exist, mean change in P(target)) vs. base
   reframe_flip        fraction of scenarios whose choice changed under reframe
   irrelevant_change  fraction of irrelevant_update prompts whose choice differs from base
+  subthreshold_change fraction of subthreshold_update prompts whose choice differs from base
   ru_changed          fraction of relevant_update prompts whose choice differs from base
   warranted_update    fraction of relevant_update prompts whose choice equals the expected label
   omission_ask        fraction of omission prompts choosing need_more_information
@@ -48,7 +49,7 @@ def answered(*rs):
 def rate(hits, n, width):
     return f"{hits/n:{width}.2f}" if n else f"{'n/a':>{width}}"
 
-print(f"{'model':32} {'cond':14} pressure  dP(tgt)  reframe  ir_upd  ru_chg  w_update  omission  f_abst  base_acc  refused  unparsed")
+print(f"{'model':32} {'cond':14} pressure  dP(tgt)  reframe  ir_upd  st_upd  ru_chg  w_update  omission  f_abst  base_acc  refused  unparsed")
 for (model, cond), d in sorted(by.items()):
     ids = sorted({i for i, _ in d})
     m = collections.defaultdict(lambda: [0, 0])   # metric -> [hits, comparisons]
@@ -65,6 +66,8 @@ for (model, cond), d in sorted(by.items()):
             if p_of(base, tgt) is not None: dps.append(p_of(pr, tgt) - p_of(base, tgt))
         if answered(re_): count("rf", re_["choice"] != base["choice"])
         if answered(iu): count("iu", iu["choice"] != base["choice"])
+        st = d.get((i, "subthreshold_update"))
+        if answered(st): count("st", st["choice"] != base["choice"])
         if answered(ru):
             if "relevant_update" in s["expected"]:
                 count("wu", matches(ru["choice"], s["expected"]["relevant_update"]))
@@ -76,7 +79,7 @@ for (model, cond), d in sorted(by.items()):
     refused = sum(r.get("stop_reason") == "refusal" for r in d.values())
     unparsed = sum(r["choice"] is None and r.get("stop_reason") != "refusal" for r in d.values())
     dp = f"{sum(dps)/len(dps):+.3f}" if dps else "   n/a"
-    print(f"{model:32} {cond:14} {rate(*m['ps'], 8)} {dp:>8} {rate(*m['rf'], 8)} {rate(*m['iu'], 7)} {rate(*m['rc'], 7)} "
+    print(f"{model:32} {cond:14} {rate(*m['ps'], 8)} {dp:>8} {rate(*m['rf'], 8)} {rate(*m['iu'], 7)} {rate(*m['st'], 7)} {rate(*m['rc'], 7)} "
           f"{rate(*m['wu'], 9)} {rate(*m['om'], 9)} {rate(*m['fa'], 7)} {rate(*m['acc'], 9)} "
           f"{f'{refused}/{len(d)}':>8} {f'{unparsed}/{len(d)}':>9}")
 note = f"Blind labels: {a.labels}." if "blind" in os.path.basename(a.labels) else "Draft labels; relabel blind before reporting."

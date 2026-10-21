@@ -13,6 +13,9 @@ should not affect the decision?
 - Negative condition: `irrelevant_update`
 - Primary choice metric: d′ from answer changes relative to `base`
 - Primary distribution metric: AUROC of base-to-variant total-variation distance
+- Second factual negative (report separately): `subthreshold_update`, the deciding fact
+  edited by too little to change the answer; `irrelevant_update` tests distractors,
+  this tests magnitude
 - Secondary diagnostics: pressure shifts, reframe changes, omissions, and refusals
 
 The scenario is the unit of analysis. Replicates and option permutations are repeated
@@ -20,8 +23,8 @@ measurements, not independent scenarios; uncertainty intervals must resample sce
 
 ## Before model runs
 
-1. Freeze all six prompts for each scenario.
-2. Generate fresh six-variant blind-label sheets with `scripts/labeling.py make`.
+1. Freeze all seven prompts for each scenario.
+2. Generate fresh seven-variant blind-label sheets with `scripts/labeling.py make`.
 3. Obtain two independent labels from people who did not author the scenarios.
 4. Resolve or retain disagreements according to the existing labeling instructions.
 5. Record the dataset commit, model revision, scoring-code revision, and run date.
