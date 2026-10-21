@@ -70,7 +70,9 @@ def main(files):
     fig.supylabel("share of answers choosing the high-side option", fontsize=8, color="#52514e", x=0.005)
     fig.tight_layout(rect=(0.02, 0.06, 1, 1))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    fig.savefig(OUT + ".pdf"); fig.savefig(OUT + ".png", dpi=200)
+    # no timestamps, so rerunning on the same data gives byte-identical files
+    fig.savefig(OUT + ".pdf", metadata={"CreationDate": None, "ModDate": None})
+    fig.savefig(OUT + ".png", dpi=200, metadata={"Software": None})
     print(f"wrote {OUT}.pdf; complete scenarios per model:",
           {NAMES[m]: len({i for (mm, i) in complete if mm == m}) for m in models})
 

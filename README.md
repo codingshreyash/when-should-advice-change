@@ -37,24 +37,30 @@ Claude Haiku 4.5 and Sonnet 5.5 (a size ladder) are partly run; see [results/REA
 
 ## Results so far
 
-**Primary question: not answered yet.** No model has been run on `irrelevant_update`.
-The confirmatory runs wait on blind labels for all seven prompts, then use five samples
-and randomized option order ([`PROTOCOL.md`](PROTOCOL.md)).
+**Headline (exploratory: draft labels, one sample).** Models fail in opposite
+directions. The Qwen3.5-9B base model *caves*: it moves more for a stated preference
+than for a relevant fact. Claude Haiku 4.5 shows *reactance*: pushed toward one option,
+it picks the other one more often. Claude Sonnet 5.5 and Opus 5 are *indifferent* to
+pressure and move for facts.
 
-**Exploratory evidence** (Claude Opus 5 only, run before blind labels):
+![Threshold-sweep decision curves](report/figures/threshold_curves.png)
 
-- **Subthreshold update.** The subthreshold edit changed Claude's answer in 1 of 29
-  scenarios (constrained) and 0 of 29 (conversational), against 22 of 29 and 19 of 28
-  relevant updates: d′ +2.32 and +2.57. The one change is a borderline scenario that also
-  moved under pressure.
-- **Threshold sweep.** Eight scenarios where one number decides the answer, at eight
-  values from 0.5× to 1.5× the threshold, with and without pressure. With a code only,
-  Claude was right on all 192 prompts and put the switch point exactly at the threshold
-  in all eight. In prose it missed 8 of 190, five of them by asking for more information
-  near the threshold.
+- **Factual discrimination grows with model size.** Relevant vs. irrelevant update
+  d′ is about 1.0 for Haiku (0.98 code only, 0.95 written) against 2.36–2.65 for Sonnet
+  and 2.27–2.47 for the (partial) Opus rerun; the subthreshold update gives the same
+  picture ([`model_ladder_career30.txt`](results/summaries/model_ladder_career30.txt)).
+- **Decision boundaries.** On the threshold sweep, Opus answering with a code was right
+  on all 192 prompts, switching exactly at the threshold in all eight scenarios; Sonnet
+  matches it on the three scenarios it finished. Haiku's switch point is off by a factor
+  of about 1.45, and pressure moves it *away* from the requested option (written
+  advice: 9 of 64 answers chose the pushed high-side option, against 26 with no
+  pressure).
+- **Not final.** No model has had confirmatory runs: those wait on blind labels for all
+  seven prompts, then use five samples and randomized option order
+  ([`PROTOCOL.md`](PROTOCOL.md)). Sonnet's sweep and the Opus rerun are incomplete.
 
 **Legacy single-turn results** (five variants, 30 scenarios, draft labels, fixed option
-order, one sample; from Table 1 of the midterm report):
+order, one sample; see section 5 of the midterm report):
 
 | | Relevant update: changed | correct | Omission asks | Unneeded asks | Pressure: shift to target | Reframe: changed | d′ (pressure + reframe) |
 |---|---|---|---|---|---|---|---|
@@ -106,7 +112,8 @@ scripts/                    run everything from the repo root
                             recheck_refusals.py, run_steering.py, run_model_ladder.sh,
                             run_gpu_experiments.sh, brev_setup.sh (GPU box setup)
   analysis/                 metrics.py, discrimination.py, replicates.py, report_tables.py,
-                            threshold.py, steering.py, pushback.py, artifact_probe.py
+                            threshold.py, plot_threshold.py, steering.py, pushback.py,
+                            artifact_probe.py
 results/                    raw outputs, <model>__<scenario set>.jsonl, one folder per study;
                             summaries/ (saved analysis output), logs/; index in results/README.md
 report/                     midterm report (midterm.tex, midterm.pdf, references.bib, ACL style)
@@ -114,9 +121,9 @@ report/                     midterm report (midterm.tex, midterm.pdf, references
 
 ## Reproducing
 
-Python 3.11. Every script runs from the repo root. Only `artifact_probe.py` needs
-packages beyond the standard library (`pip install numpy scikit-learn`); the Claude
-runners need `pip install anthropic`.
+Python 3.11. Every script runs from the repo root. `artifact_probe.py` needs
+`pip install numpy scikit-learn`, `plot_threshold.py` needs `pip install matplotlib`, and
+the Claude runners need `pip install anthropic`; everything else uses the standard library.
 
 **Validate the scenarios** (prints six WARN lines for pilot relevant updates that lead
 to `need_more_information`, a known legacy limitation):
@@ -168,6 +175,7 @@ study in one go. Delete the instance when done.
     python3 scripts/analysis/metrics.py --labels data/scenarios/career_v2.jsonl results/career/nimble-and-qwen__career_v2.jsonl results/career/claude-opus-5__career_v2.jsonl
     python3 scripts/analysis/replicates.py results/career/nimble-and-qwen__career_v2.jsonl results/career/claude-opus-5__career_v2.jsonl
     python3 scripts/analysis/threshold.py results/threshold_sweep/claude-opus-5__threshold_sweep.jsonl
+    python3 scripts/analysis/plot_threshold.py results/threshold_sweep/*.jsonl   # report/figures/threshold_curves.pdf
     python3 scripts/analysis/steering.py results/pressure_controls/claude-opus-5__pressure_controls.jsonl
     python3 scripts/analysis/pushback.py results/pushback/claude-opus-5__pressure_controls.jsonl
     python3 scripts/analysis/artifact_probe.py results/career/nimble-and-qwen__career_pilot.jsonl results/career/nimble-and-qwen__career_v2.jsonl

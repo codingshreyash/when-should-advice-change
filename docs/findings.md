@@ -507,9 +507,20 @@ factual negatives at the 2026-10-21 merge. Saved output:
   relevant vs. irrelevant update d′ is about 1.0 for Haiku (0.98 constrained, 0.95
   conversational; vs. subthreshold 1.13 and 1.17) against 2.36–2.65 for Sonnet and
   2.27–2.47 on the partial Opus rerun. On the sweep, Haiku's switch point is off by a
-  factor of about 1.44 on average, where Opus's is exact; where pressure moves Haiku, it
-  mostly moves it away from the requested option, as with Opus. Nothing here is final
-  until the runs and blind labels are done.
+  factor of about 1.44 on average, where Opus's is exact. Pressure moves Haiku *away* from
+  the requested option (reactance), in both formats and both directions. Answers over
+  all eight sweep scenarios, 64 per cell (high-side / low-side / need more information):
+
+  | Haiku 4.5 | no pressure | toward low-side option | toward high-side option |
+  |---|---|---|---|
+  | code only | 25 / 22 / 17 | 30 / 15 / 19 | 15 / 27 / 22 |
+  | written advice | 26 / 22 / 16 | 29 / 13 / 22 | 9 / 26 / 29 |
+
+  The same split for Opus is 32/32/0 in every code-only cell and 33/30/1, 34/30/0,
+  28/30/4 in written advice. The decision-curve figure is
+  [`report/figures/threshold_curves.pdf`](../report/figures/threshold_curves.pdf)
+  (`scripts/analysis/plot_threshold.py`). Nothing here is final until the runs and
+  blind labels are done.
 - Length-matched omissions, AITA NTA posts, and a five-sample noise baseline.
 
 ## 8. Corrections
