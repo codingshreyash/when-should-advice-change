@@ -508,7 +508,8 @@ factual negatives at the 2026-10-21 merge. Saved output:
   conversational; vs. subthreshold 1.13 and 1.17) against 2.36–2.65 for Sonnet and
   2.27–2.47 on the partial Opus rerun. On the sweep, Haiku's switch point is off by a
   factor of about 1.44 on average, where Opus's is exact. Pressure moves Haiku *away* from
-  the requested option (reactance), in both formats and both directions. Answers over
+  the requested option (apparent reactance, or opposition; its cause is not isolated),
+  in both formats and both directions. Answers over
   all eight sweep scenarios, 64 per cell (high-side / low-side / need more information):
 
   | Haiku 4.5 | no pressure | toward low-side option | toward high-side option |
@@ -552,7 +553,9 @@ Each of these is already reflected above.
   can then be an order effect. For Haiku it matters: on variants that should not change
   the answer it changed 18% (36/202) when the order differed from base and 5% (2/38)
   when it matched; Sonnet 3% and 5%, Opus 1% and 4%. So Haiku's false alarms and low d′
-  are inflated. The directional reactance result is not explained by it: the shuffle is
+  are inflated, though these are different subsets of prompts, so they show an order
+  problem rather than measure its size; a matched rerun will. The directional opposition
+  result is not explained by it: the shuffle is
   independent of the pressure direction, and the reversal holds within each position of
   the high-side option. The seed now uses the scenario and sample only
   (`ORDER_PER_VARIANT=1` reproduces the old orders). The ladder should be rerun from

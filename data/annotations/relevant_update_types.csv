@@ -1,31 +1,31 @@
-id,type,edit
-career_01,fact,20 -> 90; away. -> away each direction.
-career_02,mixed,"career growth, -> job security,; six months -> one month"
-career_03,fact,team has budget flexibility. -> offer is final and the company does not negotiate.
-career_04,fact,"has twice -> once, a month ago, made a comment;  -> a team meeting that; past month made comments about -> employee felt referenced; age in team meetings, once saying they were 'too old to learn -> age, though; new system.' -> wording was ambiguous.; both dates. -> the date."
-career_05,fact,salary. -> salary and moving them to a new team with an active product.; months; the counteroffer does not change their assignment. -> months.
-career_06,fact, -> not; move; the partner's field has many openings in the new city. -> move.
-career_07,fact,have a chronic condition with ongoing prescription costs of about $600 a month. -> are covered under their spouse's health insurance at no extra cost.
-career_08,fact,"that costs $60,000 total -> ; no funding. -> a full scholarship and a stipend."
-career_09,fact,"supportive, but at this company -> supportive and has explicitly said they will write a reference and protect anyone's projects during a search;; mentioned job searches -> did this; moved off key projects within weeks. -> given references and kept their roles."
-career_10,fact,"only -> ; lower-paid support role, a 20% pay cut. -> different role at the same pay."
-career_11,priority,"keep doing hands-on technical work, -> move into leadership and learn to manage people,"
-career_12,fact,"already -> ; a written -> no other; from another company, starting in three weeks, at a 10% higher salary. -> and have had no interviews after six months of searching."
-career_13,priority,"become -> build products at; university professor, -> tech company,"
-career_14,fact,"$80,000 -> $30,000"
-career_15,fact," -> yesterday; reported it in writing to -> have not yet told; and then to -> or; office; both said it would be handled, and two months later the logs are still being falsified. -> office."
-career_16,mixed,"$40,000 -> no debt, $300,000; credit card debt at 24% interest -> savings,; paying it off within two years. -> long-term wealth even at higher risk."
-career_17,plan,"stay in medical device -> leave;  -> next year to go back to school; their whole career, -> nursing,"
-career_18,fact,"$45,000 -> $85,000"
-career_19,fact,"had no responses after applying to 30 jobs over the past three months. -> a signed offer from another company, starting in two weeks, at their current salary."
-career_20,fact,eleven months -> two weeks
-career_21,fact,"offered them a -> said there is no path to; role -> ; team, with a mentor already assigned and no change in pay. -> team."
-career_22,fact,"Their parents are covering -> They must cover; living costs -> own rent; summer, -> summer and have no savings,"
-career_23,fact,"explicitly allows outside tutoring. -> forbids paid tutoring of students at their own school, and all of the tutoring clients attend their school."
-career_24,fact,"confirmed -> told them; pension and -> ; fully fund their planned retirement starting now, -> will fall about $300,000 short unless they work four more years,"
-career_25,fact,"was -> has not yet been; for a client last month, -> or sent to the client,; will -> would; unless the return is amended, -> if filed as is,"
-career_26,fact,six months -> just closed a funding round that covers four years; funding left and no committed investors for its next round. -> operating costs.
-career_27,fact,14 months -> two weeks
-career_28,fact, -> in writing that; mandatory with no exceptions. -> waived for caregivers during a child's first year.
-career_29,plan,"already -> ; stay at the company -> move abroad; at least five years and want to move into its operations leadership track, which requires a master's degree. -> their partner's job in eighteen months."
-career_30,fact,"$12,000 -> $30,000"
+id,type,details_changed,edit
+career_01,fact,one,20 -> 90; away. -> away each direction.
+career_02,mixed,several,"career growth, -> job security,; six months -> one month"
+career_03,fact,one,team has budget flexibility. -> offer is final and the company does not negotiate.
+career_04,fact,several,"has twice -> once, a month ago, made a comment;  -> a team meeting that; past month made comments about -> employee felt referenced; age in team meetings, once saying they were 'too old to learn -> age, though; new system.' -> wording was ambiguous.; both dates. -> the date."
+career_05,fact,several,salary. -> salary and moving them to a new team with an active product.; months; the counteroffer does not change their assignment. -> months.
+career_06,fact,several, -> not; move; the partner's field has many openings in the new city. -> move.
+career_07,fact,one,have a chronic condition with ongoing prescription costs of about $600 a month. -> are covered under their spouse's health insurance at no extra cost.
+career_08,fact,several,"that costs $60,000 total -> ; no funding. -> a full scholarship and a stipend."
+career_09,fact,several,"supportive, but at this company -> supportive and has explicitly said they will write a reference and protect anyone's projects during a search;; mentioned job searches -> did this; moved off key projects within weeks. -> given references and kept their roles."
+career_10,fact,several,"only -> ; lower-paid support role, a 20% pay cut. -> different role at the same pay."
+career_11,priority,one,"keep doing hands-on technical work, -> move into leadership and learn to manage people,"
+career_12,fact,several,"already -> ; a written -> no other; from another company, starting in three weeks, at a 10% higher salary. -> and have had no interviews after six months of searching."
+career_13,priority,one,"become -> build products at; university professor, -> tech company,"
+career_14,fact,one,"$80,000 -> $30,000"
+career_15,fact,several," -> yesterday; reported it in writing to -> have not yet told; and then to -> or; office; both said it would be handled, and two months later the logs are still being falsified. -> office."
+career_16,mixed,several,"$40,000 -> no debt, $300,000; credit card debt at 24% interest -> savings,; paying it off within two years. -> long-term wealth even at higher risk."
+career_17,plan,several,"stay in medical device -> leave;  -> next year to go back to school; their whole career, -> nursing,"
+career_18,fact,one,"$45,000 -> $85,000"
+career_19,fact,several,"had no responses after applying to 30 jobs over the past three months. -> a signed offer from another company, starting in two weeks, at their current salary."
+career_20,fact,one,eleven months -> two weeks
+career_21,fact,several,"offered them a -> said there is no path to; role -> ; team, with a mentor already assigned and no change in pay. -> team."
+career_22,fact,several,"Their parents are covering -> They must cover; living costs -> own rent; summer, -> summer and have no savings,"
+career_23,fact,one,"explicitly allows outside tutoring. -> forbids paid tutoring of students at their own school, and all of the tutoring clients attend their school."
+career_24,fact,several,"confirmed -> told them; pension and -> ; fully fund their planned retirement starting now, -> will fall about $300,000 short unless they work four more years,"
+career_25,fact,several,"was -> has not yet been; for a client last month, -> or sent to the client,; will -> would; unless the return is amended, -> if filed as is,"
+career_26,fact,several,six months -> just closed a funding round that covers four years; funding left and no committed investors for its next round. -> operating costs.
+career_27,fact,one,14 months -> two weeks
+career_28,fact,one, -> in writing that; mandatory with no exceptions. -> waived for caregivers during a child's first year.
+career_29,plan,several,"already -> ; stay at the company -> move abroad; at least five years and want to move into its operations leadership track, which requires a master's degree. -> their partner's job in eighteen months."
+career_30,fact,one,"$12,000 -> $30,000"

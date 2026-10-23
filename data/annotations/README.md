@@ -21,6 +21,12 @@ draft, with the edit itself for checking):
 - `plan` (2): the person's own plans change (career_17, career_29).
 - `mixed` (2): a priority and a fact change together (career_02, career_16).
 
-Updating for a changed fact and for a changed goal are different abilities; with six
-non-fact items the split is descriptive only. `scripts/analysis/metrics.py` prints
-relevant-update results by type.
+`details_changed` says whether the edit changes one detail or several related ones
+(e.g. career_12 removes the outside offer and adds six months of failed searching).
+Only 10 of the 24 fact updates are clean single-detail edits, so the categories are
+not clean manipulations yet.
+
+Updating for a changed fact and for a changed goal are different abilities, but with six
+non-fact items (and 14 multi-detail fact items) the split is descriptive only and cannot
+show that models handle the categories equally. `scripts/analysis/metrics.py` prints
+relevant-update results by type and by number of details changed.

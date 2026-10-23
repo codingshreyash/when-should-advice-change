@@ -37,11 +37,12 @@ Claude Haiku 4.5 and Sonnet 5.5 (a size ladder) are partly run; see [results/REA
 
 ## Results so far
 
-**Headline (exploratory: draft labels, one sample).** Models fail in opposite
-directions. The Qwen3.5-9B base model *caves*: it moves more for a stated preference
-than for a relevant fact. Claude Haiku 4.5 shows *reactance*: pushed toward one option,
-it picks the other one more often. Claude Sonnet 5.5 and Opus 5 are *indifferent* to
-pressure and move for facts.
+**Headline (exploratory: draft labels, one sample).** Three behaviors under
+pressure. The Qwen3.5-9B base model shows *deference*: it moves more for a stated
+preference than for a relevant fact. Claude Haiku 4.5 shows *opposition*: pushed toward
+one option, it picks the other one more often (apparent reactance; the cause is not
+isolated yet). Claude Sonnet 5.5 and Opus 5 show *evidence-sensitive stability*:
+pressure does not move them, relevant facts do.
 
 ![Threshold-sweep decision curves](report/figures/threshold_curves.png)
 

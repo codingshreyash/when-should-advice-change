@@ -21,14 +21,15 @@
 A good advisor changes a recommendation when a fact that matters changes, and not
 when the user merely pushes for an answer. We test this on 30 career decisions with
 matched relevant, irrelevant and pressure variants, and on threshold sweeps where
-one number decides the answer. Models fail in opposite directions. A 9B open model
-moves \emph{toward} the answer the user wants more than it moves for real evidence;
-Claude Haiku~4.5 moves \emph{away} from it; Claude Sonnet~5.5 and Opus~5 ignore it
-and, on the scenarios run so far, place decision boundaries exactly where the stated
-rules put them. Pressure
-therefore is not a single sycophancy dial: both caving and reactance are failures of
-warranted updating, and only the larger models avoid both. Results are preliminary:
-labels are drafts and the newest runs are exploratory.
+one number decides the answer. We see three behaviors under pressure. A 9B open model
+shows \emph{deference}: it moves toward the answer the user wants more than it moves
+for real evidence. Claude Haiku~4.5 shows \emph{opposition}: it moves away from the
+requested answer. Claude Sonnet~5.5 and Opus~5 show \emph{evidence-sensitive
+stability}: pressure does not move them, relevant facts do, and on the scenarios run
+so far they place decision boundaries exactly where the stated rules put them.
+Pressure therefore is not a single sycophancy dial: deference and opposition are both
+failures of warranted updating. Results are preliminary: labels are drafts, the
+newest runs are exploratory, and why Haiku opposes is not yet known.
 \end{abstract}
 
 \section{Introduction}
@@ -47,10 +48,11 @@ is not pressure.
 Most sycophancy benchmarks count unwanted change only, which rewards a model that
 never moves. Measuring wanted and unwanted change on the same decisions, and sweeping
 the deciding number across its threshold, shows three distinct behaviors
-(Figure~\ref{fig:sweep}, Table~\ref{tab:ladder}): \textbf{caving} (Qwen3.5-9B moves
-more for a stated preference than for a relevant fact), \textbf{reactance} (Claude
-Haiku~4.5 picks the option the user did \emph{not} ask for), and
-\textbf{indifference} (Sonnet~5.5 and Opus~5 move for facts, not for pressure).
+(Figure~\ref{fig:sweep}, Table~\ref{tab:ladder}): \textbf{deference} (Qwen3.5-9B moves
+more for a stated preference than for a relevant fact), \textbf{opposition} (Claude
+Haiku~4.5 picks the option the user did \emph{not} ask for, an apparent reactance whose
+cause we have not isolated), and \textbf{evidence-sensitive stability} (Sonnet~5.5 and
+Opus~5 move for facts, not for pressure).
 
 \section{Related Work}
 
@@ -144,15 +146,15 @@ of 30 scenarios when API credits ran out.}
 change their answer on 65--77\% of relevant updates and on almost no factual negatives
 ($d'_{\text{fact}}$ 2.3--2.7; Table~\ref{tab:ladder}). Haiku changes on fewer relevant
 updates and on more negatives, for $d'_{\text{fact}} \approx 1$, and is right both
-before and after the update in only 8--12 of 30 scenarios (Sonnet 16--19). Part of
-Haiku's gap is a measurement confound we found afterwards: these runs shuffled the
-option order separately for each variant, and Haiku changed 18\% of answers that
-should not change when the order differed from base, against 5\% when it matched
-(Sonnet and Opus: 1--5\% either way). The code now keeps one order per scenario;
-Haiku's $d'$ must be rerun before it can be compared. Haiku also asks for more
+before and after the update in only 8--12 of 30 scenarios (Sonnet 16--19). These runs
+also shuffled the option order separately for each variant. Haiku changed 18\% of
+answers that should not change when the order differed from base and 5\% when it
+matched (Sonnet and Opus 1--5\% either way). Those are different subsets of prompts,
+so this shows an order problem without measuring how much of Haiku's gap it explains;
+the code now keeps one order per scenario, and a matched rerun will tell. Haiku also asks for more
 information more often (15--17 of 30 omissions).
 
-\textbf{Decision boundaries: exact, or blurred and reactive.} On the sweep
+\textbf{Decision boundaries: exact, or blurred and opposed.} On the sweep
 (Figure~\ref{fig:sweep}), Opus answering with a code was right on all 192 prompts: its
 switch point sits exactly at the threshold in every scenario and pressure never moves
 it. In written advice it missed 8 of 190, mostly \emph{need more information} on
@@ -192,13 +194,14 @@ Labels are drafts, most cells are one sample, the Haiku/Sonnet/Opus runs are
 exploratory, shuffled options per variant, and are incomplete for Sonnet's sweep and
 the Opus rerun. Thirty authored
 scenarios in one domain is small, and our sweep rules are explicit, which makes them
-easier than real advice. Next: (1) blind labels for all seven variants; (2) finish and
-replicate the Claude runs with five samples; (3) the factual negatives, sweep and a
-neutral-mention control on the 9B models, so caving vs.\ priming can be told apart;
-(4) harder sweeps whose thresholds are implied by priorities rather than stated, to
-test whether Sonnet and Opus stay exact when the rule is not handed to them; (5) a
-second model family. AITA posts come from a released dataset and are not
-redistributed.
+easier than real advice. Fact versus goal updates are underpowered (6 non-fact items).
+Next, in order: (1) blind labels for all seven variants and a matched-order rerun of
+the Claude runs with five samples; (2) the existing pressure controls on the 9B models,
+so deference can be told apart from lexical priming; (3) a fully paired Haiku test (no
+pressure, neutral mention of each option, and several phrasings of a request for each,
+in one option order) to see whether opposition exceeds any mention effect in both
+directions; (4) harder sweeps whose thresholds are implied rather than stated;
+(5) a balanced AITA set (posts from a released dataset, not redistributed).
 
 \bibliography{references}
 
