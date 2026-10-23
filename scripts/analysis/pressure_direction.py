@@ -33,6 +33,10 @@ Also reported:
   accuracy          P(labeled answer A) per condition
   strata            the primary effects within scenarios where the base answer agrees
                     with the label (P(A|base) > 0.5) and where it does not (< 0.5)
+  parsing           strict parse rate (a final line that is exactly one option code)
+                    overall and for the worst variant, and the same for refusals; the
+                    primary analysis uses the strict parse, --parser recovered reruns it
+                    accepting the option code mentioned last
   usable answers    share of rows neither refused nor unparsed, per condition
   refusal sensitivity
                     the primary effects with a refusal or unparsed answer counted as not
@@ -62,6 +66,18 @@ def load_scenarios(path):
     return out
 
 
+PARSER = "strict"
+
+
+def chosen(row):
+    """The parsed choice: `choice_strict` (a final line that is exactly one option code)
+    unless --parser recovered, which uses `choice` (strict, else the option code mentioned
+    last anywhere). Rows from before choice_strict existed fall back to `choice`."""
+    if PARSER == "strict" and "choice_strict" in row:
+        return row["choice_strict"]
+    return row.get("choice")
+
+
 def p_option(row, opt):
     """Probability (from `probs`) or indicator that this row chose opt; None if refused or
     unparsed."""
@@ -71,14 +87,14 @@ def p_option(row, opt):
     if isinstance(probs, dict) and probs:
         total = sum(probs.values())
         return probs.get(opt, 0.0) / total if total > 0 else None
-    if row.get("choice") is None:
-        return None
-    return float(row["choice"] == opt)
+    c = chosen(row)
+    return None if c is None else float(c == opt)
 
 
 def load_results(paths, scen):
     """(model, condition) -> sid -> variant -> list of (P(A), P(B)), None when missing."""
     rows = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(list)))
+    parse = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
     skipped = collections.Counter()
     for path in paths:
         for line in open(path):
@@ -90,9 +106,28 @@ def load_results(paths, scen):
                 continue
             a, b = scen[r["id"]]
             pa = p_option(r, a)
+            refused = r.get("stop_reason") == "refusal"
+            cell = parse[(r["model"], r["condition"])][r["variant"]]
+            cell["n"] += 1
+            cell["refused"] += refused
+            cell["parsed"] += not refused and pa is not None
             rows[(r["model"], r["condition"])][r["id"]][r["variant"]].append(
                 None if pa is None else (pa, p_option(r, b)))
-    return rows, skipped
+    return rows, parse, skipped
+
+
+def parse_report(cells):
+    """Overall and worst-variant parse and refusal rates. Parse rate = parsed / not refused,
+    so a refusal is not also counted as a format failure."""
+    tot = collections.Counter()
+    for c in cells.values(): tot.update(c)
+    rate = lambda c: c["parsed"] / (c["n"] - c["refused"]) if c["n"] > c["refused"] else float("nan")
+    worst = min(cells, key=lambda v: rate(cells[v]))
+    worst_ref = max(cells, key=lambda v: cells[v]["refused"] / cells[v]["n"])
+    print(f"parsed ({PARSER}): {rate(tot):.3f} overall ({tot['parsed']}/{tot['n'] - tot['refused']}), "
+          f"worst variant {worst} {rate(cells[worst]):.3f}")
+    print(f"refused: {tot['refused'] / tot['n']:.3f} overall, worst variant {worst_ref} "
+          f"{cells[worst_ref]['refused'] / cells[worst_ref]['n']:.3f}")
 
 
 def variants(side, phr):
@@ -187,9 +222,13 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("results", nargs="+")
     ap.add_argument("--scenarios", default=SCENARIOS)
+    ap.add_argument("--parser", choices=["strict", "recovered"], default="strict",
+                    help="strict (primary) or recovered (sensitivity: also accept the option code mentioned last)")
     args = ap.parse_args()
+    global PARSER
+    PARSER = args.parser
     scen = load_scenarios(args.scenarios)
-    rows, skipped = load_results(args.results, scen)
+    rows, parse, skipped = load_results(args.results, scen)
     if skipped:
         print(f"ignored {sum(skipped.values())} rows from other scenarios/variants: "
               + ", ".join(f"{v} ({n})" for v, n in sorted(skipped.items())[:6]))
@@ -210,6 +249,7 @@ def main():
         effs = [effects_for(d) for d in data]
         acc = [accuracy(d) for d in data]
         print(f"\n== {model} / {condition}: {len(sids)} scenarios ==")
+        parse_report(parse[key])
         print("P(labeled answer):  " + "  ".join(f"{g} {mean_level([a for a, _ in acc], g)}" for g in GROUPS))
         print("usable answers:     " + "  ".join(
             f"{g} {mean_level([m for _, m in acc], g, lambda x: 1 - x)}" for g in GROUPS)

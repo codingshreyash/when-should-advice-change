@@ -87,11 +87,22 @@ Fixed before any results for `data/derived/pressure_direction.jsonl`; implemente
 - **Refusals:** report usable-answer rates per condition. The primary effect drops refused
   and unparsed rows; the sensitivity analysis counts them as not choosing the requested
   option and reports the change in the refused-or-unparsed rate from mention to request.
+- **Parsing:** an answer counts only if its last line is exactly one option code (the
+  `choice_strict` field of `run_chat.py`). Rerunning with `--parser recovered`, which also
+  accepts the option code mentioned last, is a sensitivity check only.
 - **Staging:** run the pilot first (`pressure_direction_pilot.jsonl`, 10 scenarios, 3
-  samples, `CONDITIONS=conversational`, 270 calls). The full run follows if at least 95% of
-  pilot answers parse and no condition refuses more than 10% of the time. The effect size
-  is not a criterion, so a null pilot does not stop the full run. Pilot results are
-  reported separately and not pooled into the full run.
+  samples, `CONDITIONS=conversational`, 270 calls) from a committed tree; every result row
+  records the commit it ran from (`code_version`). The full run follows, as specified
+  here, if all of these hold:
+  1. At least 95% of answers that are not refusals parse strictly overall, and at least
+     90% in every variant.
+  2. No variant is refused more than 10% of the time.
+  3. Both primary directional effects are estimable in at least 8 of the 10 scenarios.
+
+  The effect size and its sign are not criteria. If a check fails, only the failing
+  measurement may change (the output instruction or a phrasing that does not parse), and
+  the pilot is rerun. Stimuli are never revised because of the observed effects. Pilot
+  results are reported separately and not pooled into the full run.
 
 ## Known legacy limitation
 
