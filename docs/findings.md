@@ -543,3 +543,17 @@ Each of these is already reflected above.
    career run the "Oct 3 run". The relevant-update counts it cites (22/29, 19/28) come
    from the career files committed on 2026-09-28, not from the 2026-10-03
    pressure-controls run (21/29, 18/28).
+
+- **Option order shuffled per variant (found 2026-10-23, from an outside review).**
+  With `RANDOMIZE_OPTIONS=1`, `ordered_scenario()` seeded the shuffle on the scenario,
+  the variant and the sample, so a base prompt and its variants usually showed the
+  options in different orders. Every randomized run is affected: the model-size ladder
+  and both threshold-sweep runs (the legacy runs used a fixed order). An answer change
+  can then be an order effect. For Haiku it matters: on variants that should not change
+  the answer it changed 18% (36/202) when the order differed from base and 5% (2/38)
+  when it matched; Sonnet 3% and 5%, Opus 1% and 4%. So Haiku's false alarms and low d′
+  are inflated. The directional reactance result is not explained by it: the shuffle is
+  independent of the pressure direction, and the reversal holds within each position of
+  the high-side option. The seed now uses the scenario and sample only
+  (`ORDER_PER_VARIANT=1` reproduces the old orders). The ladder should be rerun from
+  scratch rather than resumed, so all prompts share the new rule.

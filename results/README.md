@@ -124,7 +124,10 @@ the Nimble runs or for the career refusal recheck.
 [`scripts/run/run_model_ladder.sh`](../scripts/run/run_model_ladder.sh) runs Claude
 Haiku 4.5, Sonnet 5.5 and Opus 5 with randomized option order (seed 1684) and one
 sample, on 2026-10-21. Exploratory until blind labels exist. The runs stopped when the
-API account ran out of credits; finish them with `RESUME=1 bash scripts/run/run_model_ladder.sh`.
+API account ran out of credits. They also shuffled option order per variant, which
+confounds answer changes (see [`docs/findings.md`](../docs/findings.md#8-corrections)), so rerun the whole
+ladder with the current runner (`OVERWRITE=1 bash scripts/run/run_model_ladder.sh`)
+rather than resuming.
 
 | File | Status |
 |---|---|

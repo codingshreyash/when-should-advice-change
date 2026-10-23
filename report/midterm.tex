@@ -132,19 +132,25 @@ Opus 5$^\dagger$ & code only & 13/18 & 10/18 & 0/17 & 0/18 & 2.47 [1.91, 3.06] &
 \bottomrule
 \end{tabular}
 \caption{Factual discrimination across Claude model sizes on the 30 career scenarios
-(exploratory: draft labels, one sample, randomized option order). $^\dagger$The Opus
-rerun stopped at 18 of 30 scenarios when API credits ran out.}
+(exploratory: draft labels, one sample). Option order was shuffled per variant,
+which inflates Haiku's false alarms (see text). $^\dagger$The Opus rerun stopped at 18
+of 30 scenarios when API credits ran out.}
 \label{tab:ladder}
 \end{table*}
 
 \section{Results}
 
-\textbf{Factual discrimination grows with model size.} Sonnet and Opus change their
-answer on 65--77\% of relevant updates and on almost no factual negatives
+\textbf{Factual discrimination: Sonnet and Opus, but not Haiku.} Sonnet and Opus
+change their answer on 65--77\% of relevant updates and on almost no factual negatives
 ($d'_{\text{fact}}$ 2.3--2.7; Table~\ref{tab:ladder}). Haiku changes on fewer relevant
-updates and on more negatives, especially in written advice, for $d'_{\text{fact}}
-\approx 1$; in written advice its interval does not overlap Sonnet's. Haiku also asks for more
-information more often, on omissions (15--17 of 30) and in the sweep.
+updates and on more negatives, for $d'_{\text{fact}} \approx 1$, and is right both
+before and after the update in only 8--12 of 30 scenarios (Sonnet 16--19). Part of
+Haiku's gap is a measurement confound we found afterwards: these runs shuffled the
+option order separately for each variant, and Haiku changed 18\% of answers that
+should not change when the order differed from base, against 5\% when it matched
+(Sonnet and Opus: 1--5\% either way). The code now keeps one order per scenario;
+Haiku's $d'$ must be rerun before it can be compared. Haiku also asks for more
+information more often (15--17 of 30 omissions).
 
 \textbf{Decision boundaries: exact, or blurred and reactive.} On the sweep
 (Figure~\ref{fig:sweep}), Opus answering with a code was right on all 192 prompts: its
@@ -157,7 +163,8 @@ as if leaving out the stated 20\% costs. Under
 pressure it moves the other way: asked to endorse the high-side option, its written
 advice chose that option 9 times out of 64 instead of 26 and the low-side option 26
 times instead of 22, and pressure toward the low side raised its high-side choices
-from 26 to 29 and cut low-side ones from 22 to 13. Code answers show the same reversal.
+from 26 to 29 and cut low-side ones from 22 to 13. Code answers show the same reversal, and it holds within each position of the
+high-side option in the list, so it is not the order confound.
 Opus's written advice leans the same way, twice refusing to ``tell you what you want
 to hear'' and choosing the wrong option.
 
@@ -182,7 +189,8 @@ the clause ``I'm the one deciding here'' alone drew 8 of 29.
 \section{Limitations and Next Steps}
 
 Labels are drafts, most cells are one sample, the Haiku/Sonnet/Opus runs are
-exploratory, and Sonnet's sweep and the Opus rerun are incomplete. Thirty authored
+exploratory, shuffled options per variant, and are incomplete for Sonnet's sweep and
+the Opus rerun. Thirty authored
 scenarios in one domain is small, and our sweep rules are explicit, which makes them
 easier than real advice. Next: (1) blind labels for all seven variants; (2) finish and
 replicate the Claude runs with five samples; (3) the factual negatives, sweep and a

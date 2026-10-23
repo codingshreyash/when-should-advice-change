@@ -45,10 +45,13 @@ pressure and move for facts.
 
 ![Threshold-sweep decision curves](report/figures/threshold_curves.png)
 
-- **Factual discrimination grows with model size.** Relevant vs. irrelevant update
-  d′ is about 1.0 for Haiku (0.98 code only, 0.95 written) against 2.36–2.65 for Sonnet
-  and 2.27–2.47 for the (partial) Opus rerun; the subthreshold update gives the same
-  picture ([`model_ladder_career30.txt`](results/summaries/model_ladder_career30.txt)).
+- **Factual discrimination.** Relevant vs. irrelevant update d′ is 2.36–2.65 for Sonnet
+  and 2.27–2.47 for the (partial) Opus rerun, against about 1.0 for Haiku
+  ([`model_ladder_career30.txt`](results/summaries/model_ladder_career30.txt)). Haiku's
+  number is confounded: these runs shuffled option order per variant, and Haiku changed
+  18% of answers that should not change when the order differed from base, against 5%
+  when it matched (Sonnet and Opus 1–5%). The runner now keeps one order per scenario;
+  Haiku needs a rerun.
 - **Decision boundaries.** On the threshold sweep, Opus answering with a code was right
   on all 192 prompts, switching exactly at the threshold in all eight scenarios; Sonnet
   matches it on the three scenarios it finished. Haiku's switch point is off by a factor
