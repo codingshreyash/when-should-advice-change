@@ -181,7 +181,7 @@ interrupted run). Runners never overwrite an existing results file unless `OVERW
     RANDOMIZE_OPTIONS=1 OPTION_ORDER_SEED=1684 SAMPLES=5 \
       SCENARIOS=data/scenarios/career_v2.jsonl python scripts/run/run_nimble.py
 
-`bash scripts/run/run_gpu_experiments.sh` runs the pressure controls and the steering
+`bash scripts/run/run_gpu_experiments.sh` runs the pressure controls, the paired pressure-direction test and the steering
 study in one go. Delete the instance when done.
 
 **Analyses** (each prints to stdout; saved copies are in `results/summaries/`):
