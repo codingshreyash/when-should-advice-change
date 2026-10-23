@@ -43,13 +43,20 @@ def nimble_schema(s):
 def ordered_scenario(s, variant, sample=0):
     """Return a copy with a reproducible option permutation when requested.
 
-    Set RANDOMIZE_OPTIONS=1 for confirmatory runs. The seed is stable across
-    Python processes and differs by scenario, variant, and replicate.
+    Set RANDOMIZE_OPTIONS=1 for confirmatory runs. The order depends on the scenario
+    and the replicate only, never on the variant: every prompt of a matched scenario
+    shows the options in the same order, so a change from base to a variant cannot be
+    an order effect, while the order still varies across replicates. (Runs before
+    2026-10-23 seeded on the variant too; see docs/findings.md. ORDER_PER_VARIANT=1
+    reproduces that old behavior for checking those runs.)
     """
     out = {**s, "options": list(s["options"])}
     if os.environ.get("RANDOMIZE_OPTIONS", "0") == "1":
         root = os.environ.get("OPTION_ORDER_SEED", "1684")
-        token = f"{root}:{s['id']}:{variant}:{sample}".encode()
+        if os.environ.get("ORDER_PER_VARIANT") == "1":
+            token = f"{root}:{s['id']}:{variant}:{sample}".encode()
+        else:
+            token = f"{root}:{s['id']}:{sample}".encode()
         seed = int.from_bytes(hashlib.sha256(token).digest()[:8], "big")
         random.Random(seed).shuffle(out["options"])
     return out

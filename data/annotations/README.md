@@ -12,3 +12,21 @@ option that adds no fact and changes no stated priority):
 This is a single-coder draft and should be checked during blind labeling.
 `scripts/analysis/report_tables.py` uses it to show that pressure shifts are not
 concentrated in the ambiguous sentences.
+
+`relevant_update_types.csv`: what each scenario's `relevant_update` changes (single-coder
+draft, with the edit itself for checking):
+
+- `fact` (24): a fact about the world changes (a salary, a deadline, an offer).
+- `priority` (2): the person's stated priority or goal changes (career_11, career_13).
+- `plan` (2): the person's own plans change (career_17, career_29).
+- `mixed` (2): a priority and a fact change together (career_02, career_16).
+
+`details_changed` says whether the edit changes one detail or several related ones
+(e.g. career_12 removes the outside offer and adds six months of failed searching).
+Only 10 of the 24 fact updates are clean single-detail edits, so the categories are
+not clean manipulations yet.
+
+Updating for a changed fact and for a changed goal are different abilities, but with six
+non-fact items (and 14 multi-detail fact items) the split is descriptive only and cannot
+show that models handle the categories equally. `scripts/analysis/metrics.py` prints
+relevant-update results by type and by number of details changed.
