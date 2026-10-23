@@ -523,6 +523,14 @@ factual negatives at the 2026-10-21 merge. Saved output:
   (`scripts/analysis/plot_threshold.py`). Nothing here is final until the runs and
   blind labels are done.
 - Length-matched omissions, AITA NTA posts, and a five-sample noise baseline.
+- The paired pressure-direction test on Haiku, pilot first
+  ([`PROTOCOL.md`](../PROTOCOL.md#pressure-direction-analysis)). One hypothesis it can
+  test: smaller models are not simply more sycophantic or more oppositional, but worse at
+  telling social pressure from decision-relevant evidence. That would explain both
+  Qwen's deference and Haiku's opposition, since either way the model moves on a request.
+  It predicts that a model's request effect, in either sign, grows as its
+  relevant-vs-irrelevant d′ falls, and that the size of the request effect, not its sign,
+  is what tracks scale.
 
 ## 8. Corrections
 

@@ -22,15 +22,24 @@ scenario and sample only, so every prompt of a scenario shows the same order.
 Skipped: scenarios whose base label is need_more_information, whose base label equals the
 pressure target, or that do not have two distinct concrete options.
 
-Usage: python3 scripts/data/build_pressure_direction.py
+Pilot (--pilot): data/derived/pressure_direction_pilot.jsonl keeps 10 scenarios drawn with
+seed 1684 and only the variants of the primary analysis (base, mention_A, mention_B, and
+request phrasings p0, p1, p4 toward each side): 9 prompts, so 270 calls at SAMPLES=3 in
+one format. It checks parsing and refusal rates before the full run; its results are
+not pooled into the full run.
+
+Usage: python3 scripts/data/build_pressure_direction.py [--pilot]
 """
-import json, sys
+import json, random, sys
 sys.dont_write_bytecode = True   # importing the sibling builder should not leave __pycache__
 from build_pressure_controls import MENTION, PREF_PHRASINGS, as_clause
 
 NMI = "need_more_information"
 SOURCES = ["data/scenarios/career_pilot.jsonl", "data/scenarios/career_v2.jsonl"]
 OUT = "data/derived/pressure_direction.jsonl"
+PILOT_OUT = "data/derived/pressure_direction_pilot.jsonl"
+PILOT_N, PILOT_SEED = 10, 1684
+PILOT_VARIANTS = ["base", "mention_A", "mention_B"] + [f"request_{s}_p{k}" for s in "AB" for k in (0, 1, 4)]
 
 def skip_reason(s):
     a, b = s["expected"]["base"], s.get("pressure_target")
@@ -90,9 +99,17 @@ if __name__ == "__main__":
             why = skip_reason(s)
             if why: skipped.append((s["id"], why))
             else: recs.append(build(s))
-    with open(OUT, "w") as f:
+    out = OUT
+    if "--pilot" in sys.argv:
+        keep = set(random.Random(PILOT_SEED).sample(sorted(r["id"] for r in recs), PILOT_N))
+        recs = [dict(r, prompts={v: r["prompts"][v] for v in PILOT_VARIANTS},
+                     expected={v: r["expected"][v] for v in PILOT_VARIANTS},
+                     appended={v: r["appended"][v] for v in PILOT_VARIANTS if v != "base"})
+                for r in recs if r["id"] in keep]
+        out = PILOT_OUT
+    with open(out, "w") as f:
         for r in recs: f.write(json.dumps(r) + "\n")
     for sid, why in skipped:
         print(f"skipped {sid}: {why}")
     n = sum(len(r["prompts"]) for r in recs)
-    print(f"wrote {len(recs)} scenarios x {len(recs[0]['prompts'])} prompts = {n} prompts to {OUT}")
+    print(f"wrote {len(recs)} scenarios x {len(recs[0]['prompts'])} prompts = {n} prompts to {out}")

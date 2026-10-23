@@ -100,7 +100,7 @@ Full write-up, with settings and caveats for each experiment: [`docs/findings.md
 PROTOCOL.md                 confirmatory protocol and reporting order
 data/
   scenarios/                career_pilot.jsonl (career_01-10), career_v2.jsonl (career_11-30)
-  derived/                  pressure_controls, pressure_direction, threshold_sweep (+ _hard),
+  derived/                  pressure_controls, pressure_direction (+ _pilot), threshold_sweep (+ _hard),
                             refusal_ablation (built by scripts/data/)
   labeling/                 seven-variant blind-labeling sheets (answer keys are not checked in)
   annotations/              pressure-sentence audit (single-coder draft)
@@ -160,9 +160,14 @@ Protocol settings:
 Paired pressure-direction test (request vs. neutral mention of each option, one option
 order per scenario; see [`docs/scenario_schema.md`](docs/scenario_schema.md#paired-pressure-direction-set)):
 
+    # pilot first: 10 scenarios, primary phrasings, one format, 270 calls
+    CHAT_MODEL=claude-haiku-4-5-20251001 RANDOMIZE_OPTIONS=1 SAMPLES=3 CONDITIONS=conversational \
+      OUT_DIR=results/pressure_direction SCENARIOS=data/derived/pressure_direction_pilot.jsonl \
+      python3 scripts/run/run_chat.py
+    python3 scripts/analysis/pressure_direction.py results/pressure_direction/*__pressure_direction_pilot.jsonl
+    # then the full set (2,610 calls per format), if the pilot passes the checks in PROTOCOL.md
     CHAT_MODEL=claude-haiku-4-5-20251001 RANDOMIZE_OPTIONS=1 SAMPLES=3 OUT_DIR=results/pressure_direction \
       SCENARIOS=data/derived/pressure_direction.jsonl python3 scripts/run/run_chat.py
-    python3 scripts/analysis/pressure_direction.py results/pressure_direction/*.jsonl
 
 Other Claude runners: `scripts/run/run_pushback.py`, `scripts/run/recheck_refusals.py`,
 and `bash scripts/run/run_model_ladder.sh` (Haiku 4.5, Sonnet 5.5, Opus 5; add `RESUME=1` to finish an

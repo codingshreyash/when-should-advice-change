@@ -72,19 +72,24 @@ expected answer never depends on pressure.
 `data/derived/pressure_direction.jsonl` (built by `scripts/data/build_pressure_direction.py`)
 separates a request for an option from merely naming it, in both directions. For each of
 29 scenarios (career_10 is skipped: its base label is need_more_information), A is the
-base answer and B the pressure target. Prompts: `base`, `mention_A`, `mention_B` (neutral
-mention), and `request_A_p0..p5`, `request_B_p0..p5` (six third-person phrasings each);
-435 prompts, all expecting the base label. Run with `RANDOMIZE_OPTIONS=1`, so every prompt
-of a scenario shares one option order within a sample, and `SAMPLES=3`.
-`scripts/analysis/pressure_direction.py` estimates, per scenario and then over
-scenarios, the request effect beyond the mention effect: P(A | request A) − P(A | mention
-A), and the same for B; positive means deference, negative opposition.
+labeled answer (the scenario author's expected base answer, not necessarily what a given
+model chooses at baseline) and B the pressure target. Prompts: `base`, `mention_A`,
+`mention_B` (neutral mention), and `request_A_p0..p5`, `request_B_p0..p5` (six
+third-person phrasings each); 435 prompts, all expecting the labeled answer. Run with
+`RANDOMIZE_OPTIONS=1`, so every prompt of a scenario shares one option order within a
+sample, and `SAMPLES=3`. `scripts/analysis/pressure_direction.py` estimates, per scenario
+and then over scenarios, the request effect beyond the mention effect: P(A | request A) −
+P(A | mention A), and the same for B; positive means deference, negative opposition.
 
-Not all six phrasings are pure requests by the study's definition of pressure: p0, p1
-and p4 ask to be told an option is right; p2 ("their gut says…") and p3 ("mostly made up
-their mind…") state an inclination, which can be read as decision-relevant; p5 ("please
-just tell them…") instructs the advisor. Read the per-phrasing breakdown, and treat
-p0/p1/p4 as the clean test. The request toward A (the base answer) is the cleaner
-deference test, since a request toward B can conflict with the person's stated priority.
-Untested so far; it needs API credits (870 calls at SAMPLES=1, 2,610 at SAMPLES=3 for one
-model).
+The analysis plan is fixed in [`PROTOCOL.md`](../PROTOCOL.md#pressure-direction-analysis)
+before any results: the primary phrasings are p0, p1 and p4 (requests to be told an
+option is right), with p0 as the single cleanest; p2 and p3 (which state an inclination)
+and p5 (which instructs the advisor) are secondary and never pooled with them. The two
+directions are always reported separately, with accuracy against the label, strata by
+whether the model's base answer agrees with the label, and a refusal sensitivity
+analysis.
+
+`data/derived/pressure_direction_pilot.jsonl` (`--pilot`) is the staged first step: 10
+scenarios drawn with a fixed seed and only the primary variants (9 prompts each), 270
+calls at `SAMPLES=3` in one format. The full set is 870 calls per format at one sample,
+2,610 at three. Untested so far; both need API credits.

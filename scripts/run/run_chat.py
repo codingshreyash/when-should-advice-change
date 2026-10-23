@@ -12,6 +12,7 @@ interrupted run instead: it keeps every prompt answered in both conditions, drop
 half-finished one, and appends only what is missing (option order depends only on
 scenario and sample, so resumed prompts get the order they would have had; every variant
 of a scenario shares that order within a sample).
+CONDITIONS=conversational (or constrained) runs one format only; the default is both.
 Usage: CHAT_MODEL=claude-opus-5 SCENARIOS=data/scenarios/career_v2.jsonl python3 scripts/run/run_chat.py
 """
 import collections, json, os, re, sys
@@ -23,15 +24,17 @@ from prompts import (load, iter_items, ordered_scenario, result_path,
 MODEL = os.environ.get("CHAT_MODEL", "claude-opus-5")
 SAMPLES = int(os.environ.get("SAMPLES", "1"))   # set 5 on the base variant later for the noise baseline
 RESUME = os.environ.get("RESUME") == "1"
+CONDITIONS = os.environ.get("CONDITIONS", "conversational,constrained").split(",")
+assert set(CONDITIONS) <= {"conversational", "constrained"} and CONDITIONS, CONDITIONS
 
 def completed(path):
-    """(id, variant, sample) answered in both conditions; rewrites the file without the
+    """(id, variant, sample) answered in every condition run; rewrites the file without the
     rows of any half-finished item so appending keeps it consistent."""
     if not os.path.exists(path): return set()
     rows = [json.loads(l) for l in open(path) if l.strip()]
     key = lambda r: (r["id"], r["variant"], r.get("sample", 0))
     n = collections.Counter(key(r) for r in rows)
-    keep = [r for r in rows if n[key(r)] == 2]
+    keep = [r for r in rows if n[key(r)] == len(CONDITIONS)]
     with open(path, "w") as f:
         for r in keep: f.write(json.dumps(r) + "\n")
     return {key(r) for r in keep}
@@ -67,19 +70,19 @@ def main():
             for k in range(SAMPLES):
                 if (s["id"], variant, k) in done: continue
                 ordered = ordered_scenario(s, variant, k)
-                # conversational
-                txt, stop, refusal = ask(client, chat_prompt_conversational(ordered, variant), 8000)
-                out.write(json.dumps({"model": MODEL, "condition": "conversational", "id": s["id"],
-                                      "variant": variant, "sample": k, "stop_reason": stop, "refusal": refusal,
-                                      "option_order": ordered["options"],
-                                      "choice": extract_code(txt, s["options"]), "text": txt}) + "\n")
-                # constrained
-                # max_tokens covers any thinking the model does before the code
-                txt, stop, refusal = ask(client, chat_prompt_constrained(ordered, variant), 4000)
-                out.write(json.dumps({"model": MODEL, "condition": "constrained", "id": s["id"],
-                                      "variant": variant, "sample": k, "stop_reason": stop, "refusal": refusal,
-                                      "option_order": ordered["options"],
-                                      "choice": extract_code(txt, s["options"]), "text": txt.strip()}) + "\n")
+                if "conversational" in CONDITIONS:
+                    txt, stop, refusal = ask(client, chat_prompt_conversational(ordered, variant), 8000)
+                    out.write(json.dumps({"model": MODEL, "condition": "conversational", "id": s["id"],
+                                          "variant": variant, "sample": k, "stop_reason": stop, "refusal": refusal,
+                                          "option_order": ordered["options"],
+                                          "choice": extract_code(txt, s["options"]), "text": txt}) + "\n")
+                if "constrained" in CONDITIONS:
+                    # max_tokens covers any thinking the model does before the code
+                    txt, stop, refusal = ask(client, chat_prompt_constrained(ordered, variant), 4000)
+                    out.write(json.dumps({"model": MODEL, "condition": "constrained", "id": s["id"],
+                                          "variant": variant, "sample": k, "stop_reason": stop, "refusal": refusal,
+                                          "option_order": ordered["options"],
+                                          "choice": extract_code(txt, s["options"]), "text": txt.strip()}) + "\n")
                 out.flush()
             print(s["id"], variant, "ok")
 
