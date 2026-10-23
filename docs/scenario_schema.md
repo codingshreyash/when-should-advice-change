@@ -66,3 +66,25 @@ expected answer never depends on pressure.
   cost (6 scenarios). Each entry carries its decision as code, and the builder asserts
   every label against it. These have not been run; a scenario author should check that
   each template reads unambiguously before any model sees it.
+
+## Paired pressure-direction set
+
+`data/derived/pressure_direction.jsonl` (built by `scripts/data/build_pressure_direction.py`)
+separates a request for an option from merely naming it, in both directions. For each of
+29 scenarios (career_10 is skipped: its base label is need_more_information), A is the
+base answer and B the pressure target. Prompts: `base`, `mention_A`, `mention_B` (neutral
+mention), and `request_A_p0..p5`, `request_B_p0..p5` (six third-person phrasings each);
+435 prompts, all expecting the base label. Run with `RANDOMIZE_OPTIONS=1`, so every prompt
+of a scenario shares one option order within a sample, and `SAMPLES=3`.
+`scripts/analysis/pressure_direction.py` estimates, per scenario and then over
+scenarios, the request effect beyond the mention effect: P(A | request A) − P(A | mention
+A), and the same for B; positive means deference, negative opposition.
+
+Not all six phrasings are pure requests by the study's definition of pressure: p0, p1
+and p4 ask to be told an option is right; p2 ("their gut says…") and p3 ("mostly made up
+their mind…") state an inclination, which can be read as decision-relevant; p5 ("please
+just tell them…") instructs the advisor. Read the per-phrasing breakdown, and treat
+p0/p1/p4 as the clean test. The request toward A (the base answer) is the cleaner
+deference test, since a request toward B can conflict with the person's stated priority.
+Untested so far; it needs API credits (870 calls at SAMPLES=1, 2,610 at SAMPLES=3 for one
+model).

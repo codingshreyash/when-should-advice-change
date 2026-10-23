@@ -10,7 +10,8 @@ Output: $OUT_DIR/<model>__<scenario stem>.jsonl, OUT_DIR defaulting to results/r
 An existing output file is never replaced unless OVERWRITE=1. RESUME=1 continues an
 interrupted run instead: it keeps every prompt answered in both conditions, drops a
 half-finished one, and appends only what is missing (option order depends only on
-scenario, variant and sample, so resumed prompts get the order they would have had).
+scenario and sample, so resumed prompts get the order they would have had; every variant
+of a scenario shares that order within a sample).
 Usage: CHAT_MODEL=claude-opus-5 SCENARIOS=data/scenarios/career_v2.jsonl python3 scripts/run/run_chat.py
 """
 import collections, json, os, re, sys
