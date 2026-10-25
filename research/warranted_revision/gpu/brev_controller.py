@@ -30,6 +30,7 @@ and passes ``--commands-verified``.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -66,7 +67,26 @@ def render(key: str, **kw: str) -> list[str]:
     return [part.format(**kw) for part in COMMANDS[key]["argv"]]
 
 
+#: Configs whose experiment was cancelled. They are kept unchanged as a record, and the
+#: controller refuses them (matched on the file's sha256, so a renamed copy is refused too).
+CANCELLED_CONFIGS = {
+    "configs/pilot_challenge.json": "challenge_v1 pilot, cancelled 2026-10-25 after the research review",
+}
+
+
+def _cancelled_reason(path: Path) -> str | None:
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    for rel, why in CANCELLED_CONFIGS.items():
+        ref = PKG / rel
+        if ref.exists() and hashlib.sha256(ref.read_bytes()).hexdigest() == digest:
+            return why
+    return None
+
+
 def build_plan(args: argparse.Namespace) -> dict:
+    why = _cancelled_reason(Path(args.config))
+    if why:
+        raise GuardError(f"config is cancelled: {why}")
     raw = json.loads(Path(args.config).read_text())
     raw["run_id"] = args.run_id
     raw["shard"] = args.shard

@@ -319,3 +319,27 @@ def test_launch_passes_config_shard_and_bench(tmp_path, fake_bin):
     log = fake_bin.read_text()
     assert "bash gpu/remote_job.sh t-s2of3" in log and "configs/_launch_config.json 2/3 1" in log
     assert log.count("brev delete") == 1
+
+
+def test_cancelled_pilot_config_is_refused(tmp_path, fake_bin):
+    ctl = _controller()
+    copy = tmp_path / "renamed.json"
+    copy.write_bytes((PKG_ROOT / "configs" / "pilot_challenge.json").read_bytes())
+    for cfg in (PKG_ROOT / "configs" / "pilot_challenge.json", copy):
+        rc = ctl.main(
+            [
+                "plan",
+                "--hourly",
+                "1.06",
+                "--max-usd",
+                "5",
+                "--run-id",
+                "t",
+                "--config",
+                str(cfg),
+                "--instance-type",
+                "L40S",
+            ]
+        )
+        assert rc == 2
+    assert not fake_bin.exists() or "brev" not in fake_bin.read_text()

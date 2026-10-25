@@ -1,6 +1,10 @@
 # Pilot plan: does premise search beat best-of-N?
 
-Status: approved 2026-10-25 with the ablation (6,160 calls, four shards, $16 aggregate worst
+**Cancelled 2026-10-25, never run.** The research review (`agent_reports/SYNTHESIS.md`)
+found that it would sit at the pressure ceiling, on labels with debatable readings and a
+benchmark a keyword rule solves, with five families and too little power. The text below and
+`configs/pilot_challenge.json` are kept unchanged as the record; the GPU controller refuses
+that config. Earlier status: approved 2026-10-25 with the ablation (6,160 calls, four shards, $16 aggregate worst
 case, no per-instance cap raised), the seeded tie-break and the strict `satisfied` definition. Everything here is exploratory: the data are
 synthetic, rule-labelled dev scenarios from five families, and no human has reviewed the
 labels. The holdout split stays untouched.
