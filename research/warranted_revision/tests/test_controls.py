@@ -97,3 +97,16 @@ def test_call_diagnostics_separate_ledger_from_decision(control_run):
     h = rows[("control:oracle", "premise_search", "hypothesis")]
     assert h["calls"] == 5 * 3 * 9 * 5  # 5 cases, 3 reps, 9 turns (base + 8 follow-ups), 5 readings
     assert h["hit_token_limit"] == 0 and h["missing"] == 0
+
+
+def test_trace_audit_on_controls(control_run):
+    from warranted_revision.trace_audit import audit_run
+
+    a = audit_run(control_run, DEV_GOLD)
+    sel = a["selection"]  # rows per system, 9-call arm and turn type
+    assert {k.split("|")[1] for k in sel} == {"best_of_n", "premise_search"}
+    oracle = sel["control:oracle|premise_search|followup"]
+    assert oracle["selected"] == oracle["any_correct"] == oracle["turns"]
+    # Every control supports only the true reading, so it is always kept and alone at the top.
+    ic = a["interpretation"]["control:oracle|premise_search"]
+    assert ic["turns_with_wrong_reading_at_max_score"] == 0
