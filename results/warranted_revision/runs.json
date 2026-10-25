@@ -1,0 +1,93 @@
+[
+  {
+    "run_id": "synthetic-20261025-bd0e95d",
+    "date": "2026-10-25",
+    "kind": "synthetic",
+    "github_run": null,
+    "purpose": "Stage 0: pipeline and evaluator controls with fake backends (no model)",
+    "outcome": "completed",
+    "instance_created": false,
+    "launch_minutes": 0,
+    "hourly_usd": null,
+    "actual_cost_usd": 0,
+    "notes": "151,200 fake calls; not real-model inference"
+  },
+  {
+    "run_id": "dry-run-1",
+    "date": "2026-10-25",
+    "kind": "dry_run",
+    "github_run": 40212392722,
+    "purpose": "Workflow dry run (plan only, no Brev call)",
+    "outcome": "completed",
+    "instance_created": false,
+    "launch_minutes": 0,
+    "hourly_usd": null,
+    "actual_cost_usd": 0,
+    "notes": ""
+  },
+  {
+    "run_id": "smoke-001",
+    "date": "2026-10-25",
+    "kind": "gpu",
+    "github_run": 40212578843,
+    "purpose": "First real launch (hyperstack_A6000)",
+    "outcome": "failed: brev create rejected the instance type; nothing created",
+    "instance_created": false,
+    "launch_minutes": 0,
+    "hourly_usd": 0.60,
+    "actual_cost_usd": null,
+    "notes": "brev create applies a default 500 GB disk filter even with --type"
+  },
+  {
+    "run_id": "smoke-002",
+    "date": "2026-10-25",
+    "kind": "gpu",
+    "github_run": 40213129003,
+    "purpose": "Retry on massedcompute_L40S",
+    "outcome": "failed: on-box test suite (results path bug); no model calls",
+    "instance_created": true,
+    "launch_minutes": 8.7,
+    "hourly_usd": 1.06,
+    "actual_cost_usd": null,
+    "notes": "instance deleted and confirmed"
+  },
+  {
+    "run_id": "smoke-003",
+    "date": "2026-10-25",
+    "kind": "gpu",
+    "github_run": 40214098165,
+    "purpose": "First full smoke run (5 dev cases, 4 conditions)",
+    "outcome": "completed; not interpretable (answer-format failures)",
+    "instance_created": true,
+    "launch_minutes": 67.7,
+    "hourly_usd": 1.06,
+    "actual_cost_usd": null,
+    "notes": "ledger schema bug found afterwards"
+  },
+  {
+    "run_id": "smoke-004",
+    "date": "2026-10-25",
+    "kind": "gpu",
+    "github_run": 40220677549,
+    "purpose": "Measurement validation after format fixes",
+    "outcome": "completed; format checks passed",
+    "instance_created": true,
+    "launch_minutes": 56.5,
+    "hourly_usd": 1.06,
+    "actual_cost_usd": null,
+    "notes": ""
+  },
+  {
+    "run_id": "format-001",
+    "date": "2026-10-25",
+    "kind": "gpu",
+    "github_run": 40228055215,
+    "purpose": "Format-only check of the shared ledger template + kernel benchmark",
+    "outcome": "completed (504 calls); report step crashed on box, regenerated locally",
+    "instance_created": true,
+    "launch_minutes": 45.2,
+    "hourly_usd": 1.06,
+    "actual_cost_usd": null,
+    "notes": "fast kernels unavailable; no speedup"
+  }
+]

@@ -66,6 +66,10 @@ To check the plan locally without touching Brev:
 
 ## Runs so far
 
+After every run (including dry runs and failed launches), add an entry to
+`results/warranted_revision/runs.json` and rerun `python -m warranted_revision.runlog`, which
+rewrites `RUN_LOG.md` with totals. Fill in `actual_cost_usd` once Brev's charge is known.
+
 - `smoke-001`: refused by `brev create` (type filter), nothing created.
 - `smoke-002`: instance created, failed in the on-box test suite (a path bug), deleted after ~9 min.
 - `smoke-003`: full run, 900 calls, ~68 min, ~$1.20. Not interpretable: most direct and
