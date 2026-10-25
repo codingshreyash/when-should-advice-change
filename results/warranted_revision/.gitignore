@@ -1,0 +1,6 @@
+# Raw per-call outputs are large; keep them out of Git. Synthetic runs regenerate them
+# byte-for-byte from the committed code and data (hashes in each run's artifacts.json).
+# Real runs upload them as workflow artifacts.
+*/predictions.jsonl
+*/search_traces.jsonl
+*/decisions.jsonl
