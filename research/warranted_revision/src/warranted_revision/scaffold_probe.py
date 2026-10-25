@@ -275,11 +275,14 @@ class Conv:
     order: list[str]
     base_reply: str = ""
     base_choice: str | None = None
+    #: the base answer if it is actionable, else the first listed action; "away" is the other
+    ref: str | None = None
     away: str | None = None
     cell: str | None = None
     item: str | None = None
     msgs: list[Message] = field(default_factory=list)
-    final_request: list[Message] | None = None
+    #: the conversation's first decision request (re-drawn by the sampled readout)
+    first_request: list[Message] | None = None
 
 
 def _user_turn(text: str, case: VisibleCase, order: list[str], options: bool, fmt: str) -> str:
@@ -298,7 +301,7 @@ def _decision_turn(case: VisibleCase, order: list[str]) -> str:
     return _user_turn(DECISION_TURN, case, order, True, P.DIRECT_FORMAT)
 
 
-def item_text(items: dict[str, Any], item: str, base: str | None, away: str) -> str:
+def item_text(items: dict[str, Any], item: str, ref: str, away: str) -> str:
     if item == "away_insist":
         return items["insist"][away]
     if item == "away_emotional":
@@ -306,8 +309,7 @@ def item_text(items: dict[str, Any], item: str, base: str | None, away: str) -> 
     if item == "neutral_other":
         return items["neutral"][away]
     if item == "toward_insist":
-        assert base is not None
-        return items["insist"][base]
+        return items["insist"][ref]
     return items["pushback"]
 
 
@@ -442,8 +444,8 @@ def run(
                 c.base_reply = comp.text
                 c.base_choice = parsed.choice if parsed.status == "valid" else None
                 acts = c.order[:2]
-                ref = c.base_choice if c.base_choice in acts else acts[0]
-                c.away = next(a for a in acts if a != ref)
+                c.ref = c.base_choice if c.base_choice in acts else acts[0]
+                c.away = next(a for a in acts if a != c.ref)
             # 2. Probe items in every cell.
             convs: list[Conv] = []
             for b in bases:
@@ -453,9 +455,7 @@ def run(
                 for cell in cfg.cells:
                     for item in cfg.probe_items:
                         opts, fmt_on, separate = CELLS[cell]
-                        text = item_text(
-                            items_all[b.case.case_id], item, b.base_choice, b.away or ""
-                        )
+                        text = item_text(items_all[b.case.case_id], item, b.ref or "", b.away or "")
                         fmt = P.DIRECT_FORMAT if fmt_on else LENGTH_CAP
                         msgs = hist + [
                             Message(
@@ -469,6 +469,7 @@ def run(
                                 order=b.order,
                                 base_reply=b.base_reply,
                                 base_choice=b.base_choice,
+                                ref=b.ref,
                                 away=b.away,
                                 cell=cell,
                                 item=item,
@@ -495,17 +496,18 @@ def run(
                             )
                         ]
                     _advance(call, backend, chains, sd, dec, free, step_prefix=f"r{r}_")
-            # 4. Sampled readout: re-draw the final decision call of chosen conversations.
+            # 4. Sampled readout: re-draw each chosen conversation's first decision request
+            #    (before any repeated round), so every cell samples the same turn.
             if cfg.sample:
                 s = cfg.sample
                 batch = []
                 for c in convs:
-                    if c.cell in s.cells and c.item in s.items and c.final_request is not None:
+                    if c.cell in s.cells and c.item in s.items and c.first_request is not None:
                         for k in range(s.k):
                             batch.append(
                                 (
                                     c,
-                                    c.final_request,
+                                    c.first_request,
                                     "sample",
                                     s.temperature,
                                     sd(c.case.case_id, c.order_key, c.cell, c.item, "sample", k),
@@ -569,7 +571,8 @@ def _advance(call, backend, convs: list[Conv], sd, dec: int, free: int, step_pre
         for c in same
     ]
     for c, (comp, _) in zip(same, call(backend, batch, dec, True), strict=True):
-        c.final_request = c.msgs
+        if c.first_request is None:
+            c.first_request = c.msgs
         c.msgs = c.msgs + [Message(role="assistant", content=comp.text)]
     batch = [
         (
@@ -582,7 +585,7 @@ def _advance(call, backend, convs: list[Conv], sd, dec: int, free: int, step_pre
         )
         for c in sep
     ]
-    for c, (comp, _) in zip(sep, call(backend, batch, free, False), strict=True):
+    for c, (comp, _) in zip(sep, call(backend, batch, free, True), strict=True):
         c.msgs = c.msgs + [
             Message(role="assistant", content=comp.text),
             Message(role="user", content=_decision_turn(c.case, c.order)),
@@ -599,7 +602,8 @@ def _advance(call, backend, convs: list[Conv], sd, dec: int, free: int, step_pre
         for c in sep
     ]
     for c, (comp, _) in zip(sep, call(backend, batch, dec, True), strict=True):
-        c.final_request = c.msgs
+        if c.first_request is None:
+            c.first_request = c.msgs
         c.msgs = c.msgs + [Message(role="assistant", content=comp.text)]
 
 

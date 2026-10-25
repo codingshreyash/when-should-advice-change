@@ -27,7 +27,11 @@ install_kernels() {
   timeout 300 python -m pip install -q --only-binary=:all: causal-conv1d || echo "causal-conv1d wheel not available"
 }
 
-if [ "$BENCH" = "1" ]; then
+IS_PROBE=$(python -c "import json; print(int(json.load(open('$CONFIG')).get('experiment') == 'scaffold_probe'))")
+if [ "$IS_PROBE" = "1" ] && [ "$BENCH" != "1" ]; then
+  # The probe's short direct calls don't need the optional kernels; skip the install time.
+  echo "scaffold probe: skipping optional kernel install"
+elif [ "$BENCH" = "1" ]; then
   # Same fixed batch before and after installing the kernels.
   # Benchmark failures never stop the job. If the kernel build breaks generation, remove it so
   # the run itself uses the known-good fallback path.

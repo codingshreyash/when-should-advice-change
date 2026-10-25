@@ -47,6 +47,10 @@ on:
         description: "Benchmark fast kernels on the box before the run"
         type: boolean
         default: false
+      est_seconds_per_call:
+        description: "Planning estimate of seconds per model call (sets the run's deadline check)"
+        required: true
+        default: "6"
 
 concurrency:
   group: warranted-revision-gpu
@@ -75,6 +79,7 @@ jobs:
       CONFIG: ${{ inputs.config }}
       SHARD: ${{ inputs.shard }}
       BENCH_FLAG: ${{ inputs.benchmark && '--bench' || '' }}
+      EST_SPC: ${{ inputs.est_seconds_per_call }}
     steps:
       - uses: actions/checkout@v4
 
@@ -92,7 +97,7 @@ jobs:
           python gpu/brev_controller.py plan \
             --hourly "$HOURLY" --max-usd "$MAX_USD" --run-id "$RUN_ID" \
             --instance-type "$INSTANCE_TYPE" --state "$STATE" \
-            --config "$CONFIG" --shard "$SHARD" $BENCH_FLAG
+            --config "$CONFIG" --shard "$SHARD" --est-seconds-per-call "$EST_SPC" $BENCH_FLAG
 
       - name: Install Brev CLI
         if: ${{ !inputs.dry_run }}
@@ -110,7 +115,7 @@ jobs:
           python gpu/brev_controller.py launch \
             --hourly "$HOURLY" --max-usd "$MAX_USD" --run-id "$RUN_ID" \
             --instance-type "$INSTANCE_TYPE" --state "$STATE" $VERIFIED_FLAG \
-            --config "$CONFIG" --shard "$SHARD" $BENCH_FLAG
+            --config "$CONFIG" --shard "$SHARD" --est-seconds-per-call "$EST_SPC" $BENCH_FLAG
 
       - name: Upload results and controller state (before final cleanup)
         if: ${{ always() && !inputs.dry_run }}

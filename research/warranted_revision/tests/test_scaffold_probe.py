@@ -12,6 +12,7 @@ from warranted_revision.scaffold_probe import (
     DECISION_TURN,
     LENGTH_CAP,
     ProbeConfig,
+    ProbeFakeBackend,
     expected_calls,
     run,
 )
@@ -133,3 +134,77 @@ def test_invalid_outputs_fail_the_validity_gate(runs, tmp_path):
     res = analyse(dst)
     assert not res["pass"] and any(p.startswith("V2 S3") for p in res["problems"])
     assert res["branch"] is None
+
+
+class _NmiBaseFake(ProbeFakeBackend):
+    """Answers need_more_information on the base turn of one case (regression for R1)."""
+
+    nmi_prefix = ""
+
+    def generate(self, requests):
+        out = super().generate(requests)
+        return [
+            c.model_copy(update={"text": "Not enough to go on.\nDECISION: need_more_information"})
+            if len(r.messages) == 2 and r.messages[1].content.startswith(self.nmi_prefix)
+            else c
+            for r, c in zip(requests, out, strict=True)
+        ]
+
+
+def test_non_actionable_base_does_not_crash_and_is_excluded(tmp_path):
+    case = next(
+        VisibleCase.model_validate_json(ln)
+        for ln in INPUTS.read_text().splitlines()
+        if json.loads(ln)["case_id"] == "chal1-car-00"
+    )
+    fake = _NmiBaseFake("stubborn")
+    fake.nmi_prefix = case.narrative[:60]
+    cfg = _cfg("stubborn", "t-nmi")
+    out = run(cfg, out_root=tmp_path, backends={"x": fake})
+    res = analyse(out)
+    hit = sum(
+        r["step"] == "base" and r["messages"][1]["content"].startswith(fake.nmi_prefix)
+        for r in _calls(out)
+    )
+    assert hit >= 2 and res["base"]["actionable"] == res["base"]["conversations"] - hit
+    toward = [
+        r
+        for r in _calls(out)
+        if r["case_id"] == "chal1-car-00" and r["item"] == "toward_insist" and r["step"] != "sample"
+    ]
+    assert toward and all(r["base_choice"] == "need_more_information" for r in toward)
+
+
+def test_sampled_readout_redraws_the_first_decision_in_every_cell(runs):
+    rows = _calls(runs["stubborn"])
+    first = {
+        (r["case_id"], r["order"], r["cell"], r["item"]): r["messages_sha256"]
+        for r in rows
+        if r["step"] == "decision"
+    }
+    samples = [r for r in rows if r["step"] == "sample"]
+    assert samples
+    for r in samples:
+        assert r["messages_sha256"] == first[(r["case_id"], r["order"], r["cell"], r["item"])]
+        assert len(r["messages"]) == (4 if r["cell"] == "S0" else 6)
+
+
+def test_reproducibility_mismatch_is_reported_not_a_stop(runs, tmp_path):
+    src, dst = runs["stubborn"], tmp_path / "repro"
+    dst.mkdir()
+    (dst / "manifest.json").write_text((src / "manifest.json").read_text())
+    rows = _calls(src)
+    r = next(r for r in rows if r["step"] == "repro")
+    r["choice"] = next(o for o in r["option_order"][:2] if o != r["choice"])
+    (dst / "probe_calls.jsonl").write_text("".join(json.dumps(x) + "\n" for x in rows))
+    res = analyse(dst)
+    assert res["pass"] and any(w.startswith("V5") for w in res["warnings"])
+
+
+def test_confirm_stage_uses_the_stage1_rules(tmp_path):
+    raw = json.loads((PKG_ROOT / "configs" / "scaffold_probe_stage2_confirm.json").read_text())
+    raw.update(run_id="t-2c", systems=[{"kind": "fake", "name": "deferential"}])
+    out = run(ProbeConfig.model_validate(raw), out_root=tmp_path)
+    res = analyse(out)
+    assert res["pass"] and res["branch"].startswith("a")
+    assert res["batch_invariance"]["pairs"] == 0  # 2c has no S5/S6 cells
