@@ -1,11 +1,73 @@
 {
-  "_status": "UNVERIFIED. Written without access to the official Brev CLI docs. Before the first real launch, check every template with `brev <cmd> --help` (and docs.nvidia.com/brev), fix it here, and only then pass --commands-verified.",
-  "login": {"argv": ["brev", "login", "--token", "{token}"], "note": "non-interactive token login"},
-  "create": {"argv": ["brev", "create", "{name}", "--gpu", "{instance_type}"], "note": "flag name for the instance/GPU type is unverified"},
-  "refresh": {"argv": ["brev", "refresh"], "note": "updates the local SSH config so `ssh <name>` works"},
-  "list": {"argv": ["brev", "ls"], "note": "used to confirm deletion"},
-  "exec": {"argv": ["ssh", "-o", "StrictHostKeyChecking=accept-new", "{name}", "{remote_cmd}"], "note": "SSH alias created by brev refresh"},
-  "copy_to": {"argv": ["scp", "-o", "StrictHostKeyChecking=accept-new", "{src}", "{name}:{dst}"]},
-  "copy_from": {"argv": ["scp", "-r", "-o", "StrictHostKeyChecking=accept-new", "{name}:{src}", "{dst}"]},
-  "delete": {"argv": ["brev", "delete", "{name}"], "note": "delete (not stop): stopped instances still bill for storage"}
+  "_status": "PARTLY VERIFIED. login checked against `brev login --help`; create, refresh, ls, delete, ssh/scp access still unverified. Check each with `brev <cmd> --help` before passing --commands-verified.",
+  "login": {
+    "argv": [
+      "brev",
+      "login",
+      "--token",
+      "{token}"
+    ],
+    "note": "VERIFIED 2026-10-25 against `brev login --help` (flag: --token string, 'token provided to auto login'). Token source in the console still to be confirmed."
+  },
+  "create": {
+    "argv": [
+      "brev",
+      "create",
+      "{name}",
+      "--gpu",
+      "{instance_type}"
+    ],
+    "note": "flag name for the instance/GPU type is unverified"
+  },
+  "refresh": {
+    "argv": [
+      "brev",
+      "refresh"
+    ],
+    "note": "updates the local SSH config so `ssh <name>` works"
+  },
+  "list": {
+    "argv": [
+      "brev",
+      "ls"
+    ],
+    "note": "used to confirm deletion"
+  },
+  "exec": {
+    "argv": [
+      "ssh",
+      "-o",
+      "StrictHostKeyChecking=accept-new",
+      "{name}",
+      "{remote_cmd}"
+    ],
+    "note": "SSH alias created by brev refresh"
+  },
+  "copy_to": {
+    "argv": [
+      "scp",
+      "-o",
+      "StrictHostKeyChecking=accept-new",
+      "{src}",
+      "{name}:{dst}"
+    ]
+  },
+  "copy_from": {
+    "argv": [
+      "scp",
+      "-r",
+      "-o",
+      "StrictHostKeyChecking=accept-new",
+      "{name}:{src}",
+      "{dst}"
+    ]
+  },
+  "delete": {
+    "argv": [
+      "brev",
+      "delete",
+      "{name}"
+    ],
+    "note": "delete (not stop): stopped instances still bill for storage"
+  }
 }
