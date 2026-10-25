@@ -60,4 +60,6 @@ cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
 cp /tmp/wrev/bench-*.json "$OUT/" 2>/dev/null || true
 python -m warranted_revision.evaluate --run "$OUT" --gold "$(cat /tmp/wrev/gold_path)"
 python -m warranted_revision.report --run "$OUT" --compress
+# Pre-declared shard checks; the PILOT_CHECK line in the job log decides the next shard.
+python -m warranted_revision.pilot_check --run "$OUT" || echo "PILOT_CHECK ERROR"
 echo "remote job finished: $OUT"

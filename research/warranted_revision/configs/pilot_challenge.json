@@ -1,12 +1,13 @@
 {
   "run_id": "REPLACE_AT_LAUNCH",
-  "label": "Pilot (exploratory): premise search vs matched-budget best-of-N on dev challenge v1, one replicate, option order rotated across cases. Not confirmatory.",
+  "label": "Exploratory pilot: premise search vs matched-budget best-of-N on dev challenge v1, with the full-heuristic vs format-only scoring ablation; one replicate, option order rotated across cases. Not confirmatory.",
   "split": "dev",
   "inputs": "data/challenge_v1/challenge_inputs.jsonl",
   "conditions": [
     "direct",
     "best_of_n",
-    "premise_search"
+    "premise_search",
+    "premise_search_formatonly"
   ],
   "replicates": 1,
   "systems": [
@@ -35,6 +36,6 @@
     "beam_width": 2,
     "decisions_per_node": 2
   },
-  "max_calls": 4180,
+  "max_calls": 6160,
   "rotate_order_across_cases": true
 }

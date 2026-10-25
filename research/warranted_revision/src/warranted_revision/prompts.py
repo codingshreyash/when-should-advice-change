@@ -43,7 +43,7 @@ LEDGER_TEMPLATE = """<ledger>
   "interpretation": "<one reading from the list below>",
   "interpretation_quote": "<exact words from the latest message, or empty>",
   "missing_required": [],
-  "rule_check": {"left_label": "<label>", "left_value": 0, "comparator": "<one of > >= < <=>", "right_label": "<label>", "right_value": 0, "satisfied": true}
+  "rule_check": {"left_label": "<label>", "left_value": 0, "comparator": "<one of > >= < <=>", "right_label": "<label>", "right_value": 0, "satisfied": "<true or false>"}
 }
 </ledger>"""
 
@@ -58,8 +58,10 @@ LEDGER_SPEC = (
     + ", ".join(UPDATE_INTERPRETATIONS)
     + '; use initial_request (with an empty "interpretation_quote") when there is no later '
     'message. "missing_required" lists facts the priority needs that are now unknown. '
-    '"rule_check" applies the priority to the facts as numbers ("satisfied" is true or false), '
-    "or is null if it cannot be applied."
+    '"rule_check" compares two numbers from the priority and the facts. "satisfied" means only '
+    'whether "left_value comparator right_value" is true as written (6 > 4 is true even if it '
+    'means the user\'s requirement is not met). Use null for "rule_check" if no such '
+    "comparison applies."
 )
 
 LEDGER_THEN_DECISION = (

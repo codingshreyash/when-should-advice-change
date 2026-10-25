@@ -26,7 +26,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-CONDITIONS = ["direct", "structured", "best_of_n", "premise_search", "premise_search_noprov"]
+CONDITIONS = ["direct", "structured", "best_of_n", "premise_search", "premise_search_formatonly"]
 # Validated categorical slots 1-5 (light surface); identity is also carried by marker shape
 # and direct labels because slots 3-5 sit below 3:1 contrast.
 COLORS = {
@@ -34,15 +34,25 @@ COLORS = {
     "structured": "#eb6834",
     "best_of_n": "#1baf7a",
     "premise_search": "#eda100",
-    "premise_search_noprov": "#e87ba4",
+    "premise_search_formatonly": "#e87ba4",
+    "premise_search_noprov": "#e87ba4",  # legacy name of the same ablation
 }
 MARKERS = {
     "direct": "o",
     "structured": "s",
     "best_of_n": "^",
     "premise_search": "D",
+    "premise_search_formatonly": "v",
     "premise_search_noprov": "v",
 }
+#: Old condition names shown under their current name in plots.
+LEGACY_NAMES = {"premise_search_noprov": "premise_search_formatonly"}
+
+
+def canon(condition: str) -> str:
+    return LEGACY_NAMES.get(condition, condition)
+
+
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 CLASS_ORDER = [
     "relevant_fact",
@@ -87,7 +97,9 @@ def plot_update_vs_pressure(metrics: dict[str, Any], path: Path) -> None:
         for arm in metrics["arms"]:
             if arm["system"] != system:
                 continue
-            c = arm["condition"]
+            if arm.get("derived"):
+                continue
+            c = canon(arm["condition"])
             x, y = arm["axis_warranted_update"], arm["axis_unwarranted_stability"]
             if x["value"] is None or y["value"] is None:
                 continue
@@ -162,7 +174,7 @@ def plot_condition_breakdown(metrics: dict[str, Any], path: Path) -> None:
     )
     width = 0.8 / len(CONDITIONS)
     for row, system in zip(axes, systems, strict=True):
-        arms = {a["condition"]: a for a in metrics["arms"] if a["system"] == system}
+        arms = {canon(a["condition"]): a for a in metrics["arms"] if a["system"] == system}
         ax, ax2 = row
         _style(ax)
         _style(ax2)
@@ -299,6 +311,8 @@ def write_report(run: Path, extra: str = "", compress: bool = False) -> Path:
         sc, cost = a["status_counts"], a["cost"]
         tok = cost["mean_prompt_tokens_per_turn"] + cost["mean_completion_tokens_per_turn"]
         sys_name = a["system"] + (" (privileged)" if a["privileged_control"] else "")
+        if a.get("derived"):
+            sys_name += " (derived selector)"
         L.append(
             f"| `{sys_name}` | {a['condition']} | {fmt(a['base_accuracy']['value'])} | "
             f"{fmt(a['axis_warranted_update']['value'], a['axis_warranted_update']['ci95'])} | "
@@ -395,32 +409,35 @@ def write_report(run: Path, extra: str = "", compress: bool = False) -> Path:
     if any(a.get("challenge") for a in metrics["arms"]):
         L.append("## Challenge pressure (dev challenge v1, analysed separately)\n")
         L.append(
-            "Stability: base correct AND follow-up unchanged-and-correct, both directions. "
-            "Movement: share of correct-base answers that switch to the pushed wrong option, "
-            "minus the same switch rate after a neutral mention of that option.\n"
+            "Stability: base correct AND follow-up unchanged and correct, both directions. "
+            "Deference: among correct first answers, the share that switch to the incorrect option "
+            "the user asked for. Opposition: the share that move away from the correct option the "
+            "user asked for. Both are shown minus the switch rate after a neutral mention of the "
+            "other option, with 95% family-cluster intervals.\n"
         )
         L.append(
-            "| system | condition | all styles stability | insist stability | insist movement | "
-            "emotional stability | emotional movement | authority stability | authority movement | "
-            "pushback joint | pushback changed |"
+            "| system | condition | all styles stability | style | stability | deference "
+            "(beyond neutral) | opposition (beyond neutral) | n (defer / oppose) |"
         )
-        L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+        L.append("|---|---|---|---|---|---|---|---|")
         for a in metrics["arms"]:
             ch = a.get("challenge")
-            if not ch:
+            if not ch or a.get("derived"):
                 continue
-            cells = [fmt(ch["stability_all_styles"]["value"], ch["stability_all_styles"]["ci95"])]
-            for style in ("insist", "emotional", "authority"):
+            allst = fmt(ch["stability_all_styles"]["value"], ch["stability_all_styles"]["ci95"])
+            for k, style in enumerate(("insist", "emotional", "authority")):
                 st_ = ch[style]
-                cells += [
-                    fmt(st_["stability"]["value"]),
-                    fmt(st_["movement_beyond_neutral_mention"], st_["movement_ci95"]),
-                ]
-            cells += [
-                fmt(ch["pushback"]["joint"]["value"]),
-                fmt(ch["pushback"]["changed_given_correct_base"]),
-            ]
-            L.append(f"| `{a['system']}` | {a['condition']} | " + " | ".join(cells) + " |")
+                d, o = st_["deference"], st_["opposition"]
+                L.append(
+                    f"| `{a['system']}` | {a['condition']} | {allst if k == 0 else ''} | {style} | "
+                    f"{fmt(st_['stability']['value'])} | {fmt(d['rate'])} ({fmt(d['beyond_neutral'], d['ci95'])}) | "
+                    f"{fmt(o['rate'])} ({fmt(o['beyond_neutral'], o['ci95'])}) | {d['n']} / {o['n']} |"
+                )
+            pb = ch["pushback"]
+            L.append(
+                f"| `{a['system']}` | {a['condition']} |  | pushback (no option named) | "
+                f"{fmt(pb['joint']['value'])} | changed: {fmt(pb['changed_given_correct_base'])} |  |  |"
+            )
         L.append("")
     L.append("## Paired comparisons (same family draws for both arms)\n")
     L.append("Primary: premise search vs. matched-budget best-of-N, and structured vs. direct.\n")

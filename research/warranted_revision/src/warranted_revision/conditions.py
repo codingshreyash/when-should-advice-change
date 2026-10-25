@@ -74,6 +74,7 @@ class ConditionConfig(BaseModel):
             "structured": 1,
             "best_of_n": self.best_of_n,
             "premise_search": self.search_calls(turn),
+            "premise_search_formatonly": self.search_calls(turn),
             "premise_search_noprov": self.search_calls(turn),
         }[condition]
 
@@ -269,13 +270,27 @@ def run_best_of_n(backend: Backend, ti: TurnInput, cfg: ConditionConfig) -> Turn
     return _finish(calls, nodes, [n.node_id for n in nodes])
 
 
+def tiebreak_keys(seed_root: str, hyps: list[str]) -> list[float]:
+    """Seeded tie-break keys in [0, 1) for depth-1 nodes, independent of list order."""
+    seen: dict[str, int] = {}
+    keys = []
+    for h in hyps:
+        occ = seen.get(h, 0)
+        seen[h] = occ + 1
+        digest = hashlib.sha256(f"{seed_root}:tiebreak:{h}:{occ}".encode()).digest()
+        keys.append(int.from_bytes(digest[:8], "big") / 2**64)
+    return keys
+
+
 def run_premise_search(
     backend: Backend, ti: TurnInput, cfg: ConditionConfig, *, provenance: bool = True
 ) -> TurnResult:
-    """Premise search. With ``provenance=False`` (the ablation) the expansions, beam width and
-    call budget are unchanged, but pruning and final selection use only format validity
-    (:func:`score_format_only`, :func:`score_hypothesis_format_only`), so no grounding,
-    supported-edit or self-reported-support signal reaches the ranking."""
+    """Premise search. With ``provenance=False`` (``premise_search_formatonly``, the
+    full-heuristic vs format-only scoring ablation) the expansions, beam width, call budget,
+    seeds and tie-break are unchanged, but pruning and final selection use only format
+    validity (:func:`score_format_only`, :func:`score_hypothesis_format_only`). This removes
+    the whole heuristic score at once (quote grounding, arithmetic consistency, supported
+    edits, abstention consistency, self-reported support), not provenance alone."""
     ctx = ti.context()
     hyp_scorer = score_hypothesis if provenance else score_hypothesis_format_only
     leaf_scorer = score_candidate if provenance else score_format_only
@@ -306,8 +321,18 @@ def run_premise_search(
                 kept=False,
             )
         )
-    # Stable sort: ties keep expansion order, which is fixed and label-free.
-    ranked = sorted(nodes, key=lambda n: -n.score)[: min(cfg.beam_width, len(nodes))]
+    # Ties are broken by a seeded pseudo-random key per node, derived from the turn's seed
+    # root and the node's reading (plus its occurrence number, for the repeated base-turn
+    # readings). It ignores list position and gold labels; the ablation shares the seed root,
+    # so both arms break ties identically. (Before the pilot, ties kept expansion order, which
+    # favoured the first readings in the list; see results/warranted_revision/audits.)
+    keys = tiebreak_keys(ti.seed_root, hyps)
+    nodes = [
+        n.model_copy(update={"score_components": {**n.score_components, "tiebreak_key": keys[k]}})
+        for k, n in enumerate(nodes)
+    ]
+    ranked = sorted(nodes, key=lambda n: (-n.score, n.score_components["tiebreak_key"]))
+    ranked = ranked[: min(cfg.beam_width, len(nodes))]
     kept_ids = {n.node_id for n in ranked}
     nodes = [n.model_copy(update={"kept": n.node_id in kept_ids}) for n in nodes]
     reqs2: list[tuple[str, tuple[Message, ...], GenParams]] = []
@@ -334,7 +359,9 @@ def run_premise_search(
     return _finish(calls + calls2, nodes, leaf_ids)
 
 
-def run_premise_search_noprov(backend: Backend, ti: TurnInput, cfg: ConditionConfig) -> TurnResult:
+def run_premise_search_formatonly(
+    backend: Backend, ti: TurnInput, cfg: ConditionConfig
+) -> TurnResult:
     return run_premise_search(backend, ti, cfg, provenance=False)
 
 
@@ -343,8 +370,12 @@ RUNNERS = {
     "structured": run_structured,
     "best_of_n": run_best_of_n,
     "premise_search": run_premise_search,
-    "premise_search_noprov": run_premise_search_noprov,
+    "premise_search_formatonly": run_premise_search_formatonly,
+    "premise_search_noprov": run_premise_search_formatonly,  # legacy name (format-001)
 }
 
 #: Conditions that reuse another condition's sampling seeds (a controlled ablation).
-SEED_ALIAS = {"premise_search_noprov": "premise_search"}
+SEED_ALIAS = {
+    "premise_search_formatonly": "premise_search",
+    "premise_search_noprov": "premise_search",
+}

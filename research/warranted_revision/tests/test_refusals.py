@@ -31,7 +31,7 @@ def test_refusals_counted_and_scored_as_failures(tmp_path):
     systems = [{"kind": "fake", "name": "visible_random", "params": {"refusal_rate": 1.0}}]
     out = make_run(tmp_path, "refuse", systems, conditions=["direct", "best_of_n"])
     m = evaluate_run(out, DEV_GOLD, n_draws=50)
-    for a in m["arms"]:
+    for a in (a for a in m["arms"] if not a["derived"]):
         sc = a["status_counts"]
         assert sc["refusal"] == sc["turns"] and sc["valid"] == 0
         assert sc["need_more_information_total"] == 0  # refusal is not need_more_information
@@ -59,4 +59,4 @@ def test_backend_errors_are_missing_not_dropped(tmp_path):
     decs = read_jsonl(out / "decisions.jsonl")
     assert len(decs) == 2 * 9 and all(d["status"] == "missing" for d in decs)
     m = evaluate_run(out, DEV_GOLD, n_draws=20)
-    assert all(a["status_counts"]["missing"] == 9 for a in m["arms"])
+    assert all(a["status_counts"]["missing"] == 9 for a in m["arms"] if not a["derived"])

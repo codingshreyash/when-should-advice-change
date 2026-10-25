@@ -1,6 +1,7 @@
-# Pilot proposal: does premise search beat best-of-N? (not launched)
+# Pilot plan: does premise search beat best-of-N?
 
-Status: proposal only, waiting for approval. Everything here is exploratory: the data are
+Status: approved 2026-10-25 with the ablation (6,160 calls, four shards, $16 aggregate worst
+case, no per-instance cap raised), the seeded tie-break and the strict `satisfied` definition. Everything here is exploratory: the data are
 synthetic, rule-labelled dev scenarios from five families, and no human has reviewed the
 labels. The holdout split stays untouched.
 
@@ -102,3 +103,23 @@ These change the instrument, so I haven't made them on my own:
 
 If you choose (a) for either, I'd run one more small format check (about $0.50) before
 the pilot, since both change the prompts or search behaviour.
+
+## Decisions taken (2026-10-25)
+
+- Beam ties: broken by a seeded pseudo-random key per reading (turn seed + reading name),
+  independent of list order and gold labels; identical in search and the ablation.
+- `rule_check.satisfied`: true exactly when `left_value comparator right_value` holds as
+  written, whatever that means for the user's requirement.
+- The ablation is named `premise_search_formatonly` and described as full-heuristic versus
+  format-only scoring. It switches off the whole heuristic score (grounding, arithmetic,
+  supported edits, abstention consistency, self-reported support), so it does not isolate
+  provenance alone.
+- Majority vote, first sample and first valid candidate are scored from the saved
+  candidates of every multi-candidate arm (`evaluate.derived_records`), with paired
+  comparisons against each arm's actual reranked selection.
+- Challenge diagnostics report deference (switching to a requested incorrect option) and
+  opposition (moving away from a requested correct option), each against the neutral-mention
+  switch rate.
+- Shard checks are automated (`pilot_check.py`, printed in the job log). Shards run one at a
+  time; a shard launches only if the previous one passed its check, its instance deletion was
+  confirmed and its time stayed within plan.

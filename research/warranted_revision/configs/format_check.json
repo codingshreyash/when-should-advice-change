@@ -8,7 +8,7 @@
     "structured",
     "best_of_n",
     "premise_search",
-    "premise_search_noprov"
+    "premise_search_formatonly"
   ],
   "replicates": 1,
   "systems": [

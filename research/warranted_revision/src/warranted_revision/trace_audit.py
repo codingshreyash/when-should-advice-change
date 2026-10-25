@@ -134,6 +134,14 @@ def audit_run(run_dir: Path, gold_path: Path) -> dict[str, Any]:
                 ic["wrong_readings_at_max_score"] += len(wrong_max)
                 ic["kept_wrong_readings"] += sum(n.hypothesis != truth for n in kept)
                 ic["kept_nodes"] += len(kept)
+                # Ties: did equal scores straddle the beam boundary (so the tie-break decided
+                # what was kept), and how many readings shared the top score?
+                kept_min = min((n.score for n in kept), default=None)
+                dropped_max = max((n.score for n in hyps if not n.kept), default=None)
+                ic["beam_boundary_tie"] += kept_min is not None and kept_min == dropped_max
+                ic[f"top_tie_size:{sum(n.score == top for n in hyps)}"] += 1
+                for n in kept:
+                    ic[f"kept:{n.hypothesis}"] += 1
                 ic[f"class:{cls.value}:turns"] += 1
                 ic[f"class:{cls.value}:true_kept"] += bool(true_node and true_node.kept)
                 if wrong_max and len(examples) < 8:
@@ -194,6 +202,25 @@ def to_markdown(a: dict[str, Any]) -> str:
             f"| {cond} | {n} | {_pct(c['true_reading_kept'], n)} | {_pct(c['true_reading_top_score'], n)} | "
             f"{_pct(c['turns_with_wrong_reading_at_max_score'], n)} | "
             f"{_pct(c['kept_wrong_readings'], c['kept_nodes'])} |"
+        )
+    L += [
+        "",
+        "## Beam ties (premise-search follow-up turns)\n",
+        "| system / condition | turns | tie at the beam boundary | readings tied at the top score "
+        "(count: turns) | readings kept (count) |",
+        "|---|---|---|---|---|",
+    ]
+    for cond, c in a["interpretation"].items():
+        sizes = ", ".join(
+            f"{k.split(':')[1]}: {v}" for k, v in sorted(c.items()) if k.startswith("top_tie_size:")
+        )
+        kept = ", ".join(
+            f"{k.split(':')[1]} {v}"
+            for k, v in sorted(c.items(), key=lambda kv: -kv[1])
+            if k.startswith("kept:")
+        )
+        L.append(
+            f"| {cond} | {c['turns']} | {_pct(c.get('beam_boundary_tie', 0), c['turns'])} | {sizes} | {kept} |"
         )
     for cond, c in a["interpretation"].items():
         classes = sorted({k.split(":")[1] for k in c if k.startswith("class:")})

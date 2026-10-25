@@ -143,12 +143,12 @@ def score_hypothesis(
 
 
 # --------------------------------------------------------------------------------------
-# Ablation scorers: format validity only (no provenance or grounding signal)
+# Ablation scorers: format validity only (the full heuristic score is switched off)
 # --------------------------------------------------------------------------------------
 
 
 def score_format_only(parsed: ParsedOutput, ctx: ScoringContext) -> tuple[float, dict[str, float]]:
-    """Final-selection score for the ``premise_search_noprov`` ablation: a valid decision
+    """Final-selection score for the ``premise_search_formatonly`` ablation: a valid decision
     and a parsed ledger, nothing else. Ties go through the same vote-then-order rule."""
     comp = {
         "valid_decision": 1.0 if parsed.status == "valid" else 0.0,

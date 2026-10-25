@@ -318,7 +318,14 @@ class ParsedOutput(Strict):
 
 Turn = Literal["base", "followup"]
 ConditionName = Literal[
-    "direct", "structured", "best_of_n", "premise_search", "premise_search_noprov"
+    "direct",
+    "structured",
+    "best_of_n",
+    "premise_search",
+    # Full-heuristic vs format-only scoring ablation (same search, budget and seeds).
+    "premise_search_formatonly",
+    # Legacy name of the same ablation, used by format-001; kept so old runs still load.
+    "premise_search_noprov",
 ]
 
 

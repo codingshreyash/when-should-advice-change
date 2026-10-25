@@ -11,7 +11,7 @@ from warranted_revision.scoring import ScoringContext, score_candidate, score_fo
 
 from .conftest import make_run, read_jsonl
 
-CONDS = ["direct", "best_of_n", "premise_search", "premise_search_noprov"]
+CONDS = ["direct", "best_of_n", "premise_search", "premise_search_formatonly"]
 SYS = [{"kind": "fake", "name": "visible_random"}]
 
 
@@ -55,10 +55,10 @@ def test_aggregate_refuses_unsafe_merges(tmp_path):
 def test_ablation_has_same_budget_and_shares_depth1_samples(tmp_path):
     cfg = ConditionConfig()
     for turn in ("base", "followup"):
-        assert cfg.calls_per_turn("premise_search_noprov", turn) == cfg.calls_per_turn(
+        assert cfg.calls_per_turn("premise_search_formatonly", turn) == cfg.calls_per_turn(
             "premise_search", turn
         )
-    run = make_run(tmp_path, "abl", SYS, conditions=["premise_search", "premise_search_noprov"])
+    run = make_run(tmp_path, "abl", SYS, conditions=["premise_search", "premise_search_formatonly"])
     rows = read_jsonl(run / "predictions.jsonl")
 
     def depth1(cond):
@@ -70,11 +70,11 @@ def test_ablation_has_same_budget_and_shares_depth1_samples(tmp_path):
             and r["call_role"].startswith("hypothesis")
         ]
 
-    assert depth1("premise_search") == depth1("premise_search_noprov")
+    assert depth1("premise_search") == depth1("premise_search_formatonly")
     counts = {}
     for r in read_jsonl(run / "decisions.jsonl"):
         counts.setdefault(r["condition"], set()).add(r["n_calls"])
-    assert counts == {"premise_search": {9}, "premise_search_noprov": {9}}
+    assert counts == {"premise_search": {9}, "premise_search_formatonly": {9}}
 
 
 def test_format_only_scorer_ignores_provenance():
@@ -108,11 +108,44 @@ def test_evaluate_and_report_with_every_condition(tmp_path):
 
     from .conftest import DEV_GOLD
 
-    conds = ["direct", "structured", "best_of_n", "premise_search", "premise_search_noprov"]
+    conds = ["direct", "structured", "best_of_n", "premise_search", "premise_search_formatonly"]
     run = make_run(tmp_path, "allconds", SYS, conditions=conds)
     m = evaluate_run(run, DEV_GOLD, n_draws=50)
     (run / "metrics.json").write_text(json.dumps(m, default=str))
     out = write_report(run)
     text = out.read_text()
-    assert "premise_search_noprov" in text and (run / "plots" / "update_vs_pressure.png").exists()
+    assert (
+        "premise_search_formatonly" in text and (run / "plots" / "update_vs_pressure.png").exists()
+    )
     assert any(c["kind"] == "ablation" for c in m["comparisons"])
+
+
+def test_derived_selectors_and_identical_tiebreak(tmp_path):
+    from warranted_revision.evaluate import evaluate_run
+
+    from .conftest import DEV_GOLD
+
+    run = make_run(
+        tmp_path,
+        "sel",
+        SYS,
+        conditions=["best_of_n", "premise_search", "premise_search_formatonly"],
+    )
+    m = evaluate_run(run, DEV_GOLD, n_draws=50)
+    names = {a["condition"] for a in m["arms"]}
+    for base in ("best_of_n", "premise_search", "premise_search_formatonly"):
+        assert {f"{base}:vote", f"{base}:first", f"{base}:firstvalid"} <= names
+    derived = [a for a in m["arms"] if a["derived"]]
+    real = {a["condition"]: a for a in m["arms"] if not a["derived"]}
+    assert all(a["n_cases"] == real["best_of_n"]["n_cases"] for a in derived)
+    assert any(c["kind"] == "selection" and c["b"] == "best_of_n:vote" for c in m["comparisons"])
+    # Search and its ablation give each depth-1 node the same tie-break key.
+    keys = {}
+    for tr in read_jsonl(run / "search_traces.jsonl"):
+        if tr["condition"].startswith("premise_search"):
+            for n in tr["nodes"]:
+                if n["hypothesis"]:
+                    keys.setdefault((tr["case_id"], tr["followup_id"], n["node_id"]), set()).add(
+                        n["score_components"]["tiebreak_key"]
+                    )
+    assert keys and all(len(v) == 1 for v in keys.values())

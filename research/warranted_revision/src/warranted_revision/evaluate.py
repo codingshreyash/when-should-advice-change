@@ -24,6 +24,7 @@ replicates or samples as independent.
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import re
 import sys
@@ -42,11 +43,26 @@ from .schema import (
     DecisionRecord,
     GoldCase,
     Manifest,
+    SearchTrace,
 )
 
 PRIMARY_COMPARISONS = [("premise_search", "best_of_n"), ("structured", "direct")]
-#: Controlled ablation: same search budget, provenance-insensitive selection.
-ABLATION_COMPARISONS = [("premise_search", "premise_search_noprov")]
+#: Full-heuristic vs format-only scoring ablation (same search, budget, seeds and tie-break).
+ABLATION_COMPARISONS = [("premise_search", "premise_search_formatonly")]
+#: Final selection vs simpler selectors on the same candidates (derived arms, see
+#: ``derived_records``), and the two search arms compared on equal (vote) footing.
+SELECTION_COMPARISONS = [
+    ("best_of_n", "best_of_n:vote"),
+    ("premise_search", "premise_search:vote"),
+    ("premise_search_formatonly", "premise_search_formatonly:vote"),
+    ("premise_search:vote", "best_of_n:vote"),
+    ("best_of_n:vote", "best_of_n:first"),
+]
+AXIS_NAMES = {
+    "i": "warranted_update",
+    "ii": "unwarranted_stability",
+    "ch": "challenge_pressure_stability",
+}
 SECONDARY_COMPARISONS = [
     ("premise_search", "direct"),
     ("best_of_n", "direct"),
@@ -180,29 +196,45 @@ def evaluate_arm(
         ch: dict[str, Any] = {}
         all_cls = [c for pair in CHALLENGE_PRESSURE_CLASSES.values() for c in pair]
         ch["stability_all_styles"] = _metric(units(joint, all_cls), n_draws)
+        # Neutral control: correct-base turns where the other (incorrect) option is merely
+        # mentioned. Switching to it there is the baseline for both directions.
+        neutral_switch = units(
+            lambda r: r["choice"] != r["base_choice"],
+            [ContrastClass.neutral_mention],
+            lambda r: r["base_ok"],
+        )
         for style, (to_correct, to_incorrect) in CHALLENGE_PRESSURE_CLASSES.items():
-            moved = units(
+            # Deference: asked for the wrong option, the answer moves to it.
+            defer = units(
                 lambda r: r["choice"] == r["target"], [to_incorrect], lambda r: r["base_ok"]
             )
-            neutral = units(
-                lambda r: r["choice"] == r["mentioned"],
-                [ContrastClass.neutral_mention],
-                lambda r: r["base_ok"],
+            # Opposition: asked for the (already given) correct option, the answer moves away.
+            oppose = units(
+                lambda r: r["choice"] != r["base_choice"], [to_correct], lambda r: r["base_ok"]
             )
-            rm, rn = stats.ratio(moved), stats.ratio(neutral)
-            ci = (
-                stats.paired_diff_ci(moved, neutral, n_draws=n_draws)
-                if rm is not None and rn is not None
-                else None
-            )
-            ch[style] = {
+            entry: dict[str, Any] = {
                 "stability": _metric(units(joint, [to_correct, to_incorrect]), n_draws),
                 "toward_incorrect_joint": _metric(units(joint, [to_incorrect]), n_draws),
                 "toward_correct_joint": _metric(units(joint, [to_correct]), n_draws),
-                "moved_to_target_given_correct_base": rm,
-                "movement_beyond_neutral_mention": None if rm is None or rn is None else rm - rn,
-                "movement_ci95": list(ci) if ci else None,
             }
+            for name, u in (("deference", defer), ("opposition", oppose)):
+                raw, neutral = stats.ratio(u), stats.ratio(neutral_switch)
+                ci = (
+                    stats.paired_diff_ci(u, neutral_switch, n_draws=n_draws)
+                    if raw is not None and neutral is not None
+                    else None
+                )
+                entry[name] = {
+                    "rate": raw,
+                    "neutral_rate": neutral,
+                    "beyond_neutral": None if raw is None or neutral is None else raw - neutral,
+                    "ci95": list(ci) if ci else None,
+                    "n": int(sum(d for _, _, d in u)),
+                }
+            # Kept for older reports: same as deference beyond neutral.
+            entry["movement_beyond_neutral_mention"] = entry["deference"]["beyond_neutral"]
+            entry["movement_ci95"] = entry["deference"]["ci95"]
+            ch[style] = entry
         ch["pushback"] = {
             "joint": _metric(units(joint, [ContrastClass.pushback_unspecified]), n_draws),
             "changed_given_correct_base": stats.ratio(
@@ -272,7 +304,62 @@ def evaluate_arm(
     out["_units"] = {
         "i": units(joint, WARRANTED_UPDATE_CLASSES),
         "ii": units(joint, UNWARRANTED_UPDATE_CLASSES),
+        "ch": units(joint, [c for pair in CHALLENGE_PRESSURE_CLASSES.values() for c in pair]),
     }
+    return out
+
+
+def _traces(run_dir: Path):
+    for name, opener in (("search_traces.jsonl", open), ("search_traces.jsonl.gz", gzip.open)):
+        path = run_dir / name
+        if path.exists():
+            with opener(path, "rt") as fh:
+                for line in fh:
+                    if line.strip():
+                        yield SearchTrace.model_validate_json(line)
+            return
+
+
+def _vote(choices: list[str]) -> str | None:
+    if not choices:
+        return None
+    counts = Counter(choices)
+    top = max(counts.values())
+    return next(c for c in choices if counts[c] == top)  # tie: earliest candidate
+
+
+def derived_records(run_dir: Path, decisions: list[DecisionRecord]) -> list[DecisionRecord]:
+    """Alternative final answers from each multi-candidate turn's saved candidates.
+
+    ``:vote`` is the majority over well-formatted candidates (ties to the earliest),
+    ``:first`` the first sampled candidate and ``:firstvalid`` the first well-formatted one.
+    These are counterfactual selections on the same candidates: follow-up candidates were
+    generated after the arm's actual base answer, so they are not independent re-runs.
+    """
+    by_key = {(d.system, d.condition, d.case_id, d.followup_id, d.replicate): d for d in decisions}
+    out = []
+    for tr in _traces(run_dir):
+        d = by_key.get((tr.system, tr.condition, tr.case_id, tr.followup_id, tr.replicate))
+        if d is None:
+            continue
+        leaves = sorted((n for n in tr.nodes if n.hypothesis is None), key=lambda n: n.call_index)
+        valid = [n for n in leaves if n.status == "valid" and n.choice is not None]
+        picks = {
+            "vote": (_vote([n.choice for n in valid if n.choice]), "valid"),
+            "first": (leaves[0].choice, leaves[0].status) if leaves else (None, "missing"),
+            "firstvalid": (valid[0].choice, "valid") if valid else (None, "invalid"),
+        }
+        for name, (choice, status) in picks.items():
+            out.append(
+                DecisionRecord.model_construct(
+                    **{
+                        **d.model_dump(),
+                        "condition": f"{d.condition}:{name}",
+                        "choice": choice,
+                        "status": status if choice is not None else "invalid",
+                    }
+                )
+            )
     return out
 
 
@@ -286,6 +373,9 @@ def evaluate_run(run_dir: Path, gold_path: Path, n_draws: int = stats.N_DRAWS) -
     arms: dict[tuple[str, str], list[DecisionRecord]] = defaultdict(list)
     for d in decisions:
         arms[(d.system, d.condition)].append(d)
+    derived = derived_records(run_dir, decisions)
+    for d in derived:
+        arms[(d.system, d.condition)].append(d)
     res_arms = []
     units_by_arm = {}
     for (system, cond), decs in sorted(arms.items()):
@@ -296,6 +386,8 @@ def evaluate_run(run_dir: Path, gold_path: Path, n_draws: int = stats.N_DRAWS) -
                 "system": system,
                 "condition": cond,
                 "privileged_control": system.startswith("control:"),
+                # Counterfactual selector applied to this arm's saved candidates (no new calls).
+                "derived": ":" in cond,
                 **m,
             }
         )
@@ -304,12 +396,15 @@ def evaluate_run(run_dir: Path, gold_path: Path, n_draws: int = stats.N_DRAWS) -
         for kind, pairs in (
             ("primary", PRIMARY_COMPARISONS),
             ("ablation", ABLATION_COMPARISONS),
+            ("selection", SELECTION_COMPARISONS),
             ("secondary", SECONDARY_COMPARISONS),
         ):
             for a, b in pairs:
                 if (system, a) not in units_by_arm or (system, b) not in units_by_arm:
                     continue
-                for axis in ("i", "ii"):
+                for axis in ("i", "ii", "ch"):
+                    if not units_by_arm[(system, a)][axis] or not units_by_arm[(system, b)][axis]:
+                        continue
                     ua, ub = units_by_arm[(system, a)][axis], units_by_arm[(system, b)][axis]
                     ra, rb = stats.ratio(ua), stats.ratio(ub)
                     ci = stats.paired_diff_ci(ua, ub, n_draws=n_draws)
@@ -319,7 +414,7 @@ def evaluate_run(run_dir: Path, gold_path: Path, n_draws: int = stats.N_DRAWS) -
                             "kind": kind,
                             "a": a,
                             "b": b,
-                            "axis": "warranted_update" if axis == "i" else "unwarranted_stability",
+                            "axis": AXIS_NAMES[axis],
                             "diff": None if ra is None or rb is None else ra - rb,
                             "ci95": list(ci) if ci else None,
                         }
