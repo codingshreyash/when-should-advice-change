@@ -69,7 +69,9 @@ def fake_bin(tmp_path, monkeypatch):
     bindir = tmp_path / "bin"
     bindir.mkdir()
     scripts = {
-        "brev": f'echo "brev $*" >> {log}; exit 0',
+        "brev": f'echo "brev $*" >> {log}; '
+        + '[ "$1" = create ] && [ "${@: -1}" = "--dry-run" ] '
+        + '&& echo "g5.xlarge (500GB disk), L4 (500GB disk), g6.xlarge (500GB disk)"; exit 0',
         "ssh": f'echo "ssh $*" >> {log}; [ "${{@: -1}}" = "true" ] && exit 0; exit 3',
         "scp": f'echo "scp $*" >> {log}; exit 0',
     }
@@ -212,7 +214,7 @@ def test_launch_checks_type_before_creating(tmp_path, fake_bin):
         )
     brev = [c for c in fake_bin.read_text().splitlines() if c.startswith("brev ")]
     assert brev[0].startswith("brev login --token")
-    assert brev[1].endswith("--type g5.xlarge --dry-run")
+    assert brev[1].endswith("--dry-run") and "--type" not in brev[1]
     assert brev[2].endswith("--type g5.xlarge --timeout 900")
 
 
@@ -241,3 +243,36 @@ def test_launch_reuses_planned_instance_name(tmp_path, fake_bin):
         ctl.main(["launch", *common, "--commands-verified"])
     assert json.loads(state.read_text())["instance"] == planned
     assert f"brev create {planned} --type g5.xlarge --timeout 900" in fake_bin.read_text()
+
+
+def test_accepted_types_parsing_and_refusal(tmp_path, fake_bin):
+    ctl = _controller()
+    out = "massedcompute_L40S (625GB disk), g2-standard-4:nvidia-l4:1 (500GB disk), hyperstack_L40x2 (1650GB disk)"
+    assert ctl.accepted_types(out) == {
+        "massedcompute_L40S",
+        "g2-standard-4:nvidia-l4:1",
+        "hyperstack_L40x2",
+    }
+    assert ctl.accepted_types("") == set()
+    cfg_path = tmp_path / "cfg.json"
+    cfg_path.write_text((PKG_ROOT / "configs" / "gpu_smoke.json").read_text())
+    rc = ctl.main(
+        [
+            "launch",
+            "--hourly",
+            "0.6",
+            "--max-usd",
+            "10",
+            "--run-id",
+            "t",
+            "--config",
+            str(cfg_path),
+            "--instance-type",
+            "hyperstack_A6000",
+            "--state",
+            str(tmp_path / "s.json"),
+            "--commands-verified",
+        ]
+    )
+    assert rc == 2  # not in create's accepted list: refused before any create
+    assert "--timeout 900" not in fake_bin.read_text()

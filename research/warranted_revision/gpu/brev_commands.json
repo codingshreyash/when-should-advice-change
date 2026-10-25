@@ -10,16 +10,14 @@
     ],
     "note": "VERIFIED 2026-10-25 against `brev login --help` (flag: --token string, 'token provided to auto login'). Token source in the console still to be confirmed."
   },
-  "create_dry_run": {
+  "create_check": {
     "argv": [
       "brev",
       "create",
       "{name}",
-      "--type",
-      "{instance_type}",
       "--dry-run"
     ],
-    "note": "VERIFIED flag: shows matching instance types without creating anything"
+    "note": "Lists the types create will accept under its default filters (e.g. min 500GB disk), as 'type (NNNGB disk), ...'. The controller refuses unless the chosen type is listed. With --type, --dry-run only echoes the type back, so it is not a check."
   },
   "create": {
     "argv": [

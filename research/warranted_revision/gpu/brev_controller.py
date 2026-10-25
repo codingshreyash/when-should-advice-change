@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -100,6 +101,11 @@ def build_plan(args: argparse.Namespace) -> dict:
             if not k.startswith("_")
         },
     }
+
+
+def accepted_types(dry_run_output: str) -> set[str]:
+    """Parse `brev create --dry-run` output: 'type (NNNGB disk), type (NNNGB disk), ...'."""
+    return set(re.findall(r"([^\s,()]+) \(\d+GB disk\)", dry_run_output))
 
 
 def run_step(
@@ -173,8 +179,18 @@ def cmd_launch(args: argparse.Namespace) -> int:
     results_local = PKG.parents[1] / "results" / "warranted_revision"
     try:
         run_step(render("login", token=token), 120, secret=token)
-        # Provider-side check that the type exists; creates nothing.
-        run_step(render("create_dry_run", name=name, instance_type=args.instance_type), 300)
+        # Ask create which types it accepts (creates nothing). `--type X --dry-run` only
+        # echoes X back, and create silently applies default filters such as a 500 GB disk
+        # minimum, so a type listed by `brev search` can still be rejected.
+        check = subprocess.run(
+            render("create_check", name=name), capture_output=True, text=True, timeout=300
+        )
+        accepted = accepted_types(check.stdout)
+        if args.instance_type not in accepted:
+            raise GuardError(
+                f"brev create does not accept {args.instance_type!r}; "
+                f"it lists {len(accepted)} types (e.g. {sorted(accepted)[:5]})"
+            )
         plan["created"] = True  # set before the call: a timed-out create may still exist
         state_path.write_text(json.dumps(plan, indent=2))
         run_step(

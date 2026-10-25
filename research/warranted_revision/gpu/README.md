@@ -10,12 +10,13 @@ Notes from setting this up. Nothing here has run on a GPU yet.
   turned off through the chat template. Pinned to commit
   `c202236235762e1c871ad0ccb60c8ee5ba337b9a` (the Hub's `main` on 2026-10-25, from
   `https://huggingface.co/api/models/Qwen/Qwen3.5-9B`). No HF token is needed.
-- **Instance:** `hyperstack_A6000` (48 GB, about $0.60/h when checked on 2026-10-25), with
-  `massedcompute_A6000` ($0.68/h) as backup. It was the cheapest option with enough memory,
-  and 48 GB means no 4-bit quantization. It comes through Shadeform, a reseller, so check
-  the console after the first run to make sure it was actually deleted.
+- **Instance:** `massedcompute_L40S` (48 GB, $1.06/h on 2026-10-25). The cheaper
+  single A6000s (`hyperstack_A6000`, $0.60/h) show up in `brev search`, but `brev create`
+  applies a default 500 GB minimum disk and rejects them. L4s are cheaper ($0.85/h), but at
+  24 GB they leave little room once the ~19 GB model is loaded. The controller now asks
+  `brev create <name> --dry-run` for the types it accepts and refuses anything not listed.
 - **Budget:** the controller caps the instance at 4 hours or 80% of `MAX_GPU_USD`, whichever
-  is less. At $0.60/h that's about $2.40 worst case. The smoke set is 5 cases x 4
+  is less. At $1.06/h that's about $4.24 worst case. The smoke set is 5 cases x 4
   conditions, 900 model calls, probably 1.5 to 2 hours.
 
 ## Brev CLI
@@ -43,11 +44,11 @@ Checked against `--help` from brev v0.6.335:
 2. Get `.github/workflows/warranted-revision-gpu-smoke.yml` onto `main`, so the
    "Run workflow" button shows up.
 3. Run it with `dry_run` checked, today's hourly price, `max_gpu_usd` 15 or less,
-   instance type `hyperstack_A6000`, and a new `run_id`. This only prints the plan.
+   instance type `massedcompute_L40S`, and a new `run_id`. This only prints the plan.
 4. Run it again with `dry_run` unchecked and `commands_verified` checked.
 5. Afterwards, confirm in the Brev console that the instance is gone and the charge looks
    right. Don't start another run if either is off.
 
 To check the plan locally without touching Brev:
 
-    python gpu/brev_controller.py plan --hourly 0.60 --max-usd 15 --run-id test --instance-type hyperstack_A6000
+    python gpu/brev_controller.py plan --hourly 1.06 --max-usd 15 --run-id test --instance-type massedcompute_L40S
