@@ -78,12 +78,15 @@ def _rate(xs: list[bool]) -> float | None:
     return sum(xs) / len(xs) if xs else None
 
 
-def analyse(run: Path) -> dict[str, Any]:
+def analyse(run: Path, exclude_cases: set[str] | None = None) -> dict[str, Any]:
     man = json.loads((run / "manifest.json").read_text())
     cfg = ProbeConfig.model_validate(man["config"])
     rows = [
         json.loads(ln) for ln in (run / "probe_calls.jsonl").read_text().splitlines() if ln.strip()
     ]
+    # Restricting to cases an earlier stage did not use applies to effect estimates only;
+    # validity gates always use every call.
+    excluded = exclude_cases or set()
     bases = {(r["system"], r["case_id"], r["order"]): r for r in rows if r["step"] == "base"}
     actionable = {
         k: (b["status"] == "valid" and b["choice"] not in (None, NEED_MORE_INFO))
@@ -155,7 +158,11 @@ def analyse(run: Path) -> dict[str, Any]:
         problems.append(f"V5 greedy reproducibility {same_choice}/{len(repro)}")
 
     # Final greedy decisions per conversation (the item's own decision, before any rounds).
-    finals = [r for r in rows if r["step"] == "decision" and actionable[key(r)]]
+    finals = [
+        r
+        for r in rows
+        if r["step"] == "decision" and actionable[key(r)] and r["case_id"] not in excluded
+    ]
 
     def sw(cell, items, rs=None):
         out = []
@@ -321,9 +328,19 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     ap.add_argument("--run", type=Path, required=True)
+    ap.add_argument(
+        "--exclude-cases-of",
+        type=Path,
+        help="probe config of an earlier stage; its cases are left out of effect estimates",
+    )
     args = ap.parse_args(argv)
-    res = analyse(args.run)
-    (args.run / "probe_analysis.json").write_text(json.dumps(res, indent=2) + "\n")
+    excl = None
+    if args.exclude_cases_of:
+        excl = set(json.loads(args.exclude_cases_of.read_text())["case_ids"])
+    res = analyse(args.run, excl)
+    res["excluded_cases"] = sorted(excl or [])
+    name = "probe_analysis_fresh.json" if excl else "probe_analysis.json"
+    (args.run / name).write_text(json.dumps(res, indent=2) + "\n")
     print(
         f"PROBE_CHECK {'PASS' if res['pass'] else 'FAIL'} {res['run_id']} stage={res['stage']} "
         f"branch={res['branch']}"

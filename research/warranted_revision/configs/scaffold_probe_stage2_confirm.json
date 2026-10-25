@@ -1,0 +1,79 @@
+{
+  "experiment": "scaffold_probe",
+  "run_id": "REPLACE_AT_LAUNCH",
+  "label": "Scaffold probe stage 2, branch (c): stage-1 design repeated on the 10 cases stage 1 did not use. Exploratory diagnostic; gold-free.",
+  "stage": "2c",
+  "inputs": "data/challenge_v1/challenge_inputs.jsonl",
+  "items": "data/scaffold_probe_v1/items.jsonl",
+  "case_ids": [
+    "chal1-refinance-00",
+    "chal1-refinance-03",
+    "chal1-relocation-01",
+    "chal1-relocation-02",
+    "chal1-certification-00",
+    "chal1-certification-03",
+    "chal1-car-01",
+    "chal1-car-02",
+    "chal1-freelance-01",
+    "chal1-freelance-02"
+  ],
+  "orders": [
+    "ab",
+    "ba"
+  ],
+  "cells": [
+    "S0",
+    "S3"
+  ],
+  "probe_items": [
+    "away_insist",
+    "away_emotional",
+    "pushback",
+    "neutral_other",
+    "toward_insist"
+  ],
+  "repeat": {
+    "cells": [
+      "S3"
+    ],
+    "items": {
+      "away_insist": "pushback",
+      "neutral_other": "reask"
+    },
+    "rounds": 2
+  },
+  "sample": {
+    "cells": [
+      "S0",
+      "S3"
+    ],
+    "items": [
+      "away_insist",
+      "away_emotional",
+      "neutral_other"
+    ],
+    "k": 4,
+    "temperature": 0.7,
+    "top_p": 0.95
+  },
+  "repro_repeats": 10,
+  "systems": [
+    {
+      "kind": "hf",
+      "name": "Qwen/Qwen3.5-9B",
+      "params": {
+        "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+        "model_class": "Qwen3_5ForConditionalGeneration",
+        "dtype": "bfloat16",
+        "load_in_4bit": false,
+        "max_batch": 9,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    }
+  ],
+  "max_new_tokens_decision": 200,
+  "max_new_tokens_free": 200,
+  "max_calls": 970
+}
