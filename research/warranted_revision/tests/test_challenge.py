@@ -58,15 +58,26 @@ def test_controls_on_challenge_set(tmp_path):
     from .conftest import make_run
 
     ids = ["chal1-refinance-00", "chal1-car-01", "chal1-freelance-02"]
-    run = make_run(tmp_path, "chal", [{"kind": "control", "name": "oracle"},
-                                     {"kind": "control", "name": "always_stay_put"},
-                                     {"kind": "fake", "name": "first_option"}],
-                   conditions=["direct", "premise_search"], case_ids=ids,
-                   inputs=DIR / "challenge_inputs.jsonl", gold=DIR / "challenge_gold.jsonl")
+    run = make_run(
+        tmp_path,
+        "chal",
+        [
+            {"kind": "control", "name": "oracle"},
+            {"kind": "control", "name": "always_stay_put"},
+            {"kind": "fake", "name": "first_option"},
+        ],
+        conditions=["direct", "premise_search"],
+        case_ids=ids,
+        inputs=DIR / "challenge_inputs.jsonl",
+        gold=DIR / "challenge_gold.jsonl",
+    )
     m = evaluate_run(run, DIR / "challenge_gold.jsonl", n_draws=100)
     arms = {(a["system"], a["condition"]): a for a in m["arms"]}
     o = arms[("control:oracle", "direct")]["challenge"]
-    assert o["stability_all_styles"]["value"] == 1.0 and o["insist"]["movement_beyond_neutral_mention"] == 0.0
+    assert (
+        o["stability_all_styles"]["value"] == 1.0
+        and o["insist"]["movement_beyond_neutral_mention"] == 0.0
+    )
     sp = arms[("control:always_stay_put", "premise_search")]
     assert sp["challenge"]["stability_all_styles"]["value"] == 1.0
     assert sp["axis_warranted_update"]["value"] == 0.0

@@ -284,3 +284,38 @@ def test_accepted_types_parsing_and_refusal(tmp_path, fake_bin):
     )
     assert rc == 2  # not in create's accepted list: refused before any create
     assert "--timeout 900" not in fake_bin.read_text()
+
+
+def test_launch_passes_config_shard_and_bench(tmp_path, fake_bin):
+    ctl = _controller()
+    cfg = json.loads((PKG_ROOT / "configs" / "gpu_smoke.json").read_text())
+    cfg_path = tmp_path / "cfg.json"
+    cfg_path.write_text(json.dumps(cfg))
+    state = tmp_path / "s.json"
+    common = [
+        "--hourly",
+        "1.0",
+        "--max-usd",
+        "10",
+        "--run-id",
+        "t-s2of3",
+        "--config",
+        str(cfg_path),
+        "--instance-type",
+        "g5.xlarge",
+        "--state",
+        str(state),
+        "--shard",
+        "2/3",
+        "--bench",
+    ]
+    assert ctl.main(["plan", *common]) == 0
+    plan = json.loads(state.read_text())
+    assert plan["shard"] == "2/3" and plan["bench"] is True
+    assert plan["budget"]["expected_calls"] < 900  # a third of the smoke cases
+    assert plan["budget"]["setup_hours"] == 0.75
+    with pytest.raises(subprocess.CalledProcessError):
+        ctl.main(["launch", *common, "--commands-verified", "--results-dir", str(tmp_path / "res")])
+    log = fake_bin.read_text()
+    assert "bash gpu/remote_job.sh t-s2of3" in log and "configs/_launch_config.json 2/3 1" in log
+    assert log.count("brev delete") == 1

@@ -38,6 +38,17 @@ Checked against `--help` from brev v0.6.335:
 - `brev refresh` rewrites the SSH config. We assume `ssh <name>` works afterwards. That's
   the main thing still unconfirmed.
 
+## Shards, benchmark and configs
+
+- `--config` / workflow input `config`: any run config under this directory. The controller
+  checks the plan against it and ships that exact file to the box.
+- `--shard i/n` / input `shard`: run one round-robin slice of the cases on its own instance,
+  with its own budget guard and deletion. Seeds don't depend on the shard. Merge finished
+  shards with `python -m warranted_revision.aggregate --out-run-id <id> <shard dirs...>`,
+  which refuses mismatched configs, commits, models or case coverage.
+- `--bench` / input `benchmark`: time a fixed batch before and after installing the fast
+  kernels (`bench-fallback.json`, `bench-kernels.json` in the run directory).
+
 ## Running it
 
 1. Done: `BREV_API_TOKEN` repository secret.

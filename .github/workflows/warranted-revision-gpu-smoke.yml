@@ -35,6 +35,18 @@ on:
         description: "I checked gpu/brev_commands.json against the current Brev CLI"
         type: boolean
         default: false
+      config:
+        description: "Run config inside research/warranted_revision"
+        required: true
+        default: "configs/gpu_smoke.json"
+      shard:
+        description: "Slice of the cases to run, i/n (one instance per shard)"
+        required: true
+        default: "1/1"
+      benchmark:
+        description: "Benchmark fast kernels on the box before the run"
+        type: boolean
+        default: false
 
 concurrency:
   group: warranted-revision-gpu
@@ -60,6 +72,9 @@ jobs:
       RUN_ID: ${{ inputs.run_id }}
       INSTANCE_TYPE: ${{ inputs.instance_type }}
       VERIFIED_FLAG: ${{ inputs.commands_verified && '--commands-verified' || '' }}
+      CONFIG: ${{ inputs.config }}
+      SHARD: ${{ inputs.shard }}
+      BENCH_FLAG: ${{ inputs.benchmark && '--bench' || '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -76,7 +91,8 @@ jobs:
         run: |
           python gpu/brev_controller.py plan \
             --hourly "$HOURLY" --max-usd "$MAX_USD" --run-id "$RUN_ID" \
-            --instance-type "$INSTANCE_TYPE" --state "$STATE"
+            --instance-type "$INSTANCE_TYPE" --state "$STATE" \
+            --config "$CONFIG" --shard "$SHARD" $BENCH_FLAG
 
       - name: Install Brev CLI
         if: ${{ !inputs.dry_run }}
@@ -93,7 +109,8 @@ jobs:
         run: |
           python gpu/brev_controller.py launch \
             --hourly "$HOURLY" --max-usd "$MAX_USD" --run-id "$RUN_ID" \
-            --instance-type "$INSTANCE_TYPE" --state "$STATE" $VERIFIED_FLAG
+            --instance-type "$INSTANCE_TYPE" --state "$STATE" $VERIFIED_FLAG \
+            --config "$CONFIG" --shard "$SHARD" $BENCH_FLAG
 
       - name: Upload results and controller state (before final cleanup)
         if: ${{ always() && !inputs.dry_run }}

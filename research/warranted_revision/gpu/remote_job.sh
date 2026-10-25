@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Runs ON the GPU instance, started by gpu/brev_controller.py. Usage:
+#   bash gpu/remote_job.sh <run_id> <deadline_minutes> <config> <shard i/n> <bench 0|1>
+# The in-instance `timeout` is only a soft guard; the billing stop is the controller's
+# provider-side delete.
+set -euo pipefail
+RUN_ID="$1"; DEADLINE_MIN="$2"; CONFIG="${3:-configs/gpu_smoke.json}"; SHARD="${4:-1/1}"; BENCH="${5:-0}"
+PY=$(command -v python3.12 || command -v python3)
+# Stock Ubuntu images often ship without venv support (same fallback as scripts/run/brev_setup.sh).
+$PY -m venv .venv || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-venv && $PY -m venv .venv; }
+source .venv/bin/activate
+python -m pip install -q --upgrade pip
+python -m pip install -q -e '.[gpu,dev]'
+# Qwen3.5 needs a transformers release that ships Qwen3_5ForConditionalGeneration.
+python -c "import transformers as t; assert hasattr(t, 'Qwen3_5ForConditionalGeneration')" \
+  || python -m pip install -q -U transformers
+python -c "import transformers as t; assert hasattr(t, 'Qwen3_5ForConditionalGeneration'), t.__version__; print('transformers', t.__version__)"
+mkdir -p /tmp/wrev
+nvidia-smi --query-gpu=name,memory.total --format=csv > /tmp/wrev/gpu.txt || true
+# Preflight: the CPU suite must pass on the box before any model call.
+python -m pytest -q
+
+install_kernels() {
+  # Optional fast kernels for Qwen3.5's linear-attention layers. Best effort, time-limited,
+  # never fatal; whether they actually load is recorded by the benchmark/run logs.
+  timeout 600 python -m pip install -q "flash-linear-attention[cuda]" || echo "flash-linear-attention not installed"
+  timeout 300 python -m pip install -q --only-binary=:all: causal-conv1d || echo "causal-conv1d wheel not available"
+}
+
+if [ "$BENCH" = "1" ]; then
+  # Same fixed batch before and after installing the kernels.
+  # Benchmark failures never stop the job. If the kernel build breaks generation, remove it so
+  # the run itself uses the known-good fallback path.
+  python -m warranted_revision.bench --config configs/gpu_smoke.json --label fallback \
+    --out /tmp/wrev/bench-fallback.json || echo "fallback benchmark failed"
+  install_kernels
+  python -m warranted_revision.bench --config configs/gpu_smoke.json --label kernels \
+    --out /tmp/wrev/bench-kernels.json \
+    || { echo "kernel benchmark failed; uninstalling kernels for the run";
+         python -m pip uninstall -y -q flash-linear-attention fla-core causal-conv1d || true; }
+else
+  install_kernels
+fi
+pip freeze > /tmp/wrev/pip_freeze.txt
+
+OUT="$HOME/results/warranted_revision/$RUN_ID"
+mkdir -p "$HOME/results/warranted_revision"
+python - "$RUN_ID" "$CONFIG" "$SHARD" <<'PY'
+import json, os, sys
+run_id, config, shard = sys.argv[1:4]
+cfg = json.load(open(config)); cfg["run_id"] = run_id; cfg["shard"] = shard
+cfg["out_root"] = os.path.expanduser("~/results/warranted_revision")
+json.dump(cfg, open("/tmp/wrev/config.json", "w"), indent=2)
+gold = cfg["inputs"].replace("_inputs.jsonl", "_gold.jsonl")
+open("/tmp/wrev/gold_path", "w").write(gold)
+PY
+python -m warranted_revision.runner --config /tmp/wrev/config.json --dry-run
+timeout "${DEADLINE_MIN}m" python -m warranted_revision.runner --config /tmp/wrev/config.json
+cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
+cp /tmp/wrev/bench-*.json "$OUT/" 2>/dev/null || true
+python -m warranted_revision.evaluate --run "$OUT" --gold "$(cat /tmp/wrev/gold_path)"
+python -m warranted_revision.report --run "$OUT" --compress
+echo "remote job finished: $OUT"

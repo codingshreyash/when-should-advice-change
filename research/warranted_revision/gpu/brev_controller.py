@@ -52,7 +52,12 @@ from warranted_revision.gpu_guard import (  # noqa: E402
     instance_name,
     plan_budget,
 )
-from warranted_revision.runner import RunConfig, expected_calls, load_cases  # noqa: E402
+from warranted_revision.runner import (  # noqa: E402
+    RunConfig,
+    expected_calls,
+    load_cases,
+    shard_cases,
+)
 
 COMMANDS = json.loads((HERE / "brev_commands.json").read_text())
 
@@ -64,9 +69,10 @@ def render(key: str, **kw: str) -> list[str]:
 def build_plan(args: argparse.Namespace) -> dict:
     raw = json.loads(Path(args.config).read_text())
     raw["run_id"] = args.run_id
+    raw["shard"] = args.shard
     check_pinned_model(raw)
     cfg = RunConfig.model_validate(raw)
-    n_calls = expected_calls(cfg, load_cases(cfg))
+    n_calls = expected_calls(cfg, shard_cases(cfg, load_cases(cfg)))
     if cfg.max_calls is not None and n_calls > cfg.max_calls:
         raise GuardError(f"plan needs {n_calls} calls > max_calls {cfg.max_calls}")
     budget = plan_budget(
@@ -74,13 +80,16 @@ def build_plan(args: argparse.Namespace) -> dict:
         args.max_usd,
         expected_calls=n_calls,
         est_seconds_per_call=args.est_seconds_per_call,
-        setup_hours=args.setup_hours,
+        # The optional benchmark runs before the experiment; reserve time for it.
+        setup_hours=args.setup_hours + (0.25 if args.bench else 0.0),
     )
     if args.instance_type:
         check_instance_type(args.instance_type)
     name = instance_name(args.run_id)
     return {
         "run_id": args.run_id,
+        "shard": args.shard,
+        "bench": bool(args.bench),
         "instance": name,
         "instance_type": args.instance_type,
         "budget": budget.as_dict(),
@@ -208,6 +217,8 @@ def cmd_launch(args: argparse.Namespace) -> int:
         with tarfile.open(bundle, "w:gz") as tar:
             for sub in ("pyproject.toml", "PROTOCOL.md", "src", "configs", "data", "gpu", "tests"):
                 tar.add(PKG / sub, arcname=f"warranted_revision/{sub}")
+            # The exact config the plan was checked against.
+            tar.add(Path(args.config), arcname="warranted_revision/configs/_launch_config.json")
         run_step(render("copy_to", name=name, src=str(bundle), dst="wrev.tar.gz"), 600)
         deadline_min = int(min(plan["budget"]["run_deadline_minutes"], remaining() / 60 - 15))
         if deadline_min <= 5:
@@ -220,7 +231,8 @@ def cmd_launch(args: argparse.Namespace) -> int:
         )
         remote = (
             f"tar xzf wrev.tar.gz && cd warranted_revision && WREV_GIT_SHA={sha} "
-            f"bash gpu/remote_smoke.sh {shlex.quote(args.run_id)} {deadline_min}"
+            f"bash gpu/remote_job.sh {shlex.quote(args.run_id)} {deadline_min} "
+            f"configs/_launch_config.json {shlex.quote(args.shard)} {1 if args.bench else 0}"
         )
         try:
             run_step(render("exec", name=name, remote_cmd=remote), deadline_min * 60 + 900)
@@ -283,6 +295,8 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--instance-type", default="")
         p.add_argument("--est-seconds-per-call", type=float, default=6.0)
         p.add_argument("--setup-hours", type=float, default=0.5)
+        p.add_argument("--shard", default="1/1", help="i/n: run only this slice of the cases")
+        p.add_argument("--bench", action="store_true", help="benchmark kernels before the run")
         p.add_argument("--state", default="brev_state.json")
         if name == "launch":
             p.add_argument("--commands-verified", action="store_true")
