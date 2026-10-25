@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from . import stats
+from .diagnostics import call_diagnostics
 from .schema import (
     NEED_MORE_INFO,
     UNWARRANTED_UPDATE_CLASSES,
@@ -276,7 +277,13 @@ def evaluate_run(run_dir: Path, gold_path: Path, n_draws: int = stats.N_DRAWS) -
                             "ci95": list(ci) if ci else None,
                         }
                     )
+    diag = None
+    for name in ("predictions.jsonl", "predictions.jsonl.gz"):
+        if (run_dir / name).exists():
+            diag = call_diagnostics(run_dir / name)
+            break
     return {
+        "call_diagnostics": diag,
         "run_id": manifest.run_id,
         "synthetic": manifest.synthetic,
         "label": manifest.label,

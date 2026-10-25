@@ -23,3 +23,18 @@ the commit after this run. Inference was also slower than it needs to be: the op
 `flash-linear-attention` and `causal-conv1d` kernels weren't installed.
 
 Raw outputs are in `predictions.jsonl.gz` and `search_traces.jsonl.gz`.
+
+## Addendum: premise-ledger validity (added before smoke-004)
+
+A separate per-call ledger diagnostic, added after this run, shows that **no ledger parsed
+in any decision call** (0/405 best-of-N, 0/180 search, 0/45 structured) and 2/225 search
+hypothesis ledgers parsed, even where the DECISION line was valid. So the search scorer's
+grounding and arithmetic checks did not function in this run; selection in both 9-call
+arms rested on decision validity and the edit/abstention checks alone.
+
+Causes, from the raw text: the ledger schema required each fact's `value` to be text while
+the prompt never said so, so the model's `"value": 8600` failed validation (2,029 field
+errors; a schema bug, now fixed). Besides that, best-of-N samples often dropped the
+`<ledger>` tags, some put the DECISION line inside the block, and some ran out of tokens.
+Re-parsing this run's raw text with the fixed schema (diagnostic only; scores above are
+as recorded) parses 326/405 search, 64/405 best-of-N and 0/45 structured ledgers.

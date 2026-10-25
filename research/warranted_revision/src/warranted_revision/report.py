@@ -326,6 +326,51 @@ def write_report(run: Path, extra: str = "", compress: bool = False) -> Path:
             f"{a['status_counts']['need_more_information_on_actionable_followups']} |"
         )
     L.append("")
+    diag = metrics.get("call_diagnostics")
+    if diag:
+        rows = diag["rows"]
+        L.append("## Measurement diagnostics (per model call)\n")
+        L.append(
+            "Computed from the raw per-call outputs; not scored and independent of gold "
+            "labels. Decision calls end in a DECISION line; hypothesis calls (premise search, "
+            "depth 1) end in a SUPPORTED line, and count as strictly valid when both their "
+            "ledger and that line parse.\n"
+        )
+        L.append(
+            "| condition | call group | calls | strictly valid | invalid | recoverable "
+            "(one clear DECISION) | refusals | missing | hit token limit | max new tokens | "
+            "mean prompt tokens | mean completion tokens |"
+        )
+        L.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
+        for r in rows:
+            rec = r["invalid_with_one_clear_decision"] if r["call_group"] == "decision" else "n/a"
+            L.append(
+                f"| {r['condition']} | {r['call_group']} | {r['calls']} | {r['strict_valid']} | "
+                f"{r['invalid']} | {rec} | {r['refusal']} | {r['missing']} | "
+                f"{r['hit_token_limit']} ({r['token_limit_rate']:.0%}) | {r['max_new_tokens']} | "
+                f"{r['mean_prompt_tokens']:.0f} | {r['mean_completion_tokens']:.0f} |"
+            )
+        L.append("")
+        L.append(
+            "Premise ledgers, checked separately from the decision line. A well-formed "
+            "DECISION does not imply a valid ledger.\n"
+        )
+        L.append(
+            "| condition | call group | ledgers expected | parsed | valid decision without "
+            "a ledger | fully grounded | mean grounding | rule check consistent / present |"
+        )
+        L.append("|---|---|---|---|---|---|---|---|")
+        for r in rows:
+            if "ledger_expected" not in r:
+                continue
+            mg = "n/a" if r["mean_grounding"] is None else f"{r['mean_grounding']:.2f}"
+            L.append(
+                f"| {r['condition']} | {r['call_group']} | {r['ledger_expected']} | "
+                f"{r['ledger_parsed']} ({r['ledger_parse_rate']:.0%}) | "
+                f"{r['valid_decision_without_ledger']} | {r['fully_grounded']} | {mg} | "
+                f"{r['rule_check_consistent']} / {r['rule_check_present']} |"
+            )
+        L.append("")
     L.append("## Format check\n")
     L.append(
         "Rejected outputs that still contain exactly one `DECISION: <code>`. These are "

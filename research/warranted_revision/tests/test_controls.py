@@ -82,3 +82,18 @@ def test_metrics_have_denominators_and_cluster_intervals(metrics, control_run):
         for s in manifest["systems"]
         if s.startswith("control:")
     )
+
+
+def test_call_diagnostics_separate_ledger_from_decision(control_run):
+    from warranted_revision.diagnostics import call_diagnostics
+
+    d = call_diagnostics(control_run / "predictions.jsonl")
+    rows = {(r["system"], r["condition"], r["call_group"]): r for r in d["rows"]}
+    direct = rows[("control:oracle", "direct", "decision")]
+    assert "ledger_expected" not in direct and direct["strict_valid"] == direct["calls"]
+    s = rows[("control:oracle", "structured", "decision")]
+    assert s["ledger_parsed"] == s["ledger_expected"] == s["calls"]
+    assert s["rule_check_consistent"] == s["rule_check_present"]
+    h = rows[("control:oracle", "premise_search", "hypothesis")]
+    assert h["calls"] == 5 * 3 * 9 * 5  # 5 cases, 3 reps, 9 turns (base + 8 follow-ups), 5 readings
+    assert h["hit_token_limit"] == 0 and h["missing"] == 0

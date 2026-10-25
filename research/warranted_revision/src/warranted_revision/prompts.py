@@ -32,7 +32,8 @@ DIRECT_FORMAT = (
 
 LEDGER_SPEC = (
     "Write a JSON object between <ledger> and </ledger> with these keys:\n"
-    '- "facts": list of {"name", "value", "quote", "source"} for every fact you use; "quote" '
+    '- "facts": list of {"name", "value", "quote", "source"} for every fact you use; "value" is '
+    'a number or short text; "quote" '
     'copies the user\'s exact words; "source" is "base" (first message) or "followup" (a later '
     "message).\n"
     '- "priority": the user\'s current priority in your words; "priority_quote": their exact words.\n'

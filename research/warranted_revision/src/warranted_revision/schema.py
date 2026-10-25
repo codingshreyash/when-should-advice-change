@@ -208,9 +208,18 @@ class Completion(Strict):
 
 class LedgerFact(Strict):
     name: str
+    # Numbers or text. Before smoke-004 this was text-only while the prompt never said so,
+    # and nearly every real ledger (``"value": 8600``) failed validation in smoke-003.
     value: str
     quote: str
     source: Literal["base", "followup"]
+
+    @field_validator("value", mode="before")
+    @classmethod
+    def _value_to_text(cls, v: object) -> object:
+        if isinstance(v, bool):
+            return v
+        return str(v) if isinstance(v, int | float) else v
 
 
 class RuleCheck(Strict):

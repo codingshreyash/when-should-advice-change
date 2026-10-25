@@ -73,3 +73,15 @@ def test_ledger_interpretation_vocabulary():
 def test_frozen_inputs_validate():
     rows = [VisibleCase.model_validate_json(ln) for ln in DEV_INPUTS.read_text().splitlines()]
     assert len(rows) == 40
+
+
+def test_ledger_fact_values_accept_numbers():
+    from warranted_revision.schema import LedgerFact
+
+    assert LedgerFact(name="x", value=8600, quote="q", source="base").value == "8600"
+    assert LedgerFact(name="x", value=2.5, quote="q", source="base").value == "2.5"
+    assert LedgerFact(name="x", value="6 years", quote="q", source="base").value == "6 years"
+    with pytest.raises(ValidationError):
+        LedgerFact(name="x", value=True, quote="q", source="base")
+    with pytest.raises(ValidationError):
+        LedgerFact(name="x", value=None, quote="q", source="base")
