@@ -507,10 +507,30 @@ factual negatives at the 2026-10-21 merge. Saved output:
   relevant vs. irrelevant update d′ is about 1.0 for Haiku (0.98 constrained, 0.95
   conversational; vs. subthreshold 1.13 and 1.17) against 2.36–2.65 for Sonnet and
   2.27–2.47 on the partial Opus rerun. On the sweep, Haiku's switch point is off by a
-  factor of about 1.44 on average, where Opus's is exact; where pressure moves Haiku, it
-  mostly moves it away from the requested option, as with Opus. Nothing here is final
-  until the runs and blind labels are done.
+  factor of about 1.44 on average, where Opus's is exact. Pressure moves Haiku *away* from
+  the requested option (apparent reactance, or opposition; its cause is not isolated),
+  in both formats and both directions. Answers over
+  all eight sweep scenarios, 64 per cell (high-side / low-side / need more information):
+
+  | Haiku 4.5 | no pressure | toward low-side option | toward high-side option |
+  |---|---|---|---|
+  | code only | 25 / 22 / 17 | 30 / 15 / 19 | 15 / 27 / 22 |
+  | written advice | 26 / 22 / 16 | 29 / 13 / 22 | 9 / 26 / 29 |
+
+  The same split for Opus is 32/32/0 in every code-only cell and 33/30/1, 34/30/0,
+  28/30/4 in written advice. The decision-curve figure is
+  [`report/figures/threshold_curves.pdf`](../report/figures/threshold_curves.pdf)
+  (`scripts/analysis/plot_threshold.py`). Nothing here is final until the runs and
+  blind labels are done.
 - Length-matched omissions, AITA NTA posts, and a five-sample noise baseline.
+- The paired pressure-direction test on Haiku, pilot first
+  ([`PROTOCOL.md`](../PROTOCOL.md#pressure-direction-analysis)). One hypothesis it can
+  test: smaller models are not simply more sycophantic or more oppositional, but worse at
+  telling social pressure from decision-relevant evidence. That would explain both
+  Qwen's deference and Haiku's opposition, since either way the model moves on a request.
+  It predicts that a model's request effect, in either sign, grows as its
+  relevant-vs-irrelevant d′ falls, and that the size of the request effect, not its sign,
+  is what tracks scale.
 
 ## 8. Corrections
 
@@ -532,3 +552,19 @@ Each of these is already reflected above.
    career run the "Oct 3 run". The relevant-update counts it cites (22/29, 19/28) come
    from the career files committed on 2026-09-28, not from the 2026-10-03
    pressure-controls run (21/29, 18/28).
+
+- **Option order shuffled per variant (found 2026-10-23, from an outside review).**
+  With `RANDOMIZE_OPTIONS=1`, `ordered_scenario()` seeded the shuffle on the scenario,
+  the variant and the sample, so a base prompt and its variants usually showed the
+  options in different orders. Every randomized run is affected: the model-size ladder
+  and both threshold-sweep runs (the legacy runs used a fixed order). An answer change
+  can then be an order effect. For Haiku it matters: on variants that should not change
+  the answer it changed 18% (36/202) when the order differed from base and 5% (2/38)
+  when it matched; Sonnet 3% and 5%, Opus 1% and 4%. So Haiku's false alarms and low d′
+  are inflated, though these are different subsets of prompts, so they show an order
+  problem rather than measure its size; a matched rerun will. The directional opposition
+  result is not explained by it: the shuffle is
+  independent of the pressure direction, and the reversal holds within each position of
+  the high-side option. The seed now uses the scenario and sample only
+  (`ORDER_PER_VARIANT=1` reproduces the old orders). The ladder should be rerun from
+  scratch rather than resumed, so all prompts share the new rule.

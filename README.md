@@ -37,24 +37,34 @@ Claude Haiku 4.5 and Sonnet 5.5 (a size ladder) are partly run; see [results/REA
 
 ## Results so far
 
-**Primary question: not answered yet.** No model has been run on `irrelevant_update`.
-The confirmatory runs wait on blind labels for all seven prompts, then use five samples
-and randomized option order ([`PROTOCOL.md`](PROTOCOL.md)).
+**Headline (exploratory: draft labels, one sample).** Three behaviors under
+pressure. The Qwen3.5-9B base model shows *deference*: it moves more for a stated
+preference than for a relevant fact. Claude Haiku 4.5 shows *opposition*: pushed toward
+one option, it picks the other one more often (apparent reactance; the cause is not
+isolated yet). Claude Sonnet 5.5 and Opus 5 show *evidence-sensitive stability*:
+pressure does not move them, relevant facts do.
 
-**Exploratory evidence** (Claude Opus 5 only, run before blind labels):
+![Threshold-sweep decision curves](report/figures/threshold_curves.png)
 
-- **Subthreshold update.** The subthreshold edit changed Claude's answer in 1 of 29
-  scenarios (constrained) and 0 of 29 (conversational), against 22 of 29 and 19 of 28
-  relevant updates: d′ +2.32 and +2.57. The one change is a borderline scenario that also
-  moved under pressure.
-- **Threshold sweep.** Eight scenarios where one number decides the answer, at eight
-  values from 0.5× to 1.5× the threshold, with and without pressure. With a code only,
-  Claude was right on all 192 prompts and put the switch point exactly at the threshold
-  in all eight. In prose it missed 8 of 190, five of them by asking for more information
-  near the threshold.
+- **Factual discrimination.** Relevant vs. irrelevant update d′ is 2.36–2.65 for Sonnet
+  and 2.27–2.47 for the (partial) Opus rerun, against about 1.0 for Haiku
+  ([`model_ladder_career30.txt`](results/summaries/model_ladder_career30.txt)). Haiku's
+  number is confounded: these runs shuffled option order per variant, and Haiku changed
+  18% of answers that should not change when the order differed from base, against 5%
+  when it matched (Sonnet and Opus 1–5%). The runner now keeps one order per scenario;
+  Haiku needs a rerun.
+- **Decision boundaries.** On the threshold sweep, Opus answering with a code was right
+  on all 192 prompts, switching exactly at the threshold in all eight scenarios; Sonnet
+  matches it on the three scenarios it finished. Haiku's switch point is off by a factor
+  of about 1.45, and pressure moves it *away* from the requested option (written
+  advice: 9 of 64 answers chose the pushed high-side option, against 26 with no
+  pressure).
+- **Not final.** No model has had confirmatory runs: those wait on blind labels for all
+  seven prompts, then use five samples and randomized option order
+  ([`PROTOCOL.md`](PROTOCOL.md)). Sonnet's sweep and the Opus rerun are incomplete.
 
 **Legacy single-turn results** (five variants, 30 scenarios, draft labels, fixed option
-order, one sample; from Table 1 of the midterm report):
+order, one sample; see section 5 of the midterm report):
 
 | | Relevant update: changed | correct | Omission asks | Unneeded asks | Pressure: shift to target | Reframe: changed | d′ (pressure + reframe) |
 |---|---|---|---|---|---|---|---|
@@ -90,7 +100,8 @@ Full write-up, with settings and caveats for each experiment: [`docs/findings.md
 PROTOCOL.md                 confirmatory protocol and reporting order
 data/
   scenarios/                career_pilot.jsonl (career_01-10), career_v2.jsonl (career_11-30)
-  derived/                  pressure_controls, threshold_sweep, refusal_ablation (built by scripts/data/)
+  derived/                  pressure_controls, pressure_direction (+ _pilot), threshold_sweep (+ _hard),
+                            refusal_ablation (built by scripts/data/)
   labeling/                 seven-variant blind-labeling sheets (answer keys are not checked in)
   annotations/              pressure-sentence audit (single-coder draft)
 docs/
@@ -106,7 +117,8 @@ scripts/                    run everything from the repo root
                             recheck_refusals.py, run_steering.py, run_model_ladder.sh,
                             run_gpu_experiments.sh, brev_setup.sh (GPU box setup)
   analysis/                 metrics.py, discrimination.py, replicates.py, report_tables.py,
-                            threshold.py, steering.py, pushback.py, artifact_probe.py
+                            threshold.py, plot_threshold.py, pressure_direction.py, steering.py, pushback.py,
+                            artifact_probe.py
 results/                    raw outputs, <model>__<scenario set>.jsonl, one folder per study;
                             summaries/ (saved analysis output), logs/; index in results/README.md
 report/                     midterm report (midterm.tex, midterm.pdf, references.bib, ACL style)
@@ -114,9 +126,9 @@ report/                     midterm report (midterm.tex, midterm.pdf, references
 
 ## Reproducing
 
-Python 3.11. Every script runs from the repo root. Only `artifact_probe.py` needs
-packages beyond the standard library (`pip install numpy scikit-learn`); the Claude
-runners need `pip install anthropic`.
+Python 3.11. Every script runs from the repo root. `artifact_probe.py` needs
+`pip install numpy scikit-learn`, `plot_threshold.py` needs `pip install matplotlib`, and
+the Claude runners need `pip install anthropic`; everything else uses the standard library.
 
 **Validate the scenarios** (prints six WARN lines for pilot relevant updates that lead
 to `need_more_information`, a known legacy limitation):
@@ -145,6 +157,18 @@ Protocol settings:
     CHAT_MODEL=claude-opus-5 RANDOMIZE_OPTIONS=1 OPTION_ORDER_SEED=1684 SAMPLES=5 \
       SCENARIOS=data/scenarios/career_v2.jsonl python3 scripts/run/run_chat.py
 
+Paired pressure-direction test (request vs. neutral mention of each option, one option
+order per scenario; see [`docs/scenario_schema.md`](docs/scenario_schema.md#paired-pressure-direction-set)):
+
+    # pilot first: 10 scenarios, primary phrasings, one format, 270 calls
+    CHAT_MODEL=claude-haiku-4-5-20251001 RANDOMIZE_OPTIONS=1 SAMPLES=3 CONDITIONS=conversational \
+      OUT_DIR=results/pressure_direction SCENARIOS=data/derived/pressure_direction_pilot.jsonl \
+      python3 scripts/run/run_chat.py
+    python3 scripts/analysis/pressure_direction.py results/pressure_direction/*__pressure_direction_pilot.jsonl
+    # then the full set (2,610 calls per format), if the pilot passes the checks in PROTOCOL.md
+    CHAT_MODEL=claude-haiku-4-5-20251001 RANDOMIZE_OPTIONS=1 SAMPLES=3 OUT_DIR=results/pressure_direction \
+      SCENARIOS=data/derived/pressure_direction.jsonl python3 scripts/run/run_chat.py
+
 Other Claude runners: `scripts/run/run_pushback.py`, `scripts/run/recheck_refusals.py`,
 and `bash scripts/run/run_model_ladder.sh` (Haiku 4.5, Sonnet 5.5, Opus 5; add `RESUME=1` to finish an
 interrupted run). Runners never overwrite an existing results file unless `OVERWRITE=1`.
@@ -157,7 +181,7 @@ interrupted run). Runners never overwrite an existing results file unless `OVERW
     RANDOMIZE_OPTIONS=1 OPTION_ORDER_SEED=1684 SAMPLES=5 \
       SCENARIOS=data/scenarios/career_v2.jsonl python scripts/run/run_nimble.py
 
-`bash scripts/run/run_gpu_experiments.sh` runs the pressure controls and the steering
+`bash scripts/run/run_gpu_experiments.sh` runs the pressure controls, the paired pressure-direction test and the steering
 study in one go. Delete the instance when done.
 
 **Analyses** (each prints to stdout; saved copies are in `results/summaries/`):
@@ -168,6 +192,7 @@ study in one go. Delete the instance when done.
     python3 scripts/analysis/metrics.py --labels data/scenarios/career_v2.jsonl results/career/nimble-and-qwen__career_v2.jsonl results/career/claude-opus-5__career_v2.jsonl
     python3 scripts/analysis/replicates.py results/career/nimble-and-qwen__career_v2.jsonl results/career/claude-opus-5__career_v2.jsonl
     python3 scripts/analysis/threshold.py results/threshold_sweep/claude-opus-5__threshold_sweep.jsonl
+    python3 scripts/analysis/plot_threshold.py results/threshold_sweep/*.jsonl   # report/figures/threshold_curves.pdf
     python3 scripts/analysis/steering.py results/pressure_controls/claude-opus-5__pressure_controls.jsonl
     python3 scripts/analysis/pushback.py results/pushback/claude-opus-5__pressure_controls.jsonl
     python3 scripts/analysis/artifact_probe.py results/career/nimble-and-qwen__career_pilot.jsonl results/career/nimble-and-qwen__career_v2.jsonl
