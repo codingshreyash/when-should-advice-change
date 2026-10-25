@@ -214,3 +214,30 @@ def test_launch_checks_type_before_creating(tmp_path, fake_bin):
     assert brev[0].startswith("brev login --token")
     assert brev[1].endswith("--type g5.xlarge --dry-run")
     assert brev[2].endswith("--type g5.xlarge --timeout 900")
+
+
+def test_launch_reuses_planned_instance_name(tmp_path, fake_bin):
+    ctl = _controller()
+    cfg_path = tmp_path / "cfg.json"
+    cfg_path.write_text((PKG_ROOT / "configs" / "gpu_smoke.json").read_text())
+    state = tmp_path / "s.json"
+    common = [
+        "--hourly",
+        "1.0",
+        "--max-usd",
+        "10",
+        "--run-id",
+        "t",
+        "--config",
+        str(cfg_path),
+        "--instance-type",
+        "g5.xlarge",
+        "--state",
+        str(state),
+    ]
+    assert ctl.main(["plan", *common]) == 0
+    planned = json.loads(state.read_text())["instance"]
+    with pytest.raises(subprocess.CalledProcessError):
+        ctl.main(["launch", *common, "--commands-verified"])
+    assert json.loads(state.read_text())["instance"] == planned
+    assert f"brev create {planned} --type g5.xlarge --timeout 900" in fake_bin.read_text()

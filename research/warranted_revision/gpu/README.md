@@ -28,8 +28,10 @@ Checked against `--help` from brev v0.6.335:
   fails at login, the token may have expired; repeat that step.
 - `brev create <name> --type <type>` creates the instance. Without `--type`, Brev picks the
   cheapest match on its own, and a comma list means "try these in order". The controller
-  allows exactly one type so the price you enter is the price you pay. `--dry-run` checks a
-  type without creating anything.
+  allows exactly one type so the price you enter is the price you pay.
+- `brev create --type X --dry-run` just echoes X back; it does not check that `create` accepts
+  it. On 2026-10-25, `hyperstack_A6000` appeared in `brev search` but `brev create` rejected it
+  as "not a recognized type" (CLI v0.6.337). Nothing was created and nothing was billed.
 - `brev delete <name>` deletes it; this takes a few minutes. Piped `brev ls` prints one
   name per line, which the controller uses to confirm deletion.
 - `brev refresh` rewrites the SSH config. We assume `ssh <name>` works afterwards. That's

@@ -160,6 +160,12 @@ def cmd_launch(args: argparse.Namespace) -> int:
         return 2
     plan = build_plan(args)
     state_path = Path(args.state)
+    # Keep the instance name the plan step already printed, if it planned this same run.
+    if state_path.exists():
+        prev = json.loads(state_path.read_text())
+        if prev.get("run_id") == args.run_id and not prev.get("created"):
+            check_instance_name(prev["instance"])
+            plan["instance"] = prev["instance"]
     state_path.write_text(json.dumps(plan, indent=2))  # name recorded before creation
     name = plan["instance"]
     t_end = time.time() + plan["budget"]["permitted_hours"] * 3600
