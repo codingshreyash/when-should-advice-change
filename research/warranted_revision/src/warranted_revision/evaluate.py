@@ -48,13 +48,19 @@ from .schema import (
 
 PRIMARY_COMPARISONS = [("premise_search", "best_of_n"), ("structured", "direct")]
 #: Full-heuristic vs format-only scoring ablation (same search, budget, seeds and tie-break).
-ABLATION_COMPARISONS = [("premise_search", "premise_search_formatonly")]
+#: format-001 ran it under its earlier name, ``premise_search_noprov``; listing both keeps
+#: re-evaluation of that run faithful to its committed metrics.
+ABLATION_COMPARISONS = [
+    ("premise_search", "premise_search_formatonly"),
+    ("premise_search", "premise_search_noprov"),
+]
 #: Final selection vs simpler selectors on the same candidates (derived arms, see
 #: ``derived_records``), and the two search arms compared on equal (vote) footing.
 SELECTION_COMPARISONS = [
     ("best_of_n", "best_of_n:vote"),
     ("premise_search", "premise_search:vote"),
     ("premise_search_formatonly", "premise_search_formatonly:vote"),
+    ("premise_search_noprov", "premise_search_noprov:vote"),
     ("premise_search:vote", "best_of_n:vote"),
     ("best_of_n:vote", "best_of_n:first"),
 ]
