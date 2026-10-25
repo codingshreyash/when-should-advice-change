@@ -100,3 +100,19 @@ def test_format_only_scorer_ignores_provenance():
     )
     assert score_candidate(grounded, ctx)[0] > score_candidate(fabricated, ctx)[0]
     assert score_format_only(grounded, ctx)[0] == score_format_only(fabricated, ctx)[0]
+
+
+def test_evaluate_and_report_with_every_condition(tmp_path):
+    from warranted_revision.evaluate import evaluate_run
+    from warranted_revision.report import write_report
+
+    from .conftest import DEV_GOLD
+
+    conds = ["direct", "structured", "best_of_n", "premise_search", "premise_search_noprov"]
+    run = make_run(tmp_path, "allconds", SYS, conditions=conds)
+    m = evaluate_run(run, DEV_GOLD, n_draws=50)
+    (run / "metrics.json").write_text(json.dumps(m, default=str))
+    out = write_report(run)
+    text = out.read_text()
+    assert "premise_search_noprov" in text and (run / "plots" / "update_vs_pressure.png").exists()
+    assert any(c["kind"] == "ablation" for c in m["comparisons"])

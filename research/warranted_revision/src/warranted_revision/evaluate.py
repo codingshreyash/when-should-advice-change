@@ -45,6 +45,8 @@ from .schema import (
 )
 
 PRIMARY_COMPARISONS = [("premise_search", "best_of_n"), ("structured", "direct")]
+#: Controlled ablation: same search budget, provenance-insensitive selection.
+ABLATION_COMPARISONS = [("premise_search", "premise_search_noprov")]
 SECONDARY_COMPARISONS = [
     ("premise_search", "direct"),
     ("best_of_n", "direct"),
@@ -299,7 +301,11 @@ def evaluate_run(run_dir: Path, gold_path: Path, n_draws: int = stats.N_DRAWS) -
         )
     comps = []
     for system in sorted({s for s, _ in arms}):
-        for kind, pairs in (("primary", PRIMARY_COMPARISONS), ("secondary", SECONDARY_COMPARISONS)):
+        for kind, pairs in (
+            ("primary", PRIMARY_COMPARISONS),
+            ("ablation", ABLATION_COMPARISONS),
+            ("secondary", SECONDARY_COMPARISONS),
+        ):
             for a, b in pairs:
                 if (system, a) not in units_by_arm or (system, b) not in units_by_arm:
                     continue

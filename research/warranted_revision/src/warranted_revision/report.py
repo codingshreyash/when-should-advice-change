@@ -26,16 +26,23 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-CONDITIONS = ["direct", "structured", "best_of_n", "premise_search"]
-# Validated categorical slots 1-4 (light surface); identity is also carried by marker shape
-# and direct labels because slots 3-4 sit below 3:1 contrast.
+CONDITIONS = ["direct", "structured", "best_of_n", "premise_search", "premise_search_noprov"]
+# Validated categorical slots 1-5 (light surface); identity is also carried by marker shape
+# and direct labels because slots 3-5 sit below 3:1 contrast.
 COLORS = {
     "direct": "#2a78d6",
     "structured": "#eb6834",
     "best_of_n": "#1baf7a",
     "premise_search": "#eda100",
+    "premise_search_noprov": "#e87ba4",
 }
-MARKERS = {"direct": "o", "structured": "s", "best_of_n": "^", "premise_search": "D"}
+MARKERS = {
+    "direct": "o",
+    "structured": "s",
+    "best_of_n": "^",
+    "premise_search": "D",
+    "premise_search_noprov": "v",
+}
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 CLASS_ORDER = [
     "relevant_fact",
@@ -89,7 +96,7 @@ def plot_update_vs_pressure(metrics: dict[str, Any], path: Path) -> None:
             # Small horizontal dodge so coincident arms stay visible (values are unchanged
             # in the tables); labels are stacked per condition for the same reason.
             k = CONDITIONS.index(c)
-            dodge = (k - 1.5) * 0.015
+            dodge = (k - (len(CONDITIONS) - 1) / 2) * 0.015
             ax.errorbar(
                 x["value"] + dodge,
                 y["value"],
@@ -163,7 +170,7 @@ def plot_condition_breakdown(metrics: dict[str, Any], path: Path) -> None:
             if c not in arms:
                 continue
             vals = [arms[c]["per_class"][cls]["joint_correct"]["value"] or 0 for cls in CLASS_ORDER]
-            xs = [i + (k - 1.5) * width for i in range(len(CLASS_ORDER))]
+            xs = [i + (k - (len(CONDITIONS) - 1) / 2) * width for i in range(len(CLASS_ORDER))]
             ax.bar(
                 xs,
                 vals,
@@ -182,7 +189,7 @@ def plot_condition_breakdown(metrics: dict[str, Any], path: Path) -> None:
                 sc["need_more_information_on_actionable_followups"] / t,
             ]
             ax2.bar(
-                [i + (k - 1.5) * width for i in range(4)],
+                [i + (k - (len(CONDITIONS) - 1) / 2) * width for i in range(4)],
                 rates,
                 width=width * 0.9,
                 color=COLORS[c],
