@@ -46,10 +46,11 @@ def test_instance_names_and_pinning():
         with pytest.raises(GuardError):
             check_instance_name(bad)
     cfg = json.loads((PKG_ROOT / "configs" / "gpu_smoke.json").read_text())
-    with pytest.raises(GuardError):
-        check_pinned_model(cfg)  # the committed config is deliberately unpinned
-    cfg["systems"][0]["params"]["revision"] = "a" * 40
-    check_pinned_model(cfg)
+    check_pinned_model(cfg)  # the committed config is pinned to a commit
+    for bad in ("main", "PIN_ME", "c2022362"):
+        cfg["systems"][0]["params"]["revision"] = bad
+        with pytest.raises(GuardError):
+            check_pinned_model(cfg)
 
 
 def _controller():

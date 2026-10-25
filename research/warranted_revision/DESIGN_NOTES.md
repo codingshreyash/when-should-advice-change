@@ -90,5 +90,5 @@ and should be re-checked against the paper before it is cited in a write-up.)
   entered. Still unconfirmed until a first real run: `ssh <name>` after `brev refresh`, and
   the CLI installer URL. `--commands-verified` remains a manual confirmation.
 - `configs/gpu_smoke.json` uses `Qwen/Qwen3.5-9B` with `Qwen3_5ForConditionalGeneration`.
-  The commit revision is still a placeholder (Hugging Face is unreachable from the build
-  environment), and every launch path refuses an unpinned model. See `gpu/README.md`.
+  It is pinned to commit `c202236235762e1c871ad0ccb60c8ee5ba337b9a`; every launch path
+  refuses an unpinned model. See `gpu/README.md`.
