@@ -6,7 +6,9 @@
 set -euo pipefail
 RUN_ID="$1"; DEADLINE_MIN="$2"
 PY=$(command -v python3.12 || command -v python3)
-$PY -m venv .venv && source .venv/bin/activate
+# Stock Ubuntu images often ship without venv support (same fallback as scripts/run/brev_setup.sh).
+$PY -m venv .venv || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-venv && $PY -m venv .venv; }
+source .venv/bin/activate
 python -m pip install -q --upgrade pip
 python -m pip install -q -e '.[gpu,dev]'
 # Qwen3.5 needs a transformers release that ships Qwen3_5ForConditionalGeneration.
