@@ -1,5 +1,15 @@
 # Warranted Decision Revision: Search and Premise Provenance
 
+> **Current status (2026-10-25).** The research direction changed after two review rounds.
+> Premise search is kept only as an experimental baseline: it was no better than a majority
+> vote over the same samples, and its scorer checked self-consistency, not premises
+> (`agent_reports/SYNTHESIS.md`). The v0 and challenge_v1 benchmarks turned out to be solvable
+> from wording. The study now first asks whether a benchmark of warranted goal and premise
+> changes can be built at all: `BENCHMARK_V2.md`, `PROTOCOL_v0.2.md` (draft),
+> `v2/annotation/`, and the review in `v2_reports/SYNTHESIS.md`. A small gold-free diagnostic
+> of the old pressure ceiling is planned in `SCAFFOLD_PROBE.md`. The challenge_v1 pilot was
+> cancelled. The text below describes the original design and is kept as the record.
+
 ## Research question
 
 Can a structured, premise-aware decision procedure reduce unwarranted agreement **and** unwarranted disagreement while preserving the ability to incorporate valid factual corrections and legitimate changes of goals?
