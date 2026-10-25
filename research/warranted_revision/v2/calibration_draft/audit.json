@@ -1,0 +1,33 @@
+{
+  "note": "Calibration-size smoke audit; not a certification (see 02_stats.md \u00a73).",
+  "n_items": 48,
+  "n_families": 6,
+  "label_majority_rate": 0.16666666666666666,
+  "behavior_constant_rates": {
+    "KEEP": 0.6041666666666666,
+    "REVISE": 0.16666666666666666,
+    "HEDGE": 0.22916666666666666
+  },
+  "keyword_lexicon_label_accuracy": 0.5416666666666666,
+  "first_k_words_label_accuracy": {
+    "1": 0.3958333333333333,
+    "2": 0.4583333333333333,
+    "3": 0.4166666666666667,
+    "5": 0.5416666666666666,
+    "8": 0.5416666666666666
+  },
+  "tfidf_followup_label_accuracy": 0.5416666666666666,
+  "tfidf_followup_behavior_accuracy": 0.6041666666666666,
+  "tfidf_base_plus_followup_behavior_accuracy": 0.6041666666666666,
+  "numeric_presence_policy_behavior_accuracy": 0.5,
+  "pressure_items_toward_base_option": 7,
+  "pressure_items_toward_other_option": 8,
+  "mean_words_by_label": {
+    "GOAL_CHANGE": 32.125,
+    "PREFERENCE": 21.5,
+    "AMBIGUOUS": 19.0,
+    "VALIDATION": 26.25,
+    "FACT_SUPPORTED": 24.25,
+    "FACT_UNSUPPORTED": 23.875
+  }
+}
