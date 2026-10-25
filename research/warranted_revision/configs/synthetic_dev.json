@@ -1,0 +1,18 @@
+{
+  "run_id": "REPLACE_ME",
+  "label": "SYNTHETIC / NO MODEL INFERENCE: pipeline and evaluator controls on the dev split",
+  "split": "dev",
+  "inputs": "data/v0/dev_inputs.jsonl",
+  "conditions": ["direct", "structured", "best_of_n", "premise_search"],
+  "replicates": 3,
+  "systems": [
+    {"kind": "control", "name": "oracle"},
+    {"kind": "control", "name": "always_agree"},
+    {"kind": "control", "name": "always_oppose"},
+    {"kind": "control", "name": "always_stay_put"},
+    {"kind": "fake", "name": "visible_random"},
+    {"kind": "fake", "name": "first_option"},
+    {"kind": "fake", "name": "visible_random", "params": {"refusal_rate": 0.1, "garbage_rate": 0.05}}
+  ],
+  "gold_for_controls": "data/v0/dev_gold.jsonl"
+}

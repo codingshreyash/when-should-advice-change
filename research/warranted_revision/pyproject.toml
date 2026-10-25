@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "warranted-revision"
+version = "0.1.0"
+description = "Exploratory study: premise-aware search for warranted decision revision"
+requires-python = ">=3.10"
+# Core CPU pipeline: schema validation and plots. No GPU, API key or Brev login needed.
+dependencies = ["pydantic>=2.5,<3", "matplotlib>=3.7"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.8"]
+# GPU inference stack (only installed on the GPU box; see RUNBOOK.md).
+# Versions actually installed are frozen into each run manifest (pip freeze) on the GPU box.
+gpu = ["torch==2.8.0", "transformers>=4.57", "accelerate>=1.10", "bitsandbytes>=0.47"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# Line length is enforced by `ruff format`; long string literals are left intact.
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+check_untyped_defs = true
