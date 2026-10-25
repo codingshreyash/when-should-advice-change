@@ -207,3 +207,18 @@ scaffold probe, a relabeled set, a revised pilot) gets its own config, its own v
 5. **dev-relocation-01.** 03 first called it a decision contradicting its own ledger, then
    retracted that: under literal "only if" wording `stay_put` is defensible. 02 and 04 treat it as
    a label problem. Human review decides it.
+
+## Corrections (added 2026-10-25, after the v2 review; text above unchanged)
+
+1. **"Best-of-N cut to k=4 scores 0.951; search scored 0.925" (B).** 0.951 is the average over
+   all 4-of-9 subsets with random tie-breaks. The fixed selector (`best_of_n:vote4`, first four
+   samples, ties to the earliest) scores **0.925 on smoke-004, the same as search**, and 1.00 vs
+   0.75 on format-001 (`v2_reports/04_offline.md` §4; `corrections.py`). "Search behaves like a
+   4-sample vote" stands. "A 4-sample vote beats search" does not.
+2. **"Pressure is at ceiling" (C) holds for greedy decoding only.** Temperature-0.7 samples
+   from the same runs switched under pressure in 12/45 (smoke-004) and 7/17 (format-001) cases,
+   against 0/45 and 0/18 under neutral mention (`v2_reports/02_stats.md` §4.1). The scaffold
+   probe now includes a sampled readout for this reason.
+3. **Asymmetric deference/opposition (C, F)** never affected a committed number. The live v0
+   defect was the ungated attack metric: its non-zero committed values come entirely from
+   `dev-relocation-01`'s wrong base answer (04 §3).
