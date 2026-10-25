@@ -343,3 +343,26 @@ def test_cancelled_pilot_config_is_refused(tmp_path, fake_bin):
         )
         assert rc == 2
     assert not fake_bin.exists() or "brev" not in fake_bin.read_text()
+
+
+def test_probe_config_plans_its_own_call_count(tmp_path, fake_bin, capsys):
+    ctl = _controller()
+    rc = ctl.main(
+        [
+            "plan",
+            "--hourly",
+            "1.06",
+            "--max-usd",
+            "2.25",
+            "--run-id",
+            "probe-t",
+            "--config",
+            str(PKG_ROOT / "configs" / "scaffold_probe_stage1.json"),
+            "--instance-type",
+            "L40S",
+            "--est-seconds-per-call",
+            "3.9",
+        ]
+    )
+    out = capsys.readouterr().out
+    assert rc == 0 and '"expected_calls": 970' in out

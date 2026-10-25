@@ -91,10 +91,17 @@ def build_plan(args: argparse.Namespace) -> dict:
     raw["run_id"] = args.run_id
     raw["shard"] = args.shard
     check_pinned_model(raw)
-    cfg = RunConfig.model_validate(raw)
-    n_calls = expected_calls(cfg, shard_cases(cfg, load_cases(cfg)))
-    if cfg.max_calls is not None and n_calls > cfg.max_calls:
-        raise GuardError(f"plan needs {n_calls} calls > max_calls {cfg.max_calls}")
+    if raw.get("experiment") == "scaffold_probe":
+        from warranted_revision import scaffold_probe
+
+        pcfg = scaffold_probe.ProbeConfig.model_validate(raw)
+        scaffold_probe.validate_plan(pcfg)
+        n_calls, max_calls = scaffold_probe.expected_calls(pcfg), pcfg.max_calls
+    else:
+        cfg = RunConfig.model_validate(raw)
+        n_calls, max_calls = expected_calls(cfg, shard_cases(cfg, load_cases(cfg))), cfg.max_calls
+    if max_calls is not None and n_calls > max_calls:
+        raise GuardError(f"plan needs {n_calls} calls > max_calls {max_calls}")
     budget = plan_budget(
         args.hourly,
         args.max_usd,

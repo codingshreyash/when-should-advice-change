@@ -54,12 +54,21 @@ json.dump(cfg, open("/tmp/wrev/config.json", "w"), indent=2)
 gold = cfg["inputs"].replace("_inputs.jsonl", "_gold.jsonl")
 open("/tmp/wrev/gold_path", "w").write(gold)
 PY
-python -m warranted_revision.runner --config /tmp/wrev/config.json --dry-run
-timeout "${DEADLINE_MIN}m" python -m warranted_revision.runner --config /tmp/wrev/config.json
-cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
-cp /tmp/wrev/bench-*.json "$OUT/" 2>/dev/null || true
-python -m warranted_revision.evaluate --run "$OUT" --gold "$(cat /tmp/wrev/gold_path)"
-python -m warranted_revision.report --run "$OUT" --compress
-# Pre-declared shard checks; the PILOT_CHECK line in the job log decides the next shard.
-python -m warranted_revision.pilot_check --run "$OUT" || echo "PILOT_CHECK ERROR"
+if python -c "import json,sys; sys.exit(json.load(open('/tmp/wrev/config.json')).get('experiment') != 'scaffold_probe')"; then
+  # Scaffold probe: its own runner and records; gold-free gates printed as a PROBE_CHECK line.
+  python -m warranted_revision.scaffold_probe --config /tmp/wrev/config.json --dry-run
+  timeout "${DEADLINE_MIN}m" python -m warranted_revision.scaffold_probe --config /tmp/wrev/config.json
+  cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
+  python -m warranted_revision.probe_analysis --run "$OUT" || echo "PROBE_CHECK ERROR"
+  gzip -k "$OUT/probe_calls.jsonl"
+else
+  python -m warranted_revision.runner --config /tmp/wrev/config.json --dry-run
+  timeout "${DEADLINE_MIN}m" python -m warranted_revision.runner --config /tmp/wrev/config.json
+  cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
+  cp /tmp/wrev/bench-*.json "$OUT/" 2>/dev/null || true
+  python -m warranted_revision.evaluate --run "$OUT" --gold "$(cat /tmp/wrev/gold_path)"
+  python -m warranted_revision.report --run "$OUT" --compress
+  # Pre-declared shard checks; the PILOT_CHECK line in the job log decides the next shard.
+  python -m warranted_revision.pilot_check --run "$OUT" || echo "PILOT_CHECK ERROR"
+fi
 echo "remote job finished: $OUT"
