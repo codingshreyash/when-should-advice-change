@@ -140,3 +140,26 @@ def score_hypothesis(
             )
     total = sum(HYPOTHESIS_WEIGHTS[k] * v for k, v in comp.items())
     return total, comp
+
+
+# --------------------------------------------------------------------------------------
+# Ablation scorers: format validity only (no provenance or grounding signal)
+# --------------------------------------------------------------------------------------
+
+
+def score_format_only(parsed: ParsedOutput, ctx: ScoringContext) -> tuple[float, dict[str, float]]:
+    """Final-selection score for the ``premise_search_noprov`` ablation: a valid decision
+    and a parsed ledger, nothing else. Ties go through the same vote-then-order rule."""
+    comp = {
+        "valid_decision": 1.0 if parsed.status == "valid" else 0.0,
+        "ledger_parsed": 1.0 if parsed.ledger is not None else 0.0,
+    }
+    return WEIGHTS["valid_decision"] * comp["valid_decision"] + comp["ledger_parsed"], comp
+
+
+def score_hypothesis_format_only(
+    parsed: ParsedOutput, hypothesis: str, ctx: ScoringContext
+) -> tuple[float, dict[str, float]]:
+    """Beam-pruning score for the ablation: did the node produce a parseable ledger."""
+    comp = {"parsed": 1.0 if parsed.ledger is not None else 0.0}
+    return comp["parsed"], comp

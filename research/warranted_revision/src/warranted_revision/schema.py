@@ -280,7 +280,9 @@ class ParsedOutput(Strict):
 
 
 Turn = Literal["base", "followup"]
-ConditionName = Literal["direct", "structured", "best_of_n", "premise_search"]
+ConditionName = Literal[
+    "direct", "structured", "best_of_n", "premise_search", "premise_search_noprov"
+]
 
 
 class CallRecord(Strict):
@@ -373,4 +375,7 @@ class Manifest(Strict):
     hardware: dict[str, Any]
     expected_calls: int
     actual_calls: int | None = None
+    shard: str = "1/1"
+    planned_case_ids: list[str] | None = None  # full case list before sharding
+    shard_runs: list[str] | None = None  # set on aggregated runs: the shard run ids merged
     notes: list[str] = Field(default_factory=list)

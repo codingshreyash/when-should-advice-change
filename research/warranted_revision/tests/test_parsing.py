@@ -97,3 +97,24 @@ def test_format_diagnostic_counts_only_single_clear_decisions():
     assert not _one_clear_decision("I would refinance.", OPTS)
     assert not _one_clear_decision("DECISION: refinance\nDECISION: keep_current_loan", OPTS)
     assert not _one_clear_decision("DECISION: sell_house", OPTS)
+
+
+def test_ledger_template_is_valid_json_and_shared():
+    import json
+
+    from warranted_revision import prompts as P
+
+    body = P.LEDGER_TEMPLATE.split("<ledger>", 1)[1].split("</ledger>", 1)[0]
+    obj = json.loads(body)
+    assert set(obj) == {
+        "facts",
+        "priority",
+        "priority_quote",
+        "interpretation",
+        "interpretation_quote",
+        "missing_required",
+        "rule_check",
+    }
+    for fmt in (P.STRUCTURED_FORMAT, P.hypothesis_format("changed_goal"), P.decide_format(None)):
+        assert P.LEDGER_TEMPLATE in fmt
+    assert P.LEDGER_TEMPLATE not in P.DIRECT_FORMAT

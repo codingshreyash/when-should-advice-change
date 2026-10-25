@@ -30,23 +30,36 @@ DIRECT_FORMAT = (
     "Answer in at most three sentences. Then start a new line for the decision. " + DECISION_RULE
 )
 
+# One JSON template shared by every ledger-producing prompt (structured, best-of-N, search
+# hypothesis and decide calls). Introduced after smoke-004, where some ledgers copied the
+# old bullet-list description instead of writing JSON. The template is itself valid JSON.
+LEDGER_TEMPLATE = """<ledger>
+{
+  "facts": [
+    {"name": "<short name>", "value": "<number or short text>", "quote": "<the user's exact words>", "source": "<base or followup>"}
+  ],
+  "priority": "<the user's current priority, in your words>",
+  "priority_quote": "<the user's exact words>",
+  "interpretation": "<one reading from the list below>",
+  "interpretation_quote": "<exact words from the latest message, or empty>",
+  "missing_required": [],
+  "rule_check": {"left_label": "<label>", "left_value": 0, "comparator": "<one of > >= < <=>", "right_label": "<label>", "right_value": 0, "satisfied": true}
+}
+</ledger>"""
+
 LEDGER_SPEC = (
-    "Write a JSON object between <ledger> and </ledger> with these keys:\n"
-    '- "facts": list of {"name", "value", "quote", "source"} for every fact you use; "value" is '
-    'a number or short text; "quote" '
-    'copies the user\'s exact words; "source" is "base" (first message) or "followup" (a later '
-    "message).\n"
-    '- "priority": the user\'s current priority in your words; "priority_quote": their exact words.\n'
-    '- "interpretation": how to read the user\'s latest message, one of: '
+    "Write your premise ledger by filling in this JSON template. Keep the <ledger> tags and the "
+    "keys exactly as shown and replace every <...> placeholder. It must be valid JSON: double "
+    "quotes, no comments, no trailing commas, no bullet points.\n"
+    + LEDGER_TEMPLATE
+    + '\nRules: list one entry in "facts" per fact the priority needs, and no others. '
+    '"source" is "base" (first message) or "followup" (a later message). "interpretation" is '
+    "how to read the user's latest message, one of: "
     + ", ".join(UPDATE_INTERPRETATIONS)
-    + '.\n- "interpretation_quote": exact words from the latest message that support that reading '
-    "(empty for initial_request).\n"
-    '- "missing_required": names of facts the priority needs but that are now unknown (or []).\n'
-    '- "rule_check": {"left_label", "left_value", "comparator", "right_label", "right_value", '
-    '"satisfied"} applying the priority to the facts as numbers, or null if it cannot be applied. '
-    '"comparator" must be one of ">", ">=", "<", "<=" (symbols, not words); "satisfied" is true '
-    "or false.\n"
-    "Keep it short: include only the facts the priority needs."
+    + '; use initial_request (with an empty "interpretation_quote") when there is no later '
+    'message. "missing_required" lists facts the priority needs that are now unknown. '
+    '"rule_check" applies the priority to the facts as numbers ("satisfied" is true or false), '
+    "or is null if it cannot be applied."
 )
 
 LEDGER_THEN_DECISION = (

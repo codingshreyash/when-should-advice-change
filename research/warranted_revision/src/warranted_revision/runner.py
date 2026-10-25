@@ -31,7 +31,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from . import prompts as P
 from .backends.base import Backend
-from .conditions import RUNNERS, ConditionConfig, TurnInput, TurnResult
+from .conditions import RUNNERS, SEED_ALIAS, ConditionConfig, TurnInput, TurnResult
 from .schema import (
     CallRecord,
     ConditionName,
@@ -68,6 +68,9 @@ class RunConfig(BaseModel):
     option_order_seed: int = 1684
     sampling_seed: int = 20261025
     max_calls: int | None = None
+    # "i/n": run only the i-th of n round-robin slices of the case list (1-based). Seeds and
+    # option orders do not depend on the shard, so shards reproduce their slice exactly.
+    shard: str = Field(default="1/1", pattern=r"^[1-9][0-9]*/[1-9][0-9]*$")
     out_root: str = "../../results/warranted_revision"
     # Only privileged control systems may read this.
     gold_for_controls: str | None = None
@@ -116,6 +119,19 @@ def load_cases(cfg: RunConfig) -> list[VisibleCase]:
     return cases
 
 
+def parse_shard(shard: str) -> tuple[int, int]:
+    i, n = (int(x) for x in shard.split("/"))
+    if not 1 <= i <= n:
+        raise SystemExit(f"bad shard {shard!r}: need 1 <= i <= n")
+    return i, n
+
+
+def shard_cases(cfg: RunConfig, cases: list[VisibleCase]) -> list[VisibleCase]:
+    """Round-robin slice ``i/n`` of the planned case list (spreads families across shards)."""
+    i, n = parse_shard(cfg.shard)
+    return cases[i - 1 :: n]
+
+
 def expected_calls(cfg: RunConfig, cases: list[VisibleCase]) -> int:
     n_fu = sum(len(c.followups) for c in cases)
     per_rep = sum(
@@ -158,11 +174,14 @@ def run(
     backends: dict[str, Backend] | None = None,
 ) -> Path | None:
     """Execute a run. ``backends`` lets tests inject already-built backends by system name."""
-    cases = load_cases(cfg)
+    planned = load_cases(cfg)
+    cases = shard_cases(cfg, planned)
+    if not cases:
+        raise SystemExit(f"shard {cfg.shard} is empty")
     n_calls = expected_calls(cfg, cases)
     n_fu = sum(len(c.followups) for c in cases)
     print(
-        f"[plan] run_id={cfg.run_id} split={cfg.split} cases={len(cases)} follow-ups={n_fu} "
+        f"[plan] run_id={cfg.run_id} split={cfg.split} shard={cfg.shard} cases={len(cases)} follow-ups={n_fu} "
         f"conditions={cfg.conditions} replicates={cfg.replicates} systems={[s.name for s in cfg.systems]}"
     )
     for cond in cfg.conditions:
@@ -286,8 +305,11 @@ def run(
                 for rep in range(cfg.replicates):
                     for case in cases:
                         order = P.option_order(case, rep, cfg.option_order_seed)
+                        # Seeds depend on system, condition, case and replicate only (never on
+                        # the shard or position), so any shard reproduces its slice exactly.
+                        seed_cond = SEED_ALIAS.get(cond, cond)
                         seed_root = (
-                            f"{cfg.sampling_seed}:{backend.label}:{cond}:{case.case_id}:{rep}"
+                            f"{cfg.sampling_seed}:{backend.label}:{seed_cond}:{case.case_id}:{rep}"
                         )
                         base = fn(
                             backend,
@@ -328,6 +350,8 @@ def run(
         data_files=data_files,
         split=cfg.split,
         case_ids=[c.case_id for c in cases],
+        shard=cfg.shard,
+        planned_case_ids=[c.case_id for c in planned],
         conditions=cfg.conditions,
         replicates=cfg.replicates,
         systems=systems_info,

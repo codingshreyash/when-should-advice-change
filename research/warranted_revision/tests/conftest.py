@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -35,8 +36,10 @@ def make_run(
     inputs: Path = DEV_INPUTS,
     **extra,
 ) -> Path:
-    ids_file = tmp / f"{run_id}_ids.json"
-    ids_file.write_text(json.dumps(case_ids or SUBSET))
+    ids = json.dumps(case_ids or SUBSET)
+    # Named by content so runs over the same cases (e.g. shards) share one file.
+    ids_file = tmp / f"ids_{hashlib.sha256(ids.encode()).hexdigest()[:12]}.json"
+    ids_file.write_text(ids)
     cfg = RunConfig(
         run_id=run_id,
         label="test",

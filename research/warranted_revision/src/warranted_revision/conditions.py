@@ -39,7 +39,13 @@ from .schema import (
     SearchNode,
     VisibleCase,
 )
-from .scoring import ScoringContext, score_candidate, score_hypothesis
+from .scoring import (
+    ScoringContext,
+    score_candidate,
+    score_format_only,
+    score_hypothesis,
+    score_hypothesis_format_only,
+)
 
 FOLLOWUP_HYPOTHESES = tuple(h for h in UPDATE_INTERPRETATIONS if h != "initial_request")
 
@@ -68,6 +74,7 @@ class ConditionConfig(BaseModel):
             "structured": 1,
             "best_of_n": self.best_of_n,
             "premise_search": self.search_calls(turn),
+            "premise_search_noprov": self.search_calls(turn),
         }[condition]
 
     @model_validator(mode="after")
@@ -205,9 +212,15 @@ def _sample(cfg: ConditionConfig, seed: int) -> GenParams:
 
 
 def _leaf_node(
-    nid: str, parent: str | None, depth: int, idx: int, p: ParsedOutput, ctx: ScoringContext
+    nid: str,
+    parent: str | None,
+    depth: int,
+    idx: int,
+    p: ParsedOutput,
+    ctx: ScoringContext,
+    scorer=score_candidate,
 ) -> SearchNode:
-    score, comp = score_candidate(p, ctx)
+    score, comp = scorer(p, ctx)
     return SearchNode(
         node_id=nid,
         parent_id=parent,
@@ -256,8 +269,16 @@ def run_best_of_n(backend: Backend, ti: TurnInput, cfg: ConditionConfig) -> Turn
     return _finish(calls, nodes, [n.node_id for n in nodes])
 
 
-def run_premise_search(backend: Backend, ti: TurnInput, cfg: ConditionConfig) -> TurnResult:
+def run_premise_search(
+    backend: Backend, ti: TurnInput, cfg: ConditionConfig, *, provenance: bool = True
+) -> TurnResult:
+    """Premise search. With ``provenance=False`` (the ablation) the expansions, beam width and
+    call budget are unchanged, but pruning and final selection use only format validity
+    (:func:`score_format_only`, :func:`score_hypothesis_format_only`), so no grounding,
+    supported-edit or self-reported-support signal reaches the ranking."""
     ctx = ti.context()
+    hyp_scorer = score_hypothesis if provenance else score_hypothesis_format_only
+    leaf_scorer = score_candidate if provenance else score_format_only
     if ti.turn == "base":
         hyps = ["initial_request"] * cfg.base_turn_readings
     else:
@@ -269,7 +290,7 @@ def run_premise_search(backend: Backend, ti: TurnInput, cfg: ConditionConfig) ->
     calls = _call(backend, reqs, lambda _r, c: parse_hypothesis(c))
     nodes: list[SearchNode] = []
     for k, (h, log) in enumerate(zip(hyps, calls, strict=True)):
-        score, comp = score_hypothesis(log.parsed, h, ctx)
+        score, comp = hyp_scorer(log.parsed, h, ctx)
         nodes.append(
             SearchNode(
                 node_id=f"h{k}",
@@ -307,10 +328,14 @@ def run_premise_search(backend: Backend, ti: TurnInput, cfg: ConditionConfig) ->
     for j, (pid, log) in enumerate(zip(parents, calls2, strict=True)):
         idx = len(calls) + j
         nid = f"d{j}"
-        nodes.append(_leaf_node(nid, pid, 2, idx, log.parsed, ctx))
+        nodes.append(_leaf_node(nid, pid, 2, idx, log.parsed, ctx, leaf_scorer))
         leaf_ids.append(nid)
     # Depth-1 kept flags mark the beam; the final selected leaf is marked kept in _finish.
     return _finish(calls + calls2, nodes, leaf_ids)
+
+
+def run_premise_search_noprov(backend: Backend, ti: TurnInput, cfg: ConditionConfig) -> TurnResult:
+    return run_premise_search(backend, ti, cfg, provenance=False)
 
 
 RUNNERS = {
@@ -318,4 +343,8 @@ RUNNERS = {
     "structured": run_structured,
     "best_of_n": run_best_of_n,
     "premise_search": run_premise_search,
+    "premise_search_noprov": run_premise_search_noprov,
 }
+
+#: Conditions that reuse another condition's sampling seeds (a controlled ablation).
+SEED_ALIAS = {"premise_search_noprov": "premise_search"}
