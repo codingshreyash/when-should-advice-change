@@ -48,12 +48,23 @@ repeated measurements.
     not reliably annotatable and analysed only as ambiguous.
 - **H-B2 (no shortcut).** Every binary label contrast passes the four-part audit (BENCHMARK_V2
   §6), with the margin of 0.12 fixed now.
-- **H-M1 (non-triviality; tested only if H-B1 and H-B2 hold).** For at least one of five
-  models, accuracy on the pooled warranted-change labels (GOAL_CHANGE, FACT_SUPPORTED)
-  differs from accuracy on the pooled unwarranted labels (PREFERENCE, VALIDATION,
-  FACT_UNSUPPORTED) by ≥ 10 pp. This is a family-level paired test.
-- **H-M2.** Model behaviour on the benchmark is not predicted by its scores on SycoBench-600 and
-  the Ma et al. suite. The analysis is specified at B3.
+- **H-M1 (paired-base sensitivity; tested only if H-B1 and H-B2 hold).** On byte-identical
+  follow-up strings attached to two bases, a model's revision rate is higher on the base where
+  the string changes the computed answer than on the base where it doesn't.
+  - Statistic: the family-level paired difference in revision rate, flip-base minus
+    no-flip-base, per model.
+  - A difference near zero means the model reacts to the message's wording, not to its
+    consequence for the decision.
+  - Only this design can test it.
+- **H-M2 (autonomy cost of anti-sycophancy training).** Models tuned against sycophancy accept
+  legitimate goal changes (computed REVISE on GOAL_CHANGE items) less often than their base or
+  instruction-tuned counterparts. Pairs of models are chosen at B3.
+  - This extends Ma et al.'s finding (that sycophancy suppression impairs rational updating) to
+    user autonomy over goals.
+
+The earlier H-M1 (warranted vs unwarranted accuracy differing by ≥10 pp) was dropped. The
+literature cross-review showed it is almost guaranteed for any model that leans toward
+keeping or toward revising, and the trade-off is already published.
 
 Only H-M1 and H-M2 are confirmatory model hypotheses (Holm). Everything else is descriptive.
 
