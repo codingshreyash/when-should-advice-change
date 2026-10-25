@@ -22,7 +22,10 @@ Notes from setting this up. Nothing here has run on a GPU yet.
 
 Checked against `--help` from brev v0.6.335:
 
-- `brev login --token <token>` works non-interactively.
+- `brev login --token <token>` works non-interactively with the `refresh_token` from
+  `~/.brev/credentials.json` (tested on 2026-10-25 in a throwaway `HOME`, followed by
+  `brev ls`). That token is stored as the `BREV_API_TOKEN` repository secret. If a run
+  fails at login, the token may have expired; repeat that step.
 - `brev create <name> --type <type>` creates the instance. Without `--type`, Brev picks the
   cheapest match on its own, and a comma list means "try these in order". The controller
   allows exactly one type so the price you enter is the price you pay. `--dry-run` checks a
@@ -34,7 +37,7 @@ Checked against `--help` from brev v0.6.335:
 
 ## Running it
 
-1. Add a `BREV_API_TOKEN` repository secret (Settings > Secrets and variables > Actions).
+1. Done: `BREV_API_TOKEN` repository secret.
 2. Get `.github/workflows/warranted-revision-gpu-smoke.yml` onto `main`, so the
    "Run workflow" button shows up.
 3. Run it with `dry_run` checked, today's hourly price, `max_gpu_usd` 15 or less,
