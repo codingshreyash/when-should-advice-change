@@ -50,7 +50,7 @@ class ConditionConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     max_new_tokens_direct: int = Field(default=160, gt=0)
-    max_new_tokens_structured: int = Field(default=640, gt=0)
+    max_new_tokens_structured: int = Field(default=1024, gt=0)
     sample_temperature: float = Field(default=0.7, gt=0)
     sample_top_p: float = Field(default=0.95, gt=0, le=1)
     best_of_n: int = Field(default=9, gt=0)

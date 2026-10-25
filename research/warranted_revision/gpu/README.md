@@ -52,3 +52,11 @@ Checked against `--help` from brev v0.6.335:
 To check the plan locally without touching Brev:
 
     python gpu/brev_controller.py plan --hourly 1.06 --max-usd 15 --run-id test --instance-type massedcompute_L40S
+
+## Runs so far
+
+- `smoke-001`: refused by `brev create` (type filter), nothing created.
+- `smoke-002`: instance created, failed in the on-box test suite (a path bug), deleted after ~9 min.
+- `smoke-003`: full run, 900 calls, ~68 min, ~$1.20. Not interpretable: most direct and
+  structured answers broke the answer format. Prompts, token limits and kernels were fixed
+  afterwards. Details in `results/warranted_revision/smoke-003/NOTES.md`.

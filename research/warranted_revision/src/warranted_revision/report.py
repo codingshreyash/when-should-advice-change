@@ -326,6 +326,20 @@ def write_report(run: Path, extra: str = "", compress: bool = False) -> Path:
             f"{a['status_counts']['need_more_information_on_actionable_followups']} |"
         )
     L.append("")
+    L.append("## Format check\n")
+    L.append(
+        "Rejected outputs that still contain exactly one `DECISION: <code>`. These are "
+        "format failures, not decision errors; they are scored as failures either way.\n"
+    )
+    L.append("| system | condition | turns | invalid | invalid with one clear decision |")
+    L.append("|---|---|---|---|---|")
+    for a in metrics["arms"]:
+        sc = a["status_counts"]
+        L.append(
+            f"| `{a['system']}` | {a['condition']} | {sc['turns']} | {sc['invalid']} | "
+            f"{sc.get('invalid_with_one_clear_decision', 'n/a')} |"
+        )
+    L.append("")
     L.append("## Paired comparisons (same family draws for both arms)\n")
     L.append("Primary: premise search vs. matched-budget best-of-N, and structured vs. direct.\n")
     L.append("| system | kind | comparison | axis | difference [95% CI] |")

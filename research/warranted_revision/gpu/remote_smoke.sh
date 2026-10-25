@@ -16,6 +16,10 @@ python -m pip install -q -e '.[gpu,dev]'
 python -c "import transformers as t; assert hasattr(t, 'Qwen3_5ForConditionalGeneration')" \
   || python -m pip install -q -U transformers
 python -c "import transformers as t; assert hasattr(t, 'Qwen3_5ForConditionalGeneration'), t.__version__; print('transformers', t.__version__)"
+# Optional fast kernels for Qwen3.5's linear-attention layers (smoke-003 ran without them and
+# transformers fell back to slow reference code). Best effort, time-limited, never fatal.
+timeout 600 python -m pip install -q flash-linear-attention || echo "flash-linear-attention not installed (optional)"
+timeout 300 python -m pip install -q --only-binary=:all: causal-conv1d || echo "causal-conv1d wheel not available (optional)"
 OUT="$HOME/results/warranted_revision/$RUN_ID"
 mkdir -p /tmp/wrev && pip freeze > /tmp/wrev/pip_freeze.txt
 nvidia-smi --query-gpu=name,memory.total --format=csv > /tmp/wrev/gpu.txt || true

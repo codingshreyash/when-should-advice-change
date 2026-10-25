@@ -87,3 +87,13 @@ def test_hypothesis_parse():
         )
     )
     assert p.status == "invalid"
+
+
+def test_format_diagnostic_counts_only_single_clear_decisions():
+    from warranted_revision.evaluate import _one_clear_decision
+
+    assert _one_clear_decision("costs stay low. DECISION: refinance", OPTS)
+    assert _one_clear_decision('{"x": 1}\nDECISION: refinance\n</ledger>', OPTS)
+    assert not _one_clear_decision("I would refinance.", OPTS)
+    assert not _one_clear_decision("DECISION: refinance\nDECISION: keep_current_loan", OPTS)
+    assert not _one_clear_decision("DECISION: sell_house", OPTS)

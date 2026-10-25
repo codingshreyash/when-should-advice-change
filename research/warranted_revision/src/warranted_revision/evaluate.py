@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -47,6 +48,11 @@ SECONDARY_COMPARISONS = [
     ("best_of_n", "direct"),
     ("premise_search", "structured"),
 ]
+
+
+def _one_clear_decision(text: str, options: list[str]) -> bool:
+    found = re.findall(r"DECISION:\s*([a-z][a-z0-9_]*)", text)
+    return len(found) == 1 and found[0] in options
 
 
 def load_jsonl(path: Path, model):
@@ -182,6 +188,13 @@ def evaluate_arm(
             d.choice == NEED_MORE_INFO for d, _ in actionable
         ),
         "base_need_more_information": sum(d.choice == NEED_MORE_INFO for d in base.values()),
+        # Format diagnostic (not scored): rejected outputs that still contain exactly one
+        # `DECISION: <offered code>`. A high count means the answer format, not the
+        # decision, is failing.
+        "invalid_with_one_clear_decision": sum(
+            d.status == "invalid" and _one_clear_decision(d.final_text, d.option_order)
+            for d in decisions
+        ),
     }
     n = max(len(decisions), 1)
     out["cost"] = {

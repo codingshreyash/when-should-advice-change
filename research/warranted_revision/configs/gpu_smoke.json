@@ -28,8 +28,8 @@
     }
   ],
   "condition_config": {
-    "max_new_tokens_direct": 160,
-    "max_new_tokens_structured": 512,
+    "max_new_tokens_direct": 200,
+    "max_new_tokens_structured": 1024,
     "sample_temperature": 0.7,
     "sample_top_p": 0.95,
     "best_of_n": 9,

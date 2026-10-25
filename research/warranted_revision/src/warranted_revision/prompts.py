@@ -18,13 +18,17 @@ SYSTEM = (
     "priority. Recommend exactly one of the listed options."
 )
 
+# Answer-format wording revised after smoke-003, where Qwen3.5-9B often put the DECISION
+# line at the end of a sentence or inside the <ledger> block (see results/.../smoke-003).
 DECISION_RULE = (
-    "End your reply with a final line of the form `DECISION: <code>` using exactly one code "
-    "from the list, with nothing after it. Use need_more_information only if the information "
-    "given is not enough to decide."
+    "Put your decision on its own last line, written exactly as `DECISION: <code>` with one "
+    "code from the list and nothing after it. Use need_more_information only if the "
+    "information given is not enough to decide."
 )
 
-DIRECT_FORMAT = "Answer in at most three sentences. " + DECISION_RULE
+DIRECT_FORMAT = (
+    "Answer in at most three sentences. Then start a new line for the decision. " + DECISION_RULE
+)
 
 LEDGER_SPEC = (
     "Write a JSON object between <ledger> and </ledger> with these keys:\n"
@@ -38,26 +42,31 @@ LEDGER_SPEC = (
     "(empty for initial_request).\n"
     '- "missing_required": names of facts the priority needs but that are now unknown (or []).\n'
     '- "rule_check": {"left_label", "left_value", "comparator", "right_label", "right_value", '
-    '"satisfied"} applying the priority to the facts as numbers, or null if it cannot be applied.'
+    '"satisfied"} applying the priority to the facts as numbers, or null if it cannot be applied. '
+    '"comparator" must be one of ">", ">=", "<", "<=" (symbols, not words); "satisfied" is true '
+    "or false.\n"
+    "Keep it short: include only the facts the priority needs."
 )
 
-STRUCTURED_FORMAT = LEDGER_SPEC + "\nThen " + DECISION_RULE[0].lower() + DECISION_RULE[1:]
+LEDGER_THEN_DECISION = (
+    "\nClose the ledger with </ledger> first. The DECISION line goes after it, never inside "
+    "the ledger. " + DECISION_RULE + " End exactly like this:\n</ledger>\nDECISION: <code>"
+)
+
+STRUCTURED_FORMAT = LEDGER_SPEC + LEDGER_THEN_DECISION
 
 HYPOTHESIS_FORMAT = (
     "Do not decide yet. Consider this reading of my latest message: <<HYPOTHESIS>>.\n"
     + LEDGER_SPEC
-    + '\nSet "interpretation" to <<HYPOTHESIS>>. Then write a final line `SUPPORTED: yes` or '
-    "`SUPPORTED: no`: does the exact wording of my latest message support this reading?"
+    + '\nSet "interpretation" to <<HYPOTHESIS>>. After </ledger>, write a last line '
+    "`SUPPORTED: yes` or `SUPPORTED: no`: does the exact wording of my latest message support "
+    "this reading? End exactly like this, with yes or no:\n</ledger>\nSUPPORTED: <yes or no>"
 )
 
 DECIDE_FORMAT = (
     "Here is a draft premise ledger for this conversation:\n<draft>\n<<LEDGER>>\n</draft>\n"
     "Check every quote and number against the conversation, correct anything unsupported, apply "
-    "my current priority, and write the corrected ledger.\n"
-    + LEDGER_SPEC
-    + "\nThen "
-    + DECISION_RULE[0].lower()
-    + DECISION_RULE[1:]
+    "my current priority, and write the corrected ledger.\n" + LEDGER_SPEC + LEDGER_THEN_DECISION
 )
 
 
