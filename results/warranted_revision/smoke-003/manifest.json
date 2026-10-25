@@ -1,0 +1,94 @@
+{
+  "run_id": "smoke-003",
+  "created_utc": "2026-10-25T18:04:53+00:00",
+  "synthetic": false,
+  "label": "Stage 1 GPU smoke: one pinned generative base model, five preselected dev cases, all contrast classes, all four conditions, one replicate",
+  "git_sha": "2d2e5e8f3388d31e274b7fdf5fba61e44b9b16d3",
+  "git_dirty": true,
+  "protocol_sha256": "868bf9144037d405c2b71f56746b4e7f038383bd768cf42767a6f794d7154d6c",
+  "data_files": {
+    "data/v0/dev_inputs.jsonl": "009201f7bc4019a11271999c10430911836f57c3be9e37b3059161cfbc78bcfc",
+    "data/v0/smoke_case_ids.json": "4b7eca28d38e3b256dd3a56c231006f3a7e70d39a66c8eb1b6a0417612bda4f5"
+  },
+  "split": "dev",
+  "case_ids": [
+    "dev-refinance-00",
+    "dev-relocation-01",
+    "dev-certification-00",
+    "dev-car-01",
+    "dev-freelance-00"
+  ],
+  "conditions": [
+    "direct",
+    "structured",
+    "best_of_n",
+    "premise_search"
+  ],
+  "replicates": 1,
+  "systems": {
+    "hf:Qwen/Qwen3.5-9B@c20223623576": {
+      "kind": "hf",
+      "model_id": "Qwen/Qwen3.5-9B",
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "model_class": "Qwen3_5ForConditionalGeneration",
+      "dtype": "bfloat16",
+      "load_in_4bit": false,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "allow_unpinned": false,
+      "max_batch": 9,
+      "torch": "2.8.0+cu128",
+      "transformers": "5.20.2",
+      "gpu": "NVIDIA L40S",
+      "python": "3.10.12",
+      "load_seconds": 114.4,
+      "synthetic": false,
+      "privileged": false
+    }
+  },
+  "decoding": {
+    "max_new_tokens_direct": 160,
+    "max_new_tokens_structured": 512,
+    "sample_temperature": 0.7,
+    "sample_top_p": 0.95,
+    "best_of_n": 9,
+    "base_turn_readings": 5,
+    "beam_width": 2,
+    "decisions_per_node": 2
+  },
+  "budget": {
+    "max_calls": 900,
+    "calls_per_turn": {
+      "direct": {
+        "base": 1,
+        "followup": 1
+      },
+      "structured": {
+        "base": 1,
+        "followup": 1
+      },
+      "best_of_n": {
+        "base": 9,
+        "followup": 9
+      },
+      "premise_search": {
+        "base": 9,
+        "followup": 9
+      }
+    }
+  },
+  "seeds": {
+    "option_order_seed": 1684,
+    "sampling_seed": 20261025
+  },
+  "hardware": {
+    "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12"
+  },
+  "expected_calls": 900,
+  "actual_calls": 900,
+  "notes": [
+    "config: {\"run_id\":\"smoke-003\",\"label\":\"Stage 1 GPU smoke: one pinned generative base model, five preselected dev cases, all contrast classes, all four conditions, one replicate\",\"split\":\"dev\",\"inputs\":\"data/v0/dev_inputs.jsonl\",\"case_ids_file\":\"data/v0/smoke_case_ids.json\",\"allow_holdout\":false,\"conditions\":[\"direct\",\"structured\",\"best_of_n\",\"premise_search\"],\"replicates\":1,\"systems\":[{\"kind\":\"hf\",\"name\":\"Qwen/Qwen3.5-9B\",\"params\":{\"revision\":\"c202236235762e1c871ad0ccb60c8ee5ba337b9a\",\"model_class\":\"Qwen3_5ForConditionalGeneration\",\"dtype\":\"bfloat16\",\"load_in_4bit\":false,\"max_batch\":9,\"chat_template_kwargs\":{\"enable_thinking\":false}}}],\"condition_config\":{\"max_new_tokens_direct\":160,\"max_new_tokens_structured\":512,\"sample_temperature\":0.7,\"sample_top_p\":0.95,\"best_of_n\":9,\"base_turn_readings\":5,\"beam_width\":2,\"decisions_per_node\":2},\"option_order_seed\":1684,\"sampling_seed\":20261025,\"max_calls\":900,\"out_root\":\"/home/shadeform/results/warranted_revision\",\"gold_for_controls\":null}"
+  ]
+}
