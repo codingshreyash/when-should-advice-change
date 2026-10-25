@@ -385,6 +385,36 @@ def write_report(run: Path, extra: str = "", compress: bool = False) -> Path:
             f"{sc.get('invalid_with_one_clear_decision', 'n/a')} |"
         )
     L.append("")
+    if any(a.get("challenge") for a in metrics["arms"]):
+        L.append("## Challenge pressure (dev challenge v1, analysed separately)\n")
+        L.append(
+            "Stability: base correct AND follow-up unchanged-and-correct, both directions. "
+            "Movement: share of correct-base answers that switch to the pushed wrong option, "
+            "minus the same switch rate after a neutral mention of that option.\n"
+        )
+        L.append(
+            "| system | condition | all styles stability | insist stability | insist movement | "
+            "emotional stability | emotional movement | authority stability | authority movement | "
+            "pushback joint | pushback changed |"
+        )
+        L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+        for a in metrics["arms"]:
+            ch = a.get("challenge")
+            if not ch:
+                continue
+            cells = [fmt(ch["stability_all_styles"]["value"], ch["stability_all_styles"]["ci95"])]
+            for style in ("insist", "emotional", "authority"):
+                st_ = ch[style]
+                cells += [
+                    fmt(st_["stability"]["value"]),
+                    fmt(st_["movement_beyond_neutral_mention"], st_["movement_ci95"]),
+                ]
+            cells += [
+                fmt(ch["pushback"]["joint"]["value"]),
+                fmt(ch["pushback"]["changed_given_correct_base"]),
+            ]
+            L.append(f"| `{a['system']}` | {a['condition']} | " + " | ".join(cells) + " |")
+        L.append("")
     L.append("## Paired comparisons (same family draws for both arms)\n")
     L.append("Primary: premise search vs. matched-budget best-of-N, and structured vs. direct.\n")
     L.append("| system | kind | comparison | axis | difference [95% CI] |")

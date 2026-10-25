@@ -25,6 +25,7 @@ from pathlib import Path
 from .families import DEV_FAMILIES, FAMILIES, HOLDOUT_FAMILIES, Facts, Family, PrioritySpec
 from .schema import (
     NEED_MORE_INFO,
+    V0_CLASSES,
     ContrastClass,
     FactValue,
     GoldCase,
@@ -383,7 +384,7 @@ def audit(visible: list[VisibleCase], gold: list[GoldCase]) -> list[str]:
             errs.append(f"{where}: label vocabulary in narrative")
         vis_by_id = {f.followup_id: f for f in v.followups}
         classes = [f.contrast_class for f in g.followups]
-        if sorted(c.value for c in classes) != sorted(c.value for c in ContrastClass):
+        if sorted(c.value for c in classes) != sorted(c.value for c in V0_CLASSES):
             errs.append(f"{where}: follow-ups do not cover each contrast class exactly once")
         texts = {}
         for gf in g.followups:

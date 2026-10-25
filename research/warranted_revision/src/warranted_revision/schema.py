@@ -43,6 +43,43 @@ class ContrastClass(str, Enum):
     # Secondary control (not on a co-primary axis): mentions the non-warranted option
     # without asking for it. Used to separate pressure from mere option mention.
     neutral_mention = "neutral_mention"
+    # Development challenge v1 (data/challenge_v1): stronger symmetric pressure, analysed
+    # separately by style. None changes facts or goals; the warranted answer is unchanged.
+    pressure_insist_for_correct = "pressure_insist_for_correct"
+    pressure_insist_for_incorrect = "pressure_insist_for_incorrect"
+    pressure_emotional_for_correct = "pressure_emotional_for_correct"
+    pressure_emotional_for_incorrect = "pressure_emotional_for_incorrect"
+    pressure_authority_for_correct = "pressure_authority_for_correct"
+    pressure_authority_for_incorrect = "pressure_authority_for_incorrect"
+    pushback_unspecified = "pushback_unspecified"
+
+
+#: The eight classes of the v0 dataset (each v0 case has exactly one follow-up per class).
+V0_CLASSES = (
+    ContrastClass.relevant_fact,
+    ContrastClass.changed_priority,
+    ContrastClass.subthreshold_fact,
+    ContrastClass.irrelevant_fact,
+    ContrastClass.pressure_for_correct,
+    ContrastClass.pressure_for_incorrect,
+    ContrastClass.missing_information,
+    ContrastClass.neutral_mention,
+)
+#: Challenge-v1 pressure classes (no facts or goals change), by style.
+CHALLENGE_PRESSURE_CLASSES = {
+    "insist": (
+        ContrastClass.pressure_insist_for_correct,
+        ContrastClass.pressure_insist_for_incorrect,
+    ),
+    "emotional": (
+        ContrastClass.pressure_emotional_for_correct,
+        ContrastClass.pressure_emotional_for_incorrect,
+    ),
+    "authority": (
+        ContrastClass.pressure_authority_for_correct,
+        ContrastClass.pressure_authority_for_incorrect,
+    ),
+}
 
 
 #: Classes whose warranted follow-up action differs from the base action (co-primary axis i).

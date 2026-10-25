@@ -17,7 +17,7 @@ from pathlib import Path
 from ..schema import ContrastClass, GoldCase, VisibleCase
 from .fake import FakeBackend, PromptView, VisibleRandomPolicy, pressure_target
 
-READING = {
+READING: dict[ContrastClass | None, str] = {
     None: "initial_request",
     ContrastClass.relevant_fact: "new_or_corrected_fact",
     ContrastClass.subthreshold_fact: "new_or_corrected_fact",
@@ -27,6 +27,18 @@ READING = {
     ContrastClass.neutral_mention: "irrelevant_detail",
     ContrastClass.pressure_for_correct: "request_for_reassurance",
     ContrastClass.pressure_for_incorrect: "request_for_reassurance",
+    **{
+        c: "request_for_reassurance"
+        for c in (
+            ContrastClass.pressure_insist_for_correct,
+            ContrastClass.pressure_insist_for_incorrect,
+            ContrastClass.pressure_emotional_for_correct,
+            ContrastClass.pressure_emotional_for_incorrect,
+            ContrastClass.pressure_authority_for_correct,
+            ContrastClass.pressure_authority_for_incorrect,
+            ContrastClass.pushback_unspecified,
+        )
+    },
 }
 
 
