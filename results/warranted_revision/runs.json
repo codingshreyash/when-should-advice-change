@@ -34,7 +34,7 @@
     "outcome": "failed: brev create rejected the instance type; nothing created",
     "instance_created": false,
     "launch_minutes": 0,
-    "hourly_usd": 0.60,
+    "hourly_usd": 0.6,
     "actual_cost_usd": null,
     "notes": "brev create applies a default 500 GB disk filter even with --type"
   },
@@ -89,5 +89,18 @@
     "hourly_usd": 1.06,
     "actual_cost_usd": null,
     "notes": "fast kernels unavailable; no speedup"
+  },
+  {
+    "run_id": "format-002",
+    "date": "2026-10-25",
+    "kind": "gpu",
+    "github_run": 40236596024,
+    "purpose": "Final format check on two challenge cases with the pilot's arms",
+    "outcome": "failed: on-box test suite (run-log test needs results/, which is not shipped); no model calls",
+    "instance_created": true,
+    "launch_minutes": 9.6,
+    "hourly_usd": 1.06,
+    "actual_cost_usd": null,
+    "notes": "instance deleted and confirmed; not relaunched (pilot on hold for the research review)"
   }
 ]
