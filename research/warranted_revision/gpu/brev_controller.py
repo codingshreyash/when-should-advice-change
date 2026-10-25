@@ -176,7 +176,7 @@ def cmd_launch(args: argparse.Namespace) -> int:
     name = plan["instance"]
     t_end = time.time() + plan["budget"]["permitted_hours"] * 3600
     remaining = lambda: t_end - time.time()  # noqa: E731
-    results_local = PKG.parents[1] / "results" / "warranted_revision"
+    results_local = Path(args.results_dir)
     try:
         run_step(render("login", token=token), 120, secret=token)
         # Ask create which types it accepts (creates nothing). `--type X --dry-run` only
@@ -225,8 +225,8 @@ def cmd_launch(args: argparse.Namespace) -> int:
         try:
             run_step(render("exec", name=name, remote_cmd=remote), deadline_min * 60 + 900)
         finally:
-            results_local.mkdir(parents=True, exist_ok=True)
             try:
+                results_local.mkdir(parents=True, exist_ok=True)
                 run_step(
                     render(
                         "copy_from",
@@ -286,6 +286,11 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--state", default="brev_state.json")
         if name == "launch":
             p.add_argument("--commands-verified", action="store_true")
+            p.add_argument(
+                "--results-dir",
+                default=str(PKG.parents[1] / "results" / "warranted_revision"),
+                help="where copied-back results go (default: the repo's results/)",
+            )
     c = sub.add_parser("cleanup")
     c.add_argument("--state", default="brev_state.json")
     c.add_argument("--dry-run", action="store_true")

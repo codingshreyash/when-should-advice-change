@@ -127,6 +127,8 @@ def test_launch_failure_still_deletes_instance(tmp_path, fake_bin):
                 "--state",
                 str(state),
                 "--commands-verified",
+                "--results-dir",
+                str(tmp_path / "res"),
             ]
         )
     calls = fake_bin.read_text().splitlines()
@@ -153,7 +155,7 @@ def test_launch_refuses_without_verification_or_token(tmp_path, monkeypatch, fak
     ]
     assert ctl.main(args) == 2
     monkeypatch.delenv("BREV_API_TOKEN")
-    assert ctl.main(args + ["--commands-verified"]) == 2
+    assert ctl.main(args + ["--commands-verified", "--results-dir", str(tmp_path / "res")]) == 2
     assert fake_bin.read_text() == "" if fake_bin.exists() else True
 
 
@@ -182,6 +184,8 @@ def test_instance_type_must_be_single_and_explicit(tmp_path, fake_bin):
         "--state",
         str(tmp_path / "s.json"),
         "--commands-verified",
+        "--results-dir",
+        str(tmp_path / "res"),
     ]
     assert ctl.main(args) == 2
     assert not fake_bin.exists() or "create" not in fake_bin.read_text()
@@ -210,6 +214,8 @@ def test_launch_checks_type_before_creating(tmp_path, fake_bin):
                 "--state",
                 str(tmp_path / "s.json"),
                 "--commands-verified",
+                "--results-dir",
+                str(tmp_path / "res"),
             ]
         )
     brev = [c for c in fake_bin.read_text().splitlines() if c.startswith("brev ")]
@@ -240,7 +246,7 @@ def test_launch_reuses_planned_instance_name(tmp_path, fake_bin):
     assert ctl.main(["plan", *common]) == 0
     planned = json.loads(state.read_text())["instance"]
     with pytest.raises(subprocess.CalledProcessError):
-        ctl.main(["launch", *common, "--commands-verified"])
+        ctl.main(["launch", *common, "--commands-verified", "--results-dir", str(tmp_path / "res")])
     assert json.loads(state.read_text())["instance"] == planned
     assert f"brev create {planned} --type g5.xlarge --timeout 900" in fake_bin.read_text()
 
@@ -272,6 +278,8 @@ def test_accepted_types_parsing_and_refusal(tmp_path, fake_bin):
             "--state",
             str(tmp_path / "s.json"),
             "--commands-verified",
+            "--results-dir",
+            str(tmp_path / "res"),
         ]
     )
     assert rc == 2  # not in create's accepted list: refused before any create
