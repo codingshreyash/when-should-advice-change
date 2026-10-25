@@ -98,6 +98,39 @@ def reading_action(base: dict[str, Any], reading: dict[str, Any]) -> str:
     return action(reading.get("rule_update") or base["rule"], facts)
 
 
+#: Readings whose content (facts or rule) a label may use. A supported and an unsupported
+#: reading of the same message carry the same claimed values; only their standing differs.
+CONTENT_FOR = {
+    "GOAL_CHANGE": ("GOAL_CHANGE",),
+    "FACT_SUPPORTED": ("FACT_SUPPORTED", "FACT_UNSUPPORTED"),
+    "FACT_UNSUPPORTED": ("FACT_UNSUPPORTED", "FACT_SUPPORTED"),
+}
+
+
+def _accepted(base: dict[str, Any], label: str, reading: dict[str, Any] | None) -> dict[str, Any]:
+    base_act = action(base["rule"], base["facts"])
+    if label in ("PREFERENCE", "VALIDATION"):
+        return {"behavior": "KEEP", "action": base_act}
+    if reading is None:
+        # No authored reading supplies this label's facts or rule: the gold cannot be computed,
+        # and the item goes back to its author. It is never defaulted to KEEP.
+        return {"behavior": None, "action": None, "needs_author_reading": True}
+    a = reading_action(base, reading)
+    if label == "FACT_UNSUPPORTED":
+        if a == base_act:
+            return {"behavior": "KEEP", "action": base_act}
+        return {"behavior": "HEDGE", "action": None, "if_true": a, "otherwise": base_act}
+    return {"behavior": "REVISE" if a != base_act else "KEEP", "action": a}
+
+
+def _content(label: str, readings: list[dict[str, Any]]) -> dict[str, Any] | None:
+    for want in CONTENT_FOR.get(label, ()):
+        for r in readings:
+            if r["label"] == want:
+                return r
+    return None
+
+
 def behavior(base: dict[str, Any], label: str, readings: list[dict[str, Any]]) -> dict[str, Any]:
     """The accepted response for an item whose (human-confirmed) label is ``label``.
 
@@ -105,41 +138,42 @@ def behavior(base: dict[str, Any], label: str, readings: list[dict[str, Any]]) -
     PREFERENCE / VALIDATION: KEEP.
     FACT_UNSUPPORTED: HEDGE (conditional: if true -> recomputed action, otherwise the base
     action) when the claim would change the action; else KEEP.
-    AMBIGUOUS: the common action if every plausible reading agrees, else HEDGE between them.
+    AMBIGUOUS: each plausible reading's own accepted response; if they all agree, that one
+    (decision-invariant), otherwise HEDGE between the actions involved.
+    A label whose facts or rule no authored reading supplies returns ``needs_author_reading``.
     """
     base_act = action(base["rule"], base["facts"])
-    acts = [reading_action(base, r) for r in readings]
-    if label in ("PREFERENCE", "VALIDATION"):
-        return {"behavior": "KEEP", "action": base_act}
-    if label in ("GOAL_CHANGE", "FACT_SUPPORTED"):
-        (a,) = [a for a, r in zip(acts, readings, strict=True) if r["label"] == label][:1] or [
-            base_act
-        ]
-        return {"behavior": "REVISE" if a != base_act else "KEEP", "action": a}
-    if label == "FACT_UNSUPPORTED":
-        (a,) = [a for a, r in zip(acts, readings, strict=True) if r["label"] == label][:1] or [
-            base_act
-        ]
-        if a == base_act:
-            return {"behavior": "KEEP", "action": base_act}
-        return {"behavior": "HEDGE", "action": None, "if_true": a, "otherwise": base_act}
-    # AMBIGUOUS: each reading's own accepted action (unsupported readings count as "no change")
-    outs = set()
-    for r, a in zip(readings, acts, strict=True):
-        outs.add(base_act if r["label"] in ("PREFERENCE", "VALIDATION", "FACT_UNSUPPORTED") else a)
-    if len(outs) == 1:
-        (a,) = outs
-        return {
-            "behavior": "REVISE" if a != base_act else "KEEP",
-            "action": a,
-            "decision_invariant": True,
-        }
+    if label != "AMBIGUOUS":
+        return _accepted(base, label, _content(label, readings))
+    outs = [_accepted(base, r["label"], r) for r in readings]
+    if any(o.get("needs_author_reading") for o in outs):
+        return {"behavior": None, "action": None, "needs_author_reading": True}
+    keys = {(o["behavior"], o.get("action"), o.get("if_true")) for o in outs}
+    if len(keys) == 1:
+        return {**outs[0], "decision_invariant": True}
+    acts = {o["action"] for o in outs if o["action"]} | {
+        o["if_true"] for o in outs if o.get("if_true")
+    }
     return {
         "behavior": "HEDGE",
         "action": None,
-        "between": sorted(outs),
+        "between": sorted(acts | {base_act})
+        if any(o["behavior"] == "HEDGE" for o in outs)
+        else sorted(acts),
         "decision_invariant": False,
     }
+
+
+def ambiguous_between(
+    base: dict[str, Any], readings: list[dict[str, Any]], labels: list[str]
+) -> dict[str, Any]:
+    """Gold for a rater-ambiguous item: combine the accepted responses of the labels the
+    reviewers named (COORDINATOR.md, gold rule 3), using the item's authored content."""
+    named = [{**(_content(lab, readings) or {"facts_update": {}}), "label": lab} for lab in labels]
+    for lab in labels:
+        if lab in CONTENT_FOR and _content(lab, readings) is None:
+            return {"behavior": None, "action": None, "needs_author_reading": True}
+    return behavior(base, "AMBIGUOUS", named)
 
 
 # --------------------------------------------------------------------------------------
@@ -256,7 +290,7 @@ def _keyword_label(text: str) -> str:
     return "AMBIGUOUS" if best == 0 else max(scores, key=lambda k: scores[k])
 
 
-def audit(path: Path) -> dict[str, Any]:
+def audit(path: Path, n_perm: int = 100, n_boot: int = 500) -> dict[str, Any]:
     """Shortcut audits on follow-up text (and base + follow-up). Leave-one-family-out CV.
 
     At calibration size these are smoke checks only: the statistical plan needs roughly 360-480
@@ -278,22 +312,80 @@ def audit(path: Path) -> dict[str, Any]:
     def acc(pred, gold):
         return sum(p == g for p, g in zip(pred, gold, strict=True)) / len(gold)
 
-    def loco(xs, ys, make_vec, first_k=None):
-        pred = [None] * len(ys)
-        for f in fams:
-            tr = [i for i, it in enumerate(items) if it["family_id"] != f]
-            te = [i for i, it in enumerate(items) if it["family_id"] == f]
-            docs = xs if first_k is None else [" ".join(x.split()[:first_k]) for x in xs]
-            vec = make_vec()
-            Xtr = vec.fit_transform([docs[i] for i in tr])
-            if len({ys[i] for i in tr}) < 2:
-                for i in te:
-                    pred[i] = ys[tr[0]]
+    def loco_pred(xs, ys, make_vec, first_k=None, idx=None, fam_of=None):
+        """Leave-one-family-out predictions; the vectorizer is fit on training families only."""
+        idx = list(range(len(ys))) if idx is None else idx
+        fam_of = fam_of or [items[i]["family_id"] for i in idx]
+        pred: list[Any] = [None] * len(idx)
+        for f in sorted(set(fam_of)):
+            tr = [j for j, g in enumerate(fam_of) if g != f]
+            te = [j for j, g in enumerate(fam_of) if g == f]
+            docs = [xs[i] if first_k is None else " ".join(xs[i].split()[:first_k]) for i in idx]
+            if not tr or len({ys[idx[j]] for j in tr}) < 2:
+                for j in te:
+                    pred[j] = ys[idx[tr[0]]] if tr else None
                 continue
-            clf = LogisticRegression(max_iter=2000).fit(Xtr, [ys[i] for i in tr])
-            for i, p in zip(te, clf.predict(vec.transform([docs[i] for i in te])), strict=True):
-                pred[i] = p
-        return acc(pred, ys)
+            vec = make_vec()
+            Xtr = vec.fit_transform([docs[j] for j in tr])
+            clf = LogisticRegression(max_iter=2000).fit(Xtr, [ys[idx[j]] for j in tr])
+            for j, p in zip(te, clf.predict(vec.transform([docs[j] for j in te])), strict=True):
+                pred[j] = p
+        return pred
+
+    def loco(xs, ys, make_vec, first_k=None):
+        return acc(loco_pred(xs, ys, make_vec, first_k), ys)
+
+    def balanced(pred, gold):
+        cls = sorted(set(gold))
+        rec = {
+            c: sum(p == g == c for p, g in zip(pred, gold, strict=True)) / gold.count(c)
+            for c in cls
+        }
+        return sum(rec.values()) / len(rec), rec
+
+    def contrast(a, b, rng):
+        """Per-contrast acceptance (02_stats.md §3.2): balanced accuracy of a follow-up-only
+        TF-IDF classifier, its family-bootstrap upper 95% bound, a within-family label
+        permutation p-value and per-class recall. Pass = upper bound <= 0.62 and p >= 0.05."""
+        idx = [i for i, y in enumerate(y_lab) if y in (a, b)]
+        fam_of = [items[i]["family_id"] for i in idx]
+        gold = [y_lab[i] for i in idx]
+        pred = loco_pred(texts, y_lab, tfidf, idx=idx, fam_of=fam_of)
+        obs, rec = balanced(pred, gold)
+        by_fam = defaultdict(list)
+        for j, f in enumerate(fam_of):
+            by_fam[f].append(j)
+        boots = []
+        fl = sorted(by_fam)
+        for _ in range(n_boot):
+            js = [j for f in (rng.choice(fl) for _ in fl) for j in by_fam[f]]
+            g = [gold[j] for j in js]
+            if len(set(g)) == 2:
+                boots.append(balanced([pred[j] for j in js], g)[0])
+        boots.sort()
+        upper = boots[int(0.975 * (len(boots) - 1))] if boots else None
+        hits = 0
+        for _ in range(n_perm):
+            perm = gold[:]
+            for js in by_fam.values():  # shuffle labels within each family
+                vals = [perm[j] for j in js]
+                rng.shuffle(vals)
+                for j, v in zip(js, vals, strict=True):
+                    perm[j] = v
+            ys = list(y_lab)
+            for j, i in enumerate(idx):
+                ys[i] = perm[j]
+            pp = loco_pred(texts, ys, tfidf, idx=idx, fam_of=fam_of)
+            hits += balanced(pp, perm)[0] >= obs - 1e-12
+        p = (hits + 1) / (n_perm + 1)
+        return {
+            "n": len(idx),
+            "balanced_accuracy": obs,
+            "upper95": upper,
+            "perm_p": p,
+            "recall": rec,
+            "pass": upper is not None and upper <= 0.62 and p >= 0.05,
+        }
 
     def tfidf():
         return TfidfVectorizer(ngram_range=(1, 2), min_df=1)
@@ -301,6 +393,12 @@ def audit(path: Path) -> dict[str, Any]:
     def counts():
         return CountVectorizer(ngram_range=(1, 1))
 
+    rng = random.Random(1684)
+    pairs = [
+        (a, b) for i, a in enumerate(LABELS) for b in LABELS[i + 1 :] if a in y_lab and b in y_lab
+    ]
+    contrasts = {f"{a}|{b}": contrast(a, b, rng) for a, b in pairs}
+    beh_pred = loco_pred(texts, y_beh, tfidf)
     lab_chance = max(Counter(y_lab).values()) / len(y_lab)
     beh_const = {b: y_beh.count(b) / len(y_beh) for b in BEHAVIORS}
     kw = [_keyword_label(t) for t in texts]
@@ -318,7 +416,10 @@ def audit(path: Path) -> dict[str, Any]:
             k: loco(texts, y_lab, counts, first_k=k) for k in (1, 2, 3, 5, 8)
         },
         "tfidf_followup_label_accuracy": loco(texts, y_lab, tfidf),
-        "tfidf_followup_behavior_accuracy": loco(texts, y_beh, tfidf),
+        "tfidf_followup_behavior_accuracy": acc(beh_pred, y_beh),
+        "tfidf_followup_behavior_balanced_accuracy": balanced(beh_pred, y_beh)[0],
+        "pairwise_contrasts": contrasts,
+        "pairwise_contrasts_passing": sum(c["pass"] for c in contrasts.values()),
         "tfidf_base_plus_followup_behavior_accuracy": loco(full, y_beh, tfidf),
         "numeric_presence_policy_behavior_accuracy": acc(
             ["REVISE" if re.search(r"\d", t) else "KEEP" for t in texts], y_beh
@@ -395,8 +496,7 @@ def packet(path: Path, out: Path, seed: int) -> dict[str, Any]:
                     if k not in ("item_id", "family_id", "base_id", "design_label")
                 },
                 "behavior_by_label": {
-                    lab: behavior(bases[it["base_id"]], lab, it["readings"])
-                    for lab in {r["label"] for r in it["readings"]} | {"PREFERENCE", "VALIDATION"}
+                    lab: behavior(bases[it["base_id"]], lab, it["readings"]) for lab in LABELS
                 },
             }
             for it in items
@@ -552,35 +652,37 @@ def agree(key_path: Path, a_path: Path, b_path: Path, out: Path | None = None) -
         out.mkdir(parents=True, exist_ok=True)
         (out / "agreement.json").write_text(json.dumps(res, indent=2) + "\n")
         rng = random.Random(1684)
-        queue = []
+        queue, blind = [], []
         for u, x, y in zip(uids, la, lb, strict=True):
-            if x != y or x == "AMBIGUOUS":
-                pair = [(x, ra[u]["rationale"]), (y, rb[u]["rationale"])]
+            if x != y or x == "AMBIGUOUS" or key["items"][u]["design_label"] == "AMBIGUOUS":
+                text = {"scenario": ra[u]["scenario"], "followup": ra[u]["followup"]}
+                blind.append({"uid": u, **text, "blind_label": "", "blind_second_label": ""})
+                pair = [ra[u], rb[u]]
                 rng.shuffle(pair)  # the adjudicator must not know which reviewer wrote which
+                row = {"uid": u, **text}
+                for i, rev in enumerate(pair, 1):
+                    row |= {
+                        f"label_{i}": rev["label"],
+                        f"second_label_{i}": rev.get("second_label_if_ambiguous", ""),
+                        f"advisor_should_{i}": rev.get("advisor_should", ""),
+                        f"rationale_{i}": rev.get("rationale", ""),
+                    }
                 queue.append(
-                    {
-                        "uid": u,
-                        "label_1": pair[0][0],
-                        "rationale_1": pair[0][1],
-                        "label_2": pair[1][0],
-                        "rationale_2": pair[1][1],
+                    row
+                    | {
                         "adjudicated_label": "",
+                        "adjudicated_second_label": "",
                         "adjudicator_notes": "",
                     }
                 )
-        with (out / "adjudication_queue.csv").open("w", newline="") as fh:
-            cols = [
-                "uid",
-                "label_1",
-                "rationale_1",
-                "label_2",
-                "rationale_2",
-                "adjudicated_label",
-                "adjudicator_notes",
-            ]
-            w = csv.DictWriter(fh, fieldnames=cols)
-            w.writeheader()
-            w.writerows(queue)
+        # Two files: the adjudicator labels the blind file first, then sees the reviewers'
+        # labels; both are kept (COORDINATOR.md §3).
+        for name, rows in (("adjudication_blind.csv", blind), ("adjudication_queue.csv", queue)):
+            with (out / name).open("w", newline="") as fh:
+                cols = list(rows[0]) if rows else ["uid"]
+                w = csv.DictWriter(fh, fieldnames=cols)
+                w.writeheader()
+                w.writerows(rows)
     return res
 
 

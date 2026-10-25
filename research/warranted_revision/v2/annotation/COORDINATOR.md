@@ -44,16 +44,25 @@ confusion matrix, ambiguity rates, agreement with design labels, the pilot gate)
 ## 3. Gold rule
 
 1. Both reviewers give the same substantive label → that label is gold.
-2. They disagree, or either chose `AMBIGUOUS` → the adjudicator chooses among {label 1,
-   label 2, `AMBIGUOUS`}.
-   - An adjudicator who wants a third label marks the item `AMBIGUOUS` and flags it for
-     revision.
+2. They disagree, either chose `AMBIGUOUS`, or the item was designed as ambiguous → the
+   adjudicator first labels it **blind** (`adjudication_blind.csv`: scenario and follow-up
+   only), then sees both reviewers' labels and rationales, unattributed
+   (`adjudication_queue.csv`), and chooses among {label 1, label 2, `AMBIGUOUS`}. Both the blind
+   and the final labels are kept.
+   - An adjudicator who wants a third label does **not** send the item to `AMBIGUOUS`. It goes
+     back to its author and is excluded until fixed: a third label usually means an authoring
+     error, not genuine ambiguity.
 3. Final `AMBIGUOUS` items form the **rater-ambiguous stratum**. Their gold behaviour is
-   computed from the readings both reviewers named: the common action if those readings agree,
-   otherwise `ask_or_conditional`.
+   computed by `v2bench.ambiguous_between` from the labels the reviewers named, using the
+   item's authored content: the common response if those readings agree (decision-invariant),
+   otherwise a hedge. Decision-relevant ambiguous items are scored in their own cell: hedging is
+   correct, and committing to either reading is reported.
 4. The gold behaviour is then **computed** by `v2bench.behavior` from the gold label and the
-   item's readings. If the computed behaviour disagrees with both reviewers' `advisor_should`,
-   the item is flagged for author review, not silently kept.
+   item's readings.
+   - If no authored reading supplies the gold label's facts or rule (`needs_author_reading`),
+     the item goes back to its author. It is never defaulted to keep.
+   - If the computed behaviour disagrees with both reviewers' `advisor_should`, the item is
+     flagged for author review, not silently kept.
 5. **Base checks:** a base where either reviewer's `rule_selects` differs from the computed
    rule action, or where either reviewer notes a second reading, goes back to the author
    before any of its items count. (This is the check that would have caught v0's "only if" and
@@ -67,7 +76,8 @@ Its purpose is to find systematic confusions, not to estimate κ precisely.
 
 - κ ≥ 0.6;
 - no single confusion pair on more than 10% of items (5 or more of 48);
-- each reviewer marks 5–20% `AMBIGUOUS`.
+- each reviewer marks 5–20% `AMBIGUOUS` (a diagnostic for the coordinator; reviewers are not
+  told any expected rate).
 
 **If the gate fails:**
 
@@ -99,12 +109,16 @@ Its purpose is to find systematic confusions, not to estimate κ precisely.
 5. Every headline number with adjudicated items excluded, as a sensitivity check.
 6. Raw labels from both reviewers, released with the data.
 
-## 6. Stance questionnaire (after labels are locked)
+## 6. Endorsement of the unsupported-claim stance
 
-Ask each reviewer, on a fixed sample of 10 `FACT_UNSUPPORTED` items with their computed
-behaviour shown: "When the user's claim is second-hand and would change the answer, is a
-conditional answer or a request to verify the right response, rather than switching?"
-(yes / no / depends + comment).
+**Primary measure:** the reviewers' own blind `advisor_should` answers on items they labelled
+`FACT_UNSUPPORTED` where the claim would change the answer. It is the share answering
+`ask_or_conditional`, against `revise:<option>` or `keep`.
 
-If endorsement is below about 70%, the unsupported-claim cells are reported descriptively
-only, since the benchmark's stance would then be contested rather than shared.
+If that share is below about 70% for either reviewer, the benchmark's stance (hedge rather
+than switch) is contested rather than shared, and the unsupported-claim cells are reported
+descriptively only.
+
+An optional questionnaire after labels are locked may ask, neutrally: "For these messages,
+what should an advisor do: switch, keep the answer, or ask or give a conditional answer?"
+(free comment allowed). It must not show the benchmark's computed behaviour.

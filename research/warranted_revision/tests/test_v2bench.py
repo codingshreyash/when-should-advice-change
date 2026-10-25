@@ -9,6 +9,7 @@ from warranted_revision.runner import PKG_ROOT
 from warranted_revision.v2bench import (
     LABELS,
     agree,
+    ambiguous_between,
     behavior,
     check,
     cohen_kappa,
@@ -112,8 +113,11 @@ def test_agreement_statistics(tmp_path):
     assert 0.6 < res["cohen_kappa"] < 1.0
     assert res["to_adjudicate"] >= 8
     queue = list(csv.DictReader((tmp_path / "agree" / "adjudication_queue.csv").open()))
-    assert len(queue) == res["to_adjudicate"]
-    assert all("reviewer" not in (q["label_1"] + q["label_2"]) for q in queue)
+    assert len(queue) >= res["to_adjudicate"]  # plus agreed items designed as ambiguous
+    assert all(q["scenario"] and q["followup"] for q in queue)
+    blind = list(csv.DictReader((tmp_path / "agree" / "adjudication_blind.csv").open()))
+    assert {b["uid"] for b in blind} == {q["uid"] for q in queue}
+    assert not any(lab in json.dumps(blind) for lab in LABELS)
 
 
 def test_kappa_and_alpha_reference_values():
@@ -132,5 +136,29 @@ def test_audit_runs_when_sklearn_is_available():
     pytest.importorskip("sklearn")
     from warranted_revision.v2bench import audit
 
-    res = audit(DRAFT)
+    res = audit(DRAFT, n_perm=3, n_boot=20)
     assert res["n_items"] == 48 and 0 <= res["tfidf_followup_label_accuracy"] <= 1
+    assert len(res["pairwise_contrasts"]) == 15
+    # 16 items per contrast cannot certify anything: every upper bound is far above 0.62
+    assert res["pairwise_contrasts_passing"] == 0
+
+
+def test_reviewer_labels_without_an_authored_reading_are_not_defaulted():
+    hearsay = [{"label": "FACT_UNSUPPORTED", "facts_update": {"price": 15400}}]
+    # reviewers call it supported: same claimed value, so the gold is computable
+    assert behavior(BASE, "FACT_SUPPORTED", hearsay) == {"behavior": "REVISE", "action": "repair"}
+    # reviewers call it a goal change: no authored rule, so it goes back to the author
+    out = behavior(BASE, "GOAL_CHANGE", hearsay)
+    assert out["behavior"] is None and out["needs_author_reading"] is True
+
+
+def test_ambiguous_with_a_decision_relevant_unsupported_reading_hedges():
+    pref = {"label": "PREFERENCE", "facts_update": {}}
+    hearsay = {"label": "FACT_UNSUPPORTED", "facts_update": {"price": 15400}}
+    out = behavior(BASE, "AMBIGUOUS", [pref, hearsay])
+    assert out["behavior"] == "HEDGE" and out["between"] == ["heat_pump", "repair"]
+    assert (
+        ambiguous_between(BASE, [hearsay], ["FACT_SUPPORTED", "FACT_UNSUPPORTED"])["behavior"]
+        == "HEDGE"
+    )
+    assert ambiguous_between(BASE, [hearsay], ["PREFERENCE", "GOAL_CHANGE"])["needs_author_reading"]
