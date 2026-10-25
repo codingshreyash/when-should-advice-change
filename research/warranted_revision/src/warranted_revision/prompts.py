@@ -100,6 +100,15 @@ def option_order(case: VisibleCase, replicate: int, seed: int) -> list[str]:
     return base[r:] + base[:r]
 
 
+def rotated_order(case: VisibleCase, k: int) -> list[str]:
+    """The case's canonical option list (two actions, then need_more_information) rotated by
+    ``k``. With ``k`` = replicate + position in the planned case list, each option takes each
+    position equally often across consecutive cases."""
+    codes = case.option_codes
+    r = k % len(codes)
+    return codes[r:] + codes[:r]
+
+
 def option_block(case: VisibleCase, order: list[str]) -> str:
     text = {o.code: o.text for o in case.options}
     return "Options:\n" + "\n".join(f"- {code}: {text[code]}" for code in order)

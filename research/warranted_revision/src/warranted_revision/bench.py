@@ -58,12 +58,19 @@ def requests(cfg: RunConfig, max_new_tokens: int) -> list[GenRequest]:
         for rep in range(3):
             order = P.option_order(case, rep, cfg.option_order_seed)
             msgs = tuple(P.conversation(case, order, P.STRUCTURED_FORMAT))
-            reqs.append(GenRequest(messages=msgs, gen=GenParams(temperature=0.0, max_new_tokens=max_new_tokens, seed=0)))
+            reqs.append(
+                GenRequest(
+                    messages=msgs,
+                    gen=GenParams(temperature=0.0, max_new_tokens=max_new_tokens, seed=0),
+                )
+            )
     return reqs
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--config", type=Path, required=True)
     ap.add_argument("--label", required=True)
     ap.add_argument("--out", type=Path, required=True)
@@ -95,7 +102,9 @@ def main(argv: list[str] | None = None) -> int:
         "kernel_imports": imports,
         "fallback_warnings": sorted({m.split("`")[1] for m in cap.messages if "falling back" in m}),
         "output_sha256": [hashlib.sha256(c.text.encode()).hexdigest()[:16] for c in comps],
-        "config": str(args.config.relative_to(PKG_ROOT)) if args.config.is_relative_to(PKG_ROOT) else str(args.config),
+        "config": str(args.config.relative_to(PKG_ROOT))
+        if args.config.is_relative_to(PKG_ROOT)
+        else str(args.config),
     }
     args.out.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({k: v for k, v in result.items() if k != "model"}, indent=2))

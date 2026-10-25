@@ -71,6 +71,9 @@ class RunConfig(BaseModel):
     # "i/n": run only the i-th of n round-robin slices of the case list (1-based). Seeds and
     # option orders do not depend on the shard, so shards reproduce their slice exactly.
     shard: str = Field(default="1/1", pattern=r"^[1-9][0-9]*/[1-9][0-9]*$")
+    # With few replicates, rotate each case's option order by its position in the planned case
+    # list, so positions are balanced across cases (orders stay paired across conditions).
+    rotate_order_across_cases: bool = False
     out_root: str = "../../results/warranted_revision"
     # Only privileged control systems may read this.
     gold_for_controls: str | None = None
@@ -176,6 +179,7 @@ def run(
     """Execute a run. ``backends`` lets tests inject already-built backends by system name."""
     planned = load_cases(cfg)
     cases = shard_cases(cfg, planned)
+    position = {c.case_id: k for k, c in enumerate(planned)}
     if not cases:
         raise SystemExit(f"shard {cfg.shard} is empty")
     n_calls = expected_calls(cfg, cases)
@@ -304,7 +308,10 @@ def run(
                 fn = RUNNERS[cond]
                 for rep in range(cfg.replicates):
                     for case in cases:
-                        order = P.option_order(case, rep, cfg.option_order_seed)
+                        if cfg.rotate_order_across_cases:
+                            order = P.rotated_order(case, rep + position[case.case_id])
+                        else:
+                            order = P.option_order(case, rep, cfg.option_order_seed)
                         # Seeds depend on system, condition, case and replicate only (never on
                         # the shard or position), so any shard reproduces its slice exactly.
                         seed_cond = SEED_ALIAS.get(cond, cond)

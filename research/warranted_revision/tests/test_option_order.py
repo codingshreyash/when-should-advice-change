@@ -32,3 +32,33 @@ def test_order_counterbalanced_across_replicates():
         for pos in range(n):
             assert sorted(o[pos] for o in orders) == sorted(c.option_codes)
         assert prompts.option_order(c, 0, 1684) == prompts.option_order(c, n, 1684)
+
+
+def test_rotation_across_cases_balances_positions_and_survives_sharding(tmp_path):
+    from collections import Counter
+
+    from .conftest import make_run
+
+    ids = [f"dev-{f}-0{i}" for f in ("refinance", "car", "freelance") for i in range(3)]
+    full = make_run(
+        tmp_path,
+        "rot",
+        [{"kind": "fake", "name": "first_option"}],
+        conditions=["direct"],
+        case_ids=ids,
+        rotate_order_across_cases=True,
+    )
+    s2 = make_run(
+        tmp_path,
+        "rot-s2",
+        [{"kind": "fake", "name": "first_option"}],
+        conditions=["direct"],
+        case_ids=ids,
+        rotate_order_across_cases=True,
+        shard="2/3",
+    )
+    orders = {r["case_id"]: r["option_order"] for r in read_jsonl(full / "decisions.jsonl")}
+    first_pos = Counter(o[0] == "need_more_information" for o in orders.values())
+    assert first_pos[True] == 3  # nmi first in exactly a third of the 9 cases
+    for r in read_jsonl(s2 / "decisions.jsonl"):
+        assert r["option_order"] == orders[r["case_id"]]
