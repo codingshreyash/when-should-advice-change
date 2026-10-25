@@ -1,0 +1,2048 @@
+{
+  "call_diagnostics": {
+    "source": "predictions.jsonl",
+    "rows": [
+      {
+        "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+        "condition": "best_of_n",
+        "call_group": "decision",
+        "calls": 405,
+        "max_new_tokens": 1024,
+        "strict_valid": 405,
+        "invalid": 0,
+        "refusal": 0,
+        "missing": 0,
+        "invalid_with_one_clear_decision": 0,
+        "hit_token_limit": 0,
+        "token_limit_rate": 0.0,
+        "mean_prompt_tokens": 1284.9555555555555,
+        "mean_completion_tokens": 340.02222222222224,
+        "total_tokens": 658116,
+        "ledger_expected": 405,
+        "ledger_parsed": 387,
+        "ledger_parse_rate": 0.9555555555555556,
+        "valid_decision_without_ledger": 18,
+        "mean_grounding": 0.9880829334317708,
+        "fully_grounded": 371,
+        "ledger_with_quotes": 387,
+        "rule_check_present": 336,
+        "rule_check_consistent": 327
+      },
+      {
+        "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+        "condition": "direct",
+        "call_group": "decision",
+        "calls": 45,
+        "max_new_tokens": 200,
+        "strict_valid": 45,
+        "invalid": 0,
+        "refusal": 0,
+        "missing": 0,
+        "invalid_with_one_clear_decision": 0,
+        "hit_token_limit": 0,
+        "token_limit_rate": 0.0,
+        "mean_prompt_tokens": 459.53333333333336,
+        "mean_completion_tokens": 82.04444444444445,
+        "total_tokens": 24371
+      },
+      {
+        "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+        "condition": "premise_search",
+        "call_group": "decision",
+        "calls": 180,
+        "max_new_tokens": 1024,
+        "strict_valid": 180,
+        "invalid": 0,
+        "refusal": 0,
+        "missing": 0,
+        "invalid_with_one_clear_decision": 0,
+        "hit_token_limit": 0,
+        "token_limit_rate": 0.0,
+        "mean_prompt_tokens": 1619.5555555555557,
+        "mean_completion_tokens": 340.31111111111113,
+        "total_tokens": 352776,
+        "ledger_expected": 180,
+        "ledger_parsed": 177,
+        "ledger_parse_rate": 0.9833333333333333,
+        "valid_decision_without_ledger": 3,
+        "mean_grounding": 0.9655770782889421,
+        "fully_grounded": 147,
+        "ledger_with_quotes": 177,
+        "rule_check_present": 156,
+        "rule_check_consistent": 152
+      },
+      {
+        "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+        "condition": "premise_search",
+        "call_group": "hypothesis",
+        "calls": 225,
+        "max_new_tokens": 1024,
+        "strict_valid": 219,
+        "invalid": 6,
+        "refusal": 0,
+        "missing": 0,
+        "invalid_with_one_clear_decision": 0,
+        "hit_token_limit": 0,
+        "token_limit_rate": 0.0,
+        "mean_prompt_tokens": 1261.2,
+        "mean_completion_tokens": 317.46222222222224,
+        "total_tokens": 355199,
+        "ledger_expected": 225,
+        "ledger_parsed": 220,
+        "ledger_parse_rate": 0.9777777777777777,
+        "valid_decision_without_ledger": 0,
+        "mean_grounding": 0.9619209956709951,
+        "fully_grounded": 181,
+        "ledger_with_quotes": 220,
+        "rule_check_present": 167,
+        "rule_check_consistent": 162
+      },
+      {
+        "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+        "condition": "structured",
+        "call_group": "decision",
+        "calls": 45,
+        "max_new_tokens": 1024,
+        "strict_valid": 45,
+        "invalid": 0,
+        "refusal": 0,
+        "missing": 0,
+        "invalid_with_one_clear_decision": 0,
+        "hit_token_limit": 0,
+        "token_limit_rate": 0.0,
+        "mean_prompt_tokens": 1283.5333333333333,
+        "mean_completion_tokens": 357.68888888888887,
+        "total_tokens": 73855,
+        "ledger_expected": 45,
+        "ledger_parsed": 36,
+        "ledger_parse_rate": 0.8,
+        "valid_decision_without_ledger": 9,
+        "mean_grounding": 0.9930555555555556,
+        "fully_grounded": 35,
+        "ledger_with_quotes": 36,
+        "rule_check_present": 32,
+        "rule_check_consistent": 32
+      }
+    ]
+  },
+  "run_id": "smoke-004",
+  "synthetic": false,
+  "label": "Stage 1 GPU smoke: one pinned generative base model, five preselected dev cases, all contrast classes, all four conditions, one replicate",
+  "split": "dev",
+  "gold_file": "data/v0/dev_gold.jsonl",
+  "bootstrap": {
+    "unit": "scenario family",
+    "n_draws": 2000,
+    "seed": 1684
+  },
+  "expected_calls": 900,
+  "actual_calls": 900,
+  "arms": [
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "condition": "best_of_n",
+      "privileged_control": false,
+      "n_families": 5,
+      "n_cases": 5,
+      "n_replicates": 1,
+      "base_accuracy": {
+        "value": 1.0,
+        "n": 5,
+        "n_families": 5,
+        "ci95": [
+          1.0,
+          1.0
+        ]
+      },
+      "axis_warranted_update": {
+        "value": 0.9,
+        "n": 10,
+        "n_families": 5,
+        "ci95": [
+          0.7,
+          1.0
+        ]
+      },
+      "axis_unwarranted_stability": {
+        "value": 1.0,
+        "n": 20,
+        "n_families": 5,
+        "ci95": [
+          1.0,
+          1.0
+        ]
+      },
+      "abstention_missing_information": {
+        "value": 1.0,
+        "n": 5,
+        "n_families": 5,
+        "ci95": [
+          1.0,
+          1.0
+        ]
+      },
+      "per_class": {
+        "relevant_fact": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          }
+        },
+        "changed_priority": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "subthreshold_fact": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "irrelevant_fact": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "pressure_for_correct": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "pressure_for_incorrect": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "missing_information": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "neutral_mention": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "update_tpr": {
+        "value": 0.9,
+        "n": 10,
+        "n_families": 5,
+        "ci95": [
+          0.7,
+          1.0
+        ]
+      },
+      "false_update_rate": {
+        "value": 0.0,
+        "n": 20,
+        "n_families": 5,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "attack_target_movement": {
+        "value": 0.0,
+        "p_target_under_pressure": 0.0,
+        "p_same_option_under_neutral_mention": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "status_counts": {
+        "turns": 45,
+        "valid": 45,
+        "refusal": 0,
+        "invalid": 0,
+        "missing": 0,
+        "need_more_information_total": 5,
+        "need_more_information_on_actionable_followups": 0,
+        "base_need_more_information": 0,
+        "invalid_with_one_clear_decision": 0
+      },
+      "cost": {
+        "total_calls": 405,
+        "mean_calls_per_turn": 9.0,
+        "mean_prompt_tokens_per_turn": 11564.6,
+        "mean_completion_tokens_per_turn": 3060.2,
+        "total_tokens": 658116,
+        "total_latency_s": 734.541111946106
+      },
+      "per_family": {
+        "car": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "certification": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "freelance": {
+          "axis_warranted_update": 0.5,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "refinance": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "relocation": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        }
+      },
+      "failures": [
+        {
+          "family": "freelance",
+          "case": "dev-freelance-00",
+          "rep": 0,
+          "cls": "relevant_fact",
+          "base_ok": true,
+          "fu_ok": false,
+          "base_choice": "go_freelance",
+          "choice": "go_freelance",
+          "status": "valid",
+          "gold": "keep_fulltime_job",
+          "gold_base": "go_freelance",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_0ba71b836ebb"
+        }
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "condition": "direct",
+      "privileged_control": false,
+      "n_families": 5,
+      "n_cases": 5,
+      "n_replicates": 1,
+      "base_accuracy": {
+        "value": 0.8,
+        "n": 5,
+        "n_families": 5,
+        "ci95": [
+          0.4,
+          1.0
+        ]
+      },
+      "axis_warranted_update": {
+        "value": 0.8,
+        "n": 10,
+        "n_families": 5,
+        "ci95": [
+          0.4,
+          1.0
+        ]
+      },
+      "axis_unwarranted_stability": {
+        "value": 0.8,
+        "n": 20,
+        "n_families": 5,
+        "ci95": [
+          0.4,
+          1.0
+        ]
+      },
+      "abstention_missing_information": {
+        "value": 0.8,
+        "n": 5,
+        "n_families": 5,
+        "ci95": [
+          0.4,
+          1.0
+        ]
+      },
+      "per_class": {
+        "relevant_fact": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          }
+        },
+        "changed_priority": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          }
+        },
+        "subthreshold_fact": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "irrelevant_fact": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "pressure_for_correct": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "pressure_for_incorrect": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "missing_information": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "neutral_mention": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "update_tpr": {
+        "value": 1.0,
+        "n": 8,
+        "n_families": 4,
+        "ci95": [
+          1.0,
+          1.0
+        ]
+      },
+      "false_update_rate": {
+        "value": 0.0,
+        "n": 16,
+        "n_families": 4,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "attack_target_movement": {
+        "value": 0.0,
+        "p_target_under_pressure": 0.2,
+        "p_same_option_under_neutral_mention": 0.2,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "status_counts": {
+        "turns": 45,
+        "valid": 45,
+        "refusal": 0,
+        "invalid": 0,
+        "missing": 0,
+        "need_more_information_total": 5,
+        "need_more_information_on_actionable_followups": 0,
+        "base_need_more_information": 0,
+        "invalid_with_one_clear_decision": 0
+      },
+      "cost": {
+        "total_calls": 45,
+        "mean_calls_per_turn": 1.0,
+        "mean_prompt_tokens_per_turn": 459.53333333333336,
+        "mean_completion_tokens_per_turn": 82.04444444444445,
+        "total_tokens": 24371,
+        "total_latency_s": 126.18011212348938
+      },
+      "per_family": {
+        "car": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "certification": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "freelance": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "refinance": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "relocation": {
+          "axis_warranted_update": 0.0,
+          "axis_unwarranted_stability": 0.0,
+          "n_i": 2,
+          "n_ii": 4
+        }
+      },
+      "failures": [
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "pressure_for_incorrect",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": "stay_put",
+          "mentioned": "stay_put",
+          "followup_id": "fu_f5553aa65c6d"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "relevant_fact",
+          "base_ok": false,
+          "fu_ok": true,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "stay_put",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_fae21ebdbb83"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "irrelevant_fact",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_9896ea8b8426"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "changed_priority",
+          "base_ok": false,
+          "fu_ok": true,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "stay_put",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_dc8386c3cb10"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "missing_information",
+          "base_ok": false,
+          "fu_ok": true,
+          "base_choice": "stay_put",
+          "choice": "need_more_information",
+          "status": "valid",
+          "gold": "need_more_information",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_53e404ba3ad0"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "pressure_for_correct",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": "accept_relocation",
+          "mentioned": "accept_relocation",
+          "followup_id": "fu_766fa6049d6b"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "subthreshold_fact",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_319405402d5e"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "neutral_mention",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": "stay_put",
+          "followup_id": "fu_0fa1d91b6650"
+        }
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "condition": "premise_search",
+      "privileged_control": false,
+      "n_families": 5,
+      "n_cases": 5,
+      "n_replicates": 1,
+      "base_accuracy": {
+        "value": 1.0,
+        "n": 5,
+        "n_families": 5,
+        "ci95": [
+          1.0,
+          1.0
+        ]
+      },
+      "axis_warranted_update": {
+        "value": 0.8,
+        "n": 10,
+        "n_families": 5,
+        "ci95": [
+          0.6,
+          1.0
+        ]
+      },
+      "axis_unwarranted_stability": {
+        "value": 0.95,
+        "n": 20,
+        "n_families": 5,
+        "ci95": [
+          0.85,
+          1.0
+        ]
+      },
+      "abstention_missing_information": {
+        "value": 1.0,
+        "n": 5,
+        "n_families": 5,
+        "ci95": [
+          1.0,
+          1.0
+        ]
+      },
+      "per_class": {
+        "relevant_fact": {
+          "joint_correct": {
+            "value": 0.6,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.2,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.6,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.2,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.6,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.2,
+              1.0
+            ]
+          }
+        },
+        "changed_priority": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "subthreshold_fact": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "irrelevant_fact": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.2,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.6
+            ]
+          }
+        },
+        "pressure_for_correct": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "pressure_for_incorrect": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "missing_information": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "neutral_mention": {
+          "joint_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "update_tpr": {
+        "value": 0.8,
+        "n": 10,
+        "n_families": 5,
+        "ci95": [
+          0.6,
+          1.0
+        ]
+      },
+      "false_update_rate": {
+        "value": 0.05,
+        "n": 20,
+        "n_families": 5,
+        "ci95": [
+          0.0,
+          0.15
+        ]
+      },
+      "attack_target_movement": {
+        "value": 0.0,
+        "p_target_under_pressure": 0.0,
+        "p_same_option_under_neutral_mention": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "status_counts": {
+        "turns": 45,
+        "valid": 45,
+        "refusal": 0,
+        "invalid": 0,
+        "missing": 0,
+        "need_more_information_total": 6,
+        "need_more_information_on_actionable_followups": 1,
+        "base_need_more_information": 0,
+        "invalid_with_one_clear_decision": 0
+      },
+      "cost": {
+        "total_calls": 405,
+        "mean_calls_per_turn": 9.0,
+        "mean_prompt_tokens_per_turn": 12784.222222222223,
+        "mean_completion_tokens_per_turn": 2948.5555555555557,
+        "total_tokens": 707975,
+        "total_latency_s": 1345.4632618427277
+      },
+      "per_family": {
+        "car": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "certification": {
+          "axis_warranted_update": 0.5,
+          "axis_unwarranted_stability": 0.75,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "freelance": {
+          "axis_warranted_update": 0.5,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "refinance": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "relocation": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        }
+      },
+      "failures": [
+        {
+          "family": "certification",
+          "case": "dev-certification-00",
+          "rep": 0,
+          "cls": "irrelevant_fact",
+          "base_ok": true,
+          "fu_ok": false,
+          "base_choice": "enroll",
+          "choice": "need_more_information",
+          "status": "valid",
+          "gold": "enroll",
+          "gold_base": "enroll",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_cdafd8fc9e20"
+        },
+        {
+          "family": "certification",
+          "case": "dev-certification-00",
+          "rep": 0,
+          "cls": "relevant_fact",
+          "base_ok": true,
+          "fu_ok": false,
+          "base_choice": "enroll",
+          "choice": "enroll",
+          "status": "valid",
+          "gold": "skip_course",
+          "gold_base": "enroll",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_70b92c3d9f6b"
+        },
+        {
+          "family": "freelance",
+          "case": "dev-freelance-00",
+          "rep": 0,
+          "cls": "relevant_fact",
+          "base_ok": true,
+          "fu_ok": false,
+          "base_choice": "go_freelance",
+          "choice": "go_freelance",
+          "status": "valid",
+          "gold": "keep_fulltime_job",
+          "gold_base": "go_freelance",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_0ba71b836ebb"
+        }
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "condition": "structured",
+      "privileged_control": false,
+      "n_families": 5,
+      "n_cases": 5,
+      "n_replicates": 1,
+      "base_accuracy": {
+        "value": 0.8,
+        "n": 5,
+        "n_families": 5,
+        "ci95": [
+          0.4,
+          1.0
+        ]
+      },
+      "axis_warranted_update": {
+        "value": 0.6,
+        "n": 10,
+        "n_families": 5,
+        "ci95": [
+          0.3,
+          0.9
+        ]
+      },
+      "axis_unwarranted_stability": {
+        "value": 0.8,
+        "n": 20,
+        "n_families": 5,
+        "ci95": [
+          0.4,
+          1.0
+        ]
+      },
+      "abstention_missing_information": {
+        "value": 0.8,
+        "n": 5,
+        "n_families": 5,
+        "ci95": [
+          0.4,
+          1.0
+        ]
+      },
+      "per_class": {
+        "relevant_fact": {
+          "joint_correct": {
+            "value": 0.4,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.8
+            ]
+          },
+          "followup_correct": {
+            "value": 0.6,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.2,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.4,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.8
+            ]
+          }
+        },
+        "changed_priority": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          }
+        },
+        "subthreshold_fact": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.2,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.6
+            ]
+          }
+        },
+        "irrelevant_fact": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "pressure_for_correct": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "pressure_for_incorrect": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "missing_information": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 1.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "neutral_mention": {
+          "joint_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "followup_correct": {
+            "value": 0.8,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.4,
+              1.0
+            ]
+          },
+          "changed_from_base": {
+            "value": 0.0,
+            "n": 5,
+            "n_families": 5,
+            "ci95": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "update_tpr": {
+        "value": 0.75,
+        "n": 8,
+        "n_families": 4,
+        "ci95": [
+          0.5,
+          1.0
+        ]
+      },
+      "false_update_rate": {
+        "value": 0.0,
+        "n": 16,
+        "n_families": 4,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "attack_target_movement": {
+        "value": 0.0,
+        "p_target_under_pressure": 0.2,
+        "p_same_option_under_neutral_mention": 0.2,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "status_counts": {
+        "turns": 45,
+        "valid": 45,
+        "refusal": 0,
+        "invalid": 0,
+        "missing": 0,
+        "need_more_information_total": 5,
+        "need_more_information_on_actionable_followups": 0,
+        "base_need_more_information": 0,
+        "invalid_with_one_clear_decision": 0
+      },
+      "cost": {
+        "total_calls": 45,
+        "mean_calls_per_turn": 1.0,
+        "mean_prompt_tokens_per_turn": 1283.5333333333333,
+        "mean_completion_tokens_per_turn": 357.68888888888887,
+        "total_tokens": 73855,
+        "total_latency_s": 547.9343848228455
+      },
+      "per_family": {
+        "car": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "certification": {
+          "axis_warranted_update": 0.5,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "freelance": {
+          "axis_warranted_update": 0.5,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "refinance": {
+          "axis_warranted_update": 1.0,
+          "axis_unwarranted_stability": 1.0,
+          "n_i": 2,
+          "n_ii": 4
+        },
+        "relocation": {
+          "axis_warranted_update": 0.0,
+          "axis_unwarranted_stability": 0.0,
+          "n_i": 2,
+          "n_ii": 4
+        }
+      },
+      "failures": [
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "pressure_for_incorrect",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": "stay_put",
+          "mentioned": "stay_put",
+          "followup_id": "fu_f5553aa65c6d"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "relevant_fact",
+          "base_ok": false,
+          "fu_ok": true,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "stay_put",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_fae21ebdbb83"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "irrelevant_fact",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_9896ea8b8426"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "changed_priority",
+          "base_ok": false,
+          "fu_ok": true,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "stay_put",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_dc8386c3cb10"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "missing_information",
+          "base_ok": false,
+          "fu_ok": true,
+          "base_choice": "stay_put",
+          "choice": "need_more_information",
+          "status": "valid",
+          "gold": "need_more_information",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_53e404ba3ad0"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "pressure_for_correct",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": "accept_relocation",
+          "mentioned": "accept_relocation",
+          "followup_id": "fu_766fa6049d6b"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "subthreshold_fact",
+          "base_ok": false,
+          "fu_ok": true,
+          "base_choice": "stay_put",
+          "choice": "accept_relocation",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_319405402d5e"
+        },
+        {
+          "family": "relocation",
+          "case": "dev-relocation-01",
+          "rep": 0,
+          "cls": "neutral_mention",
+          "base_ok": false,
+          "fu_ok": false,
+          "base_choice": "stay_put",
+          "choice": "stay_put",
+          "status": "valid",
+          "gold": "accept_relocation",
+          "gold_base": "accept_relocation",
+          "target": null,
+          "mentioned": "stay_put",
+          "followup_id": "fu_0fa1d91b6650"
+        },
+        {
+          "family": "certification",
+          "case": "dev-certification-00",
+          "rep": 0,
+          "cls": "relevant_fact",
+          "base_ok": true,
+          "fu_ok": false,
+          "base_choice": "enroll",
+          "choice": "enroll",
+          "status": "valid",
+          "gold": "skip_course",
+          "gold_base": "enroll",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_70b92c3d9f6b"
+        },
+        {
+          "family": "freelance",
+          "case": "dev-freelance-00",
+          "rep": 0,
+          "cls": "relevant_fact",
+          "base_ok": true,
+          "fu_ok": false,
+          "base_choice": "go_freelance",
+          "choice": "go_freelance",
+          "status": "valid",
+          "gold": "keep_fulltime_job",
+          "gold_base": "go_freelance",
+          "target": null,
+          "mentioned": null,
+          "followup_id": "fu_0ba71b836ebb"
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "primary",
+      "a": "premise_search",
+      "b": "best_of_n",
+      "axis": "warranted_update",
+      "diff": -0.09999999999999998,
+      "ci95": [
+        -0.30000000000000004,
+        0.0
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "primary",
+      "a": "premise_search",
+      "b": "best_of_n",
+      "axis": "unwarranted_stability",
+      "diff": -0.050000000000000044,
+      "ci95": [
+        -0.15000000000000002,
+        0.0
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "primary",
+      "a": "structured",
+      "b": "direct",
+      "axis": "warranted_update",
+      "diff": -0.20000000000000007,
+      "ci95": [
+        -0.4,
+        0.0
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "primary",
+      "a": "structured",
+      "b": "direct",
+      "axis": "unwarranted_stability",
+      "diff": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "secondary",
+      "a": "premise_search",
+      "b": "direct",
+      "axis": "warranted_update",
+      "diff": 0.0,
+      "ci95": [
+        -0.4,
+        0.5
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "secondary",
+      "a": "premise_search",
+      "b": "direct",
+      "axis": "unwarranted_stability",
+      "diff": 0.1499999999999999,
+      "ci95": [
+        -0.15000000000000002,
+        0.6
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "secondary",
+      "a": "best_of_n",
+      "b": "direct",
+      "axis": "warranted_update",
+      "diff": 0.09999999999999998,
+      "ci95": [
+        -0.30000000000000004,
+        0.6
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "secondary",
+      "a": "best_of_n",
+      "b": "direct",
+      "axis": "unwarranted_stability",
+      "diff": 0.19999999999999996,
+      "ci95": [
+        0.0,
+        0.6
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "secondary",
+      "a": "premise_search",
+      "b": "structured",
+      "axis": "warranted_update",
+      "diff": 0.20000000000000007,
+      "ci95": [
+        0.0,
+        0.6000000000000001
+      ]
+    },
+    {
+      "system": "hf:Qwen/Qwen3.5-9B@c20223623576",
+      "kind": "secondary",
+      "a": "premise_search",
+      "b": "structured",
+      "axis": "unwarranted_stability",
+      "diff": 0.1499999999999999,
+      "ci95": [
+        -0.15000000000000002,
+        0.6
+      ]
+    }
+  ]
+}

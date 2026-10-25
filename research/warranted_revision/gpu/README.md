@@ -60,3 +60,6 @@ To check the plan locally without touching Brev:
 - `smoke-003`: full run, 900 calls, ~68 min, ~$1.20. Not interpretable: most direct and
   structured answers broke the answer format. Prompts, token limits and kernels were fixed
   afterwards. Details in `results/warranted_revision/smoke-003/NOTES.md`.
+- `smoke-004`: 900 calls, ~56 min, ~$1.00 (estimate). Format checks passed: all decision calls
+  strictly valid, no token-limit stops, 96-98% of search and best-of-N ledgers parsed (80%
+  structured). See `results/warranted_revision/smoke-004/NOTES.md`.
