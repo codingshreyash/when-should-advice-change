@@ -11,6 +11,7 @@ import pytest
 from warranted_revision.gpu_guard import (
     GuardError,
     check_instance_name,
+    check_instance_type,
     check_pinned_model,
     instance_name,
     plan_budget,
@@ -151,3 +152,64 @@ def test_launch_refuses_without_verification_or_token(tmp_path, monkeypatch, fak
     monkeypatch.delenv("BREV_API_TOKEN")
     assert ctl.main(args + ["--commands-verified"]) == 2
     assert fake_bin.read_text() == "" if fake_bin.exists() else True
+
+
+def test_instance_type_must_be_single_and_explicit(tmp_path, fake_bin):
+    check_instance_type("g5.xlarge")
+    for bad in ("", "g5.xlarge,g5.2xlarge", "g5.xlarge g4dn", "--count 3"):
+        with pytest.raises(GuardError):
+            check_instance_type(bad)
+    ctl = _controller()
+    cfg = json.loads((PKG_ROOT / "configs" / "gpu_smoke.json").read_text())
+    cfg["systems"][0]["params"]["revision"] = "c" * 40
+    cfg_path = tmp_path / "cfg.json"
+    cfg_path.write_text(json.dumps(cfg))
+    args = [
+        "launch",
+        "--hourly",
+        "1.0",
+        "--max-usd",
+        "10",
+        "--run-id",
+        "t",
+        "--config",
+        str(cfg_path),
+        "--instance-type",
+        "g5.xlarge,g5.2xlarge",
+        "--state",
+        str(tmp_path / "s.json"),
+        "--commands-verified",
+    ]
+    assert ctl.main(args) == 2
+    assert not fake_bin.exists() or "create" not in fake_bin.read_text()
+
+
+def test_launch_checks_type_before_creating(tmp_path, fake_bin):
+    ctl = _controller()
+    cfg = json.loads((PKG_ROOT / "configs" / "gpu_smoke.json").read_text())
+    cfg["systems"][0]["params"]["revision"] = "d" * 40
+    cfg_path = tmp_path / "cfg.json"
+    cfg_path.write_text(json.dumps(cfg))
+    with pytest.raises(subprocess.CalledProcessError):
+        ctl.main(
+            [
+                "launch",
+                "--hourly",
+                "1.0",
+                "--max-usd",
+                "10",
+                "--run-id",
+                "t",
+                "--config",
+                str(cfg_path),
+                "--instance-type",
+                "g5.xlarge",
+                "--state",
+                str(tmp_path / "s.json"),
+                "--commands-verified",
+            ]
+        )
+    brev = [c for c in fake_bin.read_text().splitlines() if c.startswith("brev ")]
+    assert brev[0].startswith("brev login --token")
+    assert brev[1].endswith("--type g5.xlarge --dry-run")
+    assert brev[2].endswith("--type g5.xlarge --timeout 900")

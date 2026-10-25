@@ -46,6 +46,7 @@ sys.path.insert(0, str(PKG / "src"))
 from warranted_revision.gpu_guard import (  # noqa: E402
     GuardError,
     check_instance_name,
+    check_instance_type,
     check_pinned_model,
     instance_name,
     plan_budget,
@@ -74,6 +75,8 @@ def build_plan(args: argparse.Namespace) -> dict:
         est_seconds_per_call=args.est_seconds_per_call,
         setup_hours=args.setup_hours,
     )
+    if args.instance_type:
+        check_instance_type(args.instance_type)
     name = instance_name(args.run_id)
     return {
         "run_id": args.run_id,
@@ -125,12 +128,15 @@ def delete_instance(name: str, deadline_s: float = 300) -> bool:
         run_step(render("delete", name=name), deadline_s)
     except subprocess.CalledProcessError as exc:
         print(f"[controller] delete returned {exc.returncode}; checking listing", flush=True)
-    for _ in range(10):
+    # Piped `brev ls` prints one instance name per line; match whole lines. Deletion can take
+    # a few minutes, so poll for up to ~10 minutes.
+    for _ in range(24):
         out = subprocess.run(render("list"), capture_output=True, text=True, timeout=120)
-        if name not in out.stdout:
+        listed = {ln.strip() for ln in out.stdout.splitlines()}
+        if out.returncode == 0 and name not in listed:
             print(f"[controller] confirmed: {name} not listed", flush=True)
             return True
-        time.sleep(15)
+        time.sleep(25)
     print(
         f"[controller] WARNING: {name} still listed; delete it by hand and check billing",
         flush=True,
@@ -161,6 +167,8 @@ def cmd_launch(args: argparse.Namespace) -> int:
     results_local = PKG.parents[1] / "results" / "warranted_revision"
     try:
         run_step(render("login", token=token), 120, secret=token)
+        # Provider-side check that the type exists; creates nothing.
+        run_step(render("create_dry_run", name=name, instance_type=args.instance_type), 300)
         plan["created"] = True  # set before the call: a timed-out create may still exist
         state_path.write_text(json.dumps(plan, indent=2))
         run_step(

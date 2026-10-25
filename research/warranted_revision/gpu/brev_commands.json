@@ -1,5 +1,6 @@
 {
-  "_status": "PARTLY VERIFIED. login checked against `brev login --help`; create, refresh, ls, delete, ssh/scp access still unverified. Check each with `brev <cmd> --help` before passing --commands-verified.",
+  "_status": "Checked against `brev ... --help` from brev CLI v0.6.335 on 2026-10-25: login, create, delete, ls, refresh. Still unconfirmed until the first real run: that `ssh <name>` works after `brev refresh`, and the CLI installer URL used by the workflow.",
+  "_cli_version_checked": "v0.6.335",
   "login": {
     "argv": [
       "brev",
@@ -9,29 +10,42 @@
     ],
     "note": "VERIFIED 2026-10-25 against `brev login --help` (flag: --token string, 'token provided to auto login'). Token source in the console still to be confirmed."
   },
+  "create_dry_run": {
+    "argv": [
+      "brev",
+      "create",
+      "{name}",
+      "--type",
+      "{instance_type}",
+      "--dry-run"
+    ],
+    "note": "VERIFIED flag: shows matching instance types without creating anything"
+  },
   "create": {
     "argv": [
       "brev",
       "create",
       "{name}",
-      "--gpu",
-      "{instance_type}"
+      "--type",
+      "{instance_type}",
+      "--timeout",
+      "900"
     ],
-    "note": "flag name for the instance/GPU type is unverified"
+    "note": "VERIFIED: -t/--type takes instance types (comma list = fallback chain, which the guard forbids); -g is --gpu-name, a search filter, not a type. Waits for readiness unless --detached; --timeout is seconds per instance (default 300)."
   },
   "refresh": {
     "argv": [
       "brev",
       "refresh"
     ],
-    "note": "updates the local SSH config so `ssh <name>` works"
+    "note": "VERIFIED: 'Force a refresh to the SSH config'"
   },
   "list": {
     "argv": [
       "brev",
       "ls"
     ],
-    "note": "used to confirm deletion"
+    "note": "VERIFIED: when stdout is piped, prints instance names only, one per line"
   },
   "exec": {
     "argv": [
@@ -41,7 +55,7 @@
       "{name}",
       "{remote_cmd}"
     ],
-    "note": "SSH alias created by brev refresh"
+    "note": "SSH alias written by `brev refresh`; confirm `ssh <name>` on the first run"
   },
   "copy_to": {
     "argv": [
@@ -68,6 +82,6 @@
       "delete",
       "{name}"
     ],
-    "note": "delete (not stop): stopped instances still bill for storage"
+    "note": "VERIFIED: `brev delete <name>`; deletion can take a few minutes, check with `brev ls`. Delete, not stop: stopped instances still bill for storage."
   }
 }

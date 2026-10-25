@@ -81,11 +81,14 @@ and should be re-checked against the paper before it is cited in a write-up.)
 ## GPU path
 
 - `gpu/brev_controller.py` is meant to run on an independent controller (the manual
-  workflow), creates one dedicated instance with a generated name, and deletes only that
-  name in `finally` and again in an `always()` step. The Brev CLI command templates in
-  `gpu/brev_commands.json` were not verified against official documentation (the docs host
-  was unreachable from the build environment); the controller refuses to launch until a
-  person confirms them with `--commands-verified`.
+  workflow). It creates one dedicated instance with a generated name and deletes only that
+  name: once in `finally` and again in an `always()` step.
+- The command templates in `gpu/brev_commands.json` (login, create, delete, ls, refresh) were
+  checked against `--help` output from brev CLI v0.6.335. `brev create` takes `--type`;
+  without a type it auto-selects, and a comma list becomes a fallback chain. The guard
+  therefore requires exactly one explicit type, so the machine matches the hourly price
+  entered. Still unconfirmed until a first real run: `ssh <name>` after `brev refresh`, and
+  the CLI installer URL. `--commands-verified` remains a manual confirmation.
 - `configs/gpu_smoke.json` names Qwen3.5-9B as the protocol's first choice, but its exact
   Hugging Face id, loader class and revision have not been confirmed; the revision is a
   placeholder and every launch path refuses an unpinned model.

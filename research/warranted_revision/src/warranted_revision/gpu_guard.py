@@ -7,6 +7,7 @@ The guard never talks to a cloud provider. It turns user-supplied limits into a 
 * reserves setup overhead and a safety margin, and derives a hard wall-clock deadline,
 * refuses when the run's own call plan, at a conservative per-call time, does not fit,
 * refuses a GPU config whose model is not pinned to a 40-hex commit,
+* requires exactly one explicit instance type (no auto-selection or fallback list),
 * names a dedicated instance ``wrev-smoke-<run>-<random>`` so cleanup can only ever target
   the instance this run created.
 """
@@ -21,6 +22,7 @@ FIRST_RUN_CAP_USD = 15.0
 INSTANCE_PREFIX = "wrev-smoke-"
 INSTANCE_RE = re.compile(r"^wrev-smoke-[a-z0-9-]{1,40}-[0-9a-f]{6}$")
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+INSTANCE_TYPE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$")
 
 
 class GuardError(ValueError):
@@ -118,3 +120,16 @@ def check_pinned_model(config: dict) -> None:
             raise GuardError("allow_unpinned is not permitted for a paid run")
     if config.get("max_calls") is None:
         raise GuardError("GPU config must set max_calls")
+
+
+def check_instance_type(instance_type: str) -> None:
+    """Exactly one explicit instance type.
+
+    ``brev create`` auto-selects the cheapest match when no type is given and treats a comma
+    list as a fallback chain; either could start a machine whose price differs from the
+    ``GPU_HOURLY_USD`` the budget was computed from.
+    """
+    if not INSTANCE_TYPE_RE.match(instance_type or ""):
+        raise GuardError(
+            f"instance type {instance_type!r} must be exactly one explicit type (no lists, no blanks)"
+        )

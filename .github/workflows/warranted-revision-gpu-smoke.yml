@@ -81,7 +81,10 @@ jobs:
       - name: Install Brev CLI
         if: ${{ !inputs.dry_run }}
         # Unverified installer URL; confirm against the official Brev docs before enabling.
-        run: bash -c "$(curl -fsSL https://raw.githubusercontent.com/brevdev/brev-cli/main/bin/install-latest.sh)"
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/brevdev/brev-cli/main/bin/install-latest.sh)"
+          # Command templates were checked against v0.6.335; a different version is logged here.
+          brev --version
 
       - name: Launch, run, copy back, delete
         if: ${{ !inputs.dry_run }}
