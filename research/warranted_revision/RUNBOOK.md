@@ -56,21 +56,6 @@ NVIDIA Brev docs: https://docs.nvidia.com/brev/concepts/gpu-instances (stopped i
 
 Do not launch full training, iterate on a frozen holdout, silently widen the research goal, rewrite the existing paper, or rewrite unrelated repository files.
 
-## GPU smoke path in this repository (not yet executed)
+## GPU smoke path in this repository
 
-1. Pin the model: set `systems[0].name`, `params.revision` (40-hex commit) and
-   `params.model_class` in `configs/gpu_smoke.json`. Commit the change before the run.
-2. Verify every template in `gpu/brev_commands.json` with `brev <cmd> --help` and the Brev
-   docs; fix and commit. Confirm the CLI installer URL used by the workflow.
-3. Add the repository secret `BREV_API_TOKEN`. The workflow file must be on the default
-   branch for the GitHub "Run workflow" button to appear.
-4. Dry run: dispatch `warranted-revision GPU smoke` with `dry_run=true`, the hourly price
-   from the launch screen, `max_gpu_usd<=15`, an instance type and a fresh `run_id`. The job
-   runs the CPU suite and prints the plan (calls, deadline, worst-case spend, instance name).
-5. Real run: dispatch again with `dry_run=false` and `commands_verified=true`. The job uploads
-   `results/warranted_revision/<run_id>` and the controller state, then deletes the
-   instance (again) in an always-run step. Afterwards, check the Brev console: the instance
-   must be gone and the charge must be within the cap. Do not start a second run if not.
-
-Locally, `python gpu/brev_controller.py plan ...` performs the same checks without any
-provider call.
+See `gpu/README.md` for the model, instance, Brev commands and the step-by-step launch.

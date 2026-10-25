@@ -9,6 +9,11 @@ PY=$(command -v python3.12 || command -v python3)
 $PY -m venv .venv && source .venv/bin/activate
 python -m pip install -q --upgrade pip
 python -m pip install -q -e '.[gpu,dev]'
+# Qwen3.5 needs a transformers release that ships Qwen3_5ForConditionalGeneration.
+# Fail here, before any inference, rather than mid-run; the installed version is recorded.
+python -c "import transformers as t; assert hasattr(t, 'Qwen3_5ForConditionalGeneration')" \
+  || python -m pip install -q -U transformers
+python -c "import transformers as t; assert hasattr(t, 'Qwen3_5ForConditionalGeneration'), t.__version__; print('transformers', t.__version__)"
 OUT="$HOME/results/warranted_revision/$RUN_ID"
 mkdir -p /tmp/wrev && pip freeze > /tmp/wrev/pip_freeze.txt
 nvidia-smi --query-gpu=name,memory.total --format=csv > /tmp/wrev/gpu.txt || true

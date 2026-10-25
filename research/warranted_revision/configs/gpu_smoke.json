@@ -4,7 +4,12 @@
   "split": "dev",
   "inputs": "data/v0/dev_inputs.jsonl",
   "case_ids_file": "data/v0/smoke_case_ids.json",
-  "conditions": ["direct", "structured", "best_of_n", "premise_search"],
+  "conditions": [
+    "direct",
+    "structured",
+    "best_of_n",
+    "premise_search"
+  ],
   "replicates": 1,
   "systems": [
     {
@@ -12,11 +17,13 @@
       "name": "Qwen/Qwen3.5-9B",
       "params": {
         "revision": "PIN_ME_TO_A_40_HEX_COMMIT",
-        "model_class": "AutoModelForCausalLM",
+        "model_class": "Qwen3_5ForConditionalGeneration",
         "dtype": "bfloat16",
         "load_in_4bit": false,
         "max_batch": 9,
-        "chat_template_kwargs": {"enable_thinking": false}
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
       }
     }
   ],

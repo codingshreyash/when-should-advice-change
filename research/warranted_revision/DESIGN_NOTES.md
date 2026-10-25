@@ -89,6 +89,6 @@ and should be re-checked against the paper before it is cited in a write-up.)
   therefore requires exactly one explicit type, so the machine matches the hourly price
   entered. Still unconfirmed until a first real run: `ssh <name>` after `brev refresh`, and
   the CLI installer URL. `--commands-verified` remains a manual confirmation.
-- `configs/gpu_smoke.json` names Qwen3.5-9B as the protocol's first choice, but its exact
-  Hugging Face id, loader class and revision have not been confirmed; the revision is a
-  placeholder and every launch path refuses an unpinned model.
+- `configs/gpu_smoke.json` uses `Qwen/Qwen3.5-9B` with `Qwen3_5ForConditionalGeneration`.
+  The commit revision is still a placeholder (Hugging Face is unreachable from the build
+  environment), and every launch path refuses an unpinned model. See `gpu/README.md`.
