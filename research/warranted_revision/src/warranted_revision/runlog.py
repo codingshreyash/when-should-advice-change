@@ -78,11 +78,11 @@ def _pct(a: float, b: float) -> str:
     return "–" if not b else f"{a / b:.0%}"
 
 
-def build() -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    entries = json.loads((RESULTS / "runs.json").read_text())
+def build(results: Path = RESULTS) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    entries = json.loads((results / "runs.json").read_text())
     rows = []
     for e in entries:
-        m = measured(RESULTS / e["run_id"])
+        m = measured(results / e["run_id"])
         est = (e["launch_minutes"] / 60 * e["hourly_usd"]) if e.get("hourly_usd") else 0.0
         rows.append({**e, **m, "est_cost_usd": round(est, 2)})
     real = [r for r in rows if r["kind"] == "gpu"]
