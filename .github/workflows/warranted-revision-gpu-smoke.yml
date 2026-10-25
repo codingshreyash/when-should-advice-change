@@ -1,0 +1,112 @@
+# Manual, bounded GPU smoke run for research/warranted_revision (Stage 1 of PROTOCOL.md).
+#
+# This job is the independent controller: it creates one dedicated Brev instance, runs the
+# smoke set on it, copies results back, and deletes the instance. Deletion runs inside the
+# controller's `finally` and again in an `if: always()` step, so it also runs on failure and
+# on cancellation. Nothing runs on push or on a schedule.
+#
+# Defaults are safe: dry_run=true only validates the plan (no provider call). A real launch
+# additionally needs commands_verified=true (after checking gpu/brev_commands.json against
+# `brev <cmd> --help`), a pinned model revision in configs/gpu_smoke.json, and the
+# BREV_API_TOKEN repository secret.
+name: warranted-revision GPU smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      gpu_hourly_usd:
+        description: "Hourly price of the chosen instance, copied from the Brev launch screen"
+        required: true
+      max_gpu_usd:
+        description: "Spend cap for this run (at most 15)"
+        required: true
+        default: "15"
+      instance_type:
+        description: "Brev instance/GPU type (24 GB class, e.g. L4 or A10G)"
+        required: true
+      run_id:
+        description: "Unique run id (letters, digits, . _ -)"
+        required: true
+      dry_run:
+        description: "Only validate the plan; make no provider call"
+        type: boolean
+        default: true
+      commands_verified:
+        description: "I checked gpu/brev_commands.json against the current Brev CLI"
+        type: boolean
+        default: false
+
+concurrency:
+  group: warranted-revision-gpu
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    # Hard ceiling for the controller job; the controller derives a tighter deadline from
+    # the spend cap and hourly price.
+    timeout-minutes: 300
+    defaults:
+      run:
+        working-directory: research/warranted_revision
+    env:
+      STATE: ${{ github.workspace }}/brev_state.json
+      # Inputs reach shell steps only through environment variables (no inline interpolation).
+      HOURLY: ${{ inputs.gpu_hourly_usd }}
+      MAX_USD: ${{ inputs.max_gpu_usd }}
+      RUN_ID: ${{ inputs.run_id }}
+      INSTANCE_TYPE: ${{ inputs.instance_type }}
+      VERIFIED_FLAG: ${{ inputs.commands_verified && '--commands-verified' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU package and run the CPU preflight suite
+        run: |
+          python -m pip install -q -e '.[dev]'
+          python -m pytest -q
+
+      - name: Plan (no provider call)
+        run: |
+          python gpu/brev_controller.py plan \
+            --hourly "$HOURLY" --max-usd "$MAX_USD" --run-id "$RUN_ID" \
+            --instance-type "$INSTANCE_TYPE" --state "$STATE"
+
+      - name: Install Brev CLI
+        if: ${{ !inputs.dry_run }}
+        # Unverified installer URL; confirm against the official Brev docs before enabling.
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/brevdev/brev-cli/main/bin/install-latest.sh)"
+          # Command templates were checked against v0.6.335; a different version is logged here.
+          brev --version
+
+      - name: Launch, run, copy back, delete
+        if: ${{ !inputs.dry_run }}
+        env:
+          BREV_API_TOKEN: ${{ secrets.BREV_API_TOKEN }}
+        run: |
+          python gpu/brev_controller.py launch \
+            --hourly "$HOURLY" --max-usd "$MAX_USD" --run-id "$RUN_ID" \
+            --instance-type "$INSTANCE_TYPE" --state "$STATE" $VERIFIED_FLAG
+
+      - name: Upload results and controller state (before final cleanup)
+        if: ${{ always() && !inputs.dry_run }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: warranted-revision-${{ inputs.run_id }}
+          path: |
+            results/warranted_revision/${{ inputs.run_id }}
+            ${{ env.STATE }}
+          if-no-files-found: warn
+
+      - name: Always delete the instance this run created
+        if: ${{ always() && !inputs.dry_run }}
+        env:
+          BREV_API_TOKEN: ${{ secrets.BREV_API_TOKEN }}
+        run: python gpu/brev_controller.py cleanup --state "$STATE"
