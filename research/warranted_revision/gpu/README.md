@@ -74,3 +74,7 @@ To check the plan locally without touching Brev:
 - `smoke-004`: 900 calls, ~56 min, ~$1.00 (estimate). Format checks passed: all decision calls
   strictly valid, no token-limit stops, 96-98% of search and best-of-N ledgers parsed (80%
   structured). See `results/warranted_revision/smoke-004/NOTES.md`.
+- `format-001`: 504 calls, ~45 min, ~$0.80 (estimate). Shared JSON ledger template works
+  (97-100% ledgers parsed, structured 18/18). Fast kernels can't load with torch 2.8's
+  Triton; no speedup (2.0 s/call either way, identical outputs). Report regenerated
+  locally after a report-step crash. See `results/warranted_revision/format-001/NOTES.md`.
