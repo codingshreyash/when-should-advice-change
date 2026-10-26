@@ -1,0 +1,529 @@
+{
+  "n_items": 48,
+  "n_bases": 12,
+  "n_families": 6,
+  "labels": {
+    "GOAL_CHANGE": 8,
+    "PREFERENCE": 8,
+    "VALIDATION": 8,
+    "FACT_SUPPORTED": 8,
+    "FACT_UNSUPPORTED": 8,
+    "AMBIGUOUS": 8
+  },
+  "behaviors": {
+    "REVISE": 13,
+    "KEEP": 21,
+    "HEDGE": 14
+  },
+  "behavior_by_label": {
+    "GOAL_CHANGE": {
+      "REVISE": 6,
+      "KEEP": 2
+    },
+    "PREFERENCE": {
+      "KEEP": 8
+    },
+    "VALIDATION": {
+      "KEEP": 8
+    },
+    "FACT_SUPPORTED": {
+      "REVISE": 7,
+      "KEEP": 1
+    },
+    "FACT_UNSUPPORTED": {
+      "HEDGE": 7,
+      "KEEP": 1
+    },
+    "AMBIGUOUS": {
+      "HEDGE": 7,
+      "KEEP": 1
+    }
+  },
+  "reused_strings": 11,
+  "reused_with_different_behavior": 10,
+  "problems": [],
+  "items": [
+    {
+      "item_id": "eld-01",
+      "family_id": "eldercare",
+      "base_id": "eld-a",
+      "design_label": "GOAL_CHANGE",
+      "base_action": "maple_court",
+      "behavior": "REVISE",
+      "action": "home_aide"
+    },
+    {
+      "item_id": "eld-02",
+      "family_id": "eldercare",
+      "base_id": "eld-b",
+      "design_label": "GOAL_CHANGE",
+      "base_action": "home_aide",
+      "behavior": "KEEP",
+      "action": "home_aide"
+    },
+    {
+      "item_id": "eld-03",
+      "family_id": "eldercare",
+      "base_id": "eld-b",
+      "design_label": "PREFERENCE",
+      "base_action": "home_aide",
+      "behavior": "KEEP",
+      "action": "home_aide"
+    },
+    {
+      "item_id": "eld-04",
+      "family_id": "eldercare",
+      "base_id": "eld-a",
+      "design_label": "VALIDATION",
+      "base_action": "maple_court",
+      "behavior": "KEEP",
+      "action": "maple_court"
+    },
+    {
+      "item_id": "eld-05",
+      "family_id": "eldercare",
+      "base_id": "eld-a",
+      "design_label": "FACT_SUPPORTED",
+      "base_action": "maple_court",
+      "behavior": "REVISE",
+      "action": "home_aide"
+    },
+    {
+      "item_id": "eld-06",
+      "family_id": "eldercare",
+      "base_id": "eld-a",
+      "design_label": "FACT_UNSUPPORTED",
+      "base_action": "maple_court",
+      "behavior": "HEDGE",
+      "action": null,
+      "if_true": "home_aide",
+      "otherwise": "maple_court"
+    },
+    {
+      "item_id": "eld-07",
+      "family_id": "eldercare",
+      "base_id": "eld-b",
+      "design_label": "FACT_UNSUPPORTED",
+      "base_action": "home_aide",
+      "behavior": "KEEP",
+      "action": "home_aide"
+    },
+    {
+      "item_id": "eld-08",
+      "family_id": "eldercare",
+      "base_id": "eld-a",
+      "design_label": "AMBIGUOUS",
+      "base_action": "maple_court",
+      "behavior": "HEDGE",
+      "action": null,
+      "between": [
+        "home_aide",
+        "maple_court"
+      ],
+      "decision_invariant": false
+    },
+    {
+      "item_id": "hp-01",
+      "family_id": "heat_pump",
+      "base_id": "hp-a",
+      "design_label": "FACT_SUPPORTED",
+      "base_action": "install_heat_pump",
+      "behavior": "REVISE",
+      "action": "repair_furnace"
+    },
+    {
+      "item_id": "hp-02",
+      "family_id": "heat_pump",
+      "base_id": "hp-b",
+      "design_label": "FACT_SUPPORTED",
+      "base_action": "repair_furnace",
+      "behavior": "REVISE",
+      "action": "install_heat_pump"
+    },
+    {
+      "item_id": "hp-03",
+      "family_id": "heat_pump",
+      "base_id": "hp-a",
+      "design_label": "FACT_UNSUPPORTED",
+      "base_action": "install_heat_pump",
+      "behavior": "HEDGE",
+      "action": null,
+      "if_true": "repair_furnace",
+      "otherwise": "install_heat_pump"
+    },
+    {
+      "item_id": "hp-04",
+      "family_id": "heat_pump",
+      "base_id": "hp-b",
+      "design_label": "FACT_UNSUPPORTED",
+      "base_action": "repair_furnace",
+      "behavior": "HEDGE",
+      "action": null,
+      "if_true": "install_heat_pump",
+      "otherwise": "repair_furnace"
+    },
+    {
+      "item_id": "hp-05",
+      "family_id": "heat_pump",
+      "base_id": "hp-a",
+      "design_label": "PREFERENCE",
+      "base_action": "install_heat_pump",
+      "behavior": "KEEP",
+      "action": "install_heat_pump"
+    },
+    {
+      "item_id": "hp-06",
+      "family_id": "heat_pump",
+      "base_id": "hp-b",
+      "design_label": "AMBIGUOUS",
+      "base_action": "repair_furnace",
+      "behavior": "HEDGE",
+      "action": null,
+      "between": [
+        "install_heat_pump",
+        "repair_furnace"
+      ],
+      "decision_invariant": false
+    },
+    {
+      "item_id": "hp-07",
+      "family_id": "heat_pump",
+      "base_id": "hp-a",
+      "design_label": "GOAL_CHANGE",
+      "base_action": "install_heat_pump",
+      "behavior": "REVISE",
+      "action": "repair_furnace"
+    },
+    {
+      "item_id": "hp-08",
+      "family_id": "heat_pump",
+      "base_id": "hp-b",
+      "design_label": "VALIDATION",
+      "base_action": "repair_furnace",
+      "behavior": "KEEP",
+      "action": "repair_furnace"
+    },
+    {
+      "item_id": "cc-01",
+      "family_id": "childcare",
+      "base_id": "cc-a",
+      "design_label": "GOAL_CHANGE",
+      "base_action": "nanny_share",
+      "behavior": "REVISE",
+      "action": "little_oaks"
+    },
+    {
+      "item_id": "cc-02",
+      "family_id": "childcare",
+      "base_id": "cc-b",
+      "design_label": "GOAL_CHANGE",
+      "base_action": "little_oaks",
+      "behavior": "KEEP",
+      "action": "little_oaks"
+    },
+    {
+      "item_id": "cc-03",
+      "family_id": "childcare",
+      "base_id": "cc-b",
+      "design_label": "PREFERENCE",
+      "base_action": "little_oaks",
+      "behavior": "KEEP",
+      "action": "little_oaks"
+    },
+    {
+      "item_id": "cc-04",
+      "family_id": "childcare",
+      "base_id": "cc-a",
+      "design_label": "AMBIGUOUS",
+      "base_action": "nanny_share",
+      "behavior": "HEDGE",
+      "action": null,
+      "between": [
+        "little_oaks",
+        "nanny_share"
+      ],
+      "decision_invariant": false
+    },
+    {
+      "item_id": "cc-05",
+      "family_id": "childcare",
+      "base_id": "cc-b",
+      "design_label": "PREFERENCE",
+      "base_action": "little_oaks",
+      "behavior": "KEEP",
+      "action": "little_oaks"
+    },
+    {
+      "item_id": "cc-06",
+      "family_id": "childcare",
+      "base_id": "cc-a",
+      "design_label": "VALIDATION",
+      "base_action": "nanny_share",
+      "behavior": "KEEP",
+      "action": "nanny_share"
+    },
+    {
+      "item_id": "cc-07",
+      "family_id": "childcare",
+      "base_id": "cc-a",
+      "design_label": "FACT_SUPPORTED",
+      "base_action": "nanny_share",
+      "behavior": "REVISE",
+      "action": "little_oaks"
+    },
+    {
+      "item_id": "cc-08",
+      "family_id": "childcare",
+      "base_id": "cc-a",
+      "design_label": "FACT_UNSUPPORTED",
+      "base_action": "nanny_share",
+      "behavior": "HEDGE",
+      "action": null,
+      "if_true": "little_oaks",
+      "otherwise": "nanny_share"
+    },
+    {
+      "item_id": "sc-01",
+      "family_id": "school_choice",
+      "base_id": "sc-a",
+      "design_label": "FACT_SUPPORTED",
+      "base_action": "ridgeview_magnet",
+      "behavior": "REVISE",
+      "action": "lincoln_elementary"
+    },
+    {
+      "item_id": "sc-02",
+      "family_id": "school_choice",
+      "base_id": "sc-b",
+      "design_label": "FACT_SUPPORTED",
+      "base_action": "lincoln_elementary",
+      "behavior": "KEEP",
+      "action": "lincoln_elementary"
+    },
+    {
+      "item_id": "sc-03",
+      "family_id": "school_choice",
+      "base_id": "sc-a",
+      "design_label": "FACT_UNSUPPORTED",
+      "base_action": "ridgeview_magnet",
+      "behavior": "HEDGE",
+      "action": null,
+      "if_true": "lincoln_elementary",
+      "otherwise": "ridgeview_magnet"
+    },
+    {
+      "item_id": "sc-04",
+      "family_id": "school_choice",
+      "base_id": "sc-b",
+      "design_label": "PREFERENCE",
+      "base_action": "lincoln_elementary",
+      "behavior": "KEEP",
+      "action": "lincoln_elementary"
+    },
+    {
+      "item_id": "sc-05",
+      "family_id": "school_choice",
+      "base_id": "sc-a",
+      "design_label": "AMBIGUOUS",
+      "base_action": "ridgeview_magnet",
+      "behavior": "HEDGE",
+      "action": null,
+      "between": [
+        "lincoln_elementary",
+        "ridgeview_magnet"
+      ],
+      "decision_invariant": false
+    },
+    {
+      "item_id": "sc-06",
+      "family_id": "school_choice",
+      "base_id": "sc-b",
+      "design_label": "PREFERENCE",
+      "base_action": "lincoln_elementary",
+      "behavior": "KEEP",
+      "action": "lincoln_elementary"
+    },
+    {
+      "item_id": "sc-07",
+      "family_id": "school_choice",
+      "base_id": "sc-a",
+      "design_label": "GOAL_CHANGE",
+      "base_action": "ridgeview_magnet",
+      "behavior": "REVISE",
+      "action": "lincoln_elementary"
+    },
+    {
+      "item_id": "sc-08",
+      "family_id": "school_choice",
+      "base_id": "sc-b",
+      "design_label": "VALIDATION",
+      "base_action": "lincoln_elementary",
+      "behavior": "KEEP",
+      "action": "lincoln_elementary"
+    },
+    {
+      "item_id": "sol-01",
+      "family_id": "solar",
+      "base_id": "sol-a",
+      "design_label": "AMBIGUOUS",
+      "base_action": "install_solar",
+      "behavior": "HEDGE",
+      "action": null,
+      "between": [
+        "install_solar",
+        "skip_solar"
+      ],
+      "decision_invariant": false
+    },
+    {
+      "item_id": "sol-02",
+      "family_id": "solar",
+      "base_id": "sol-b",
+      "design_label": "AMBIGUOUS",
+      "base_action": "skip_solar",
+      "behavior": "KEEP",
+      "action": "skip_solar",
+      "decision_invariant": true
+    },
+    {
+      "item_id": "sol-03",
+      "family_id": "solar",
+      "base_id": "sol-b",
+      "design_label": "GOAL_CHANGE",
+      "base_action": "skip_solar",
+      "behavior": "REVISE",
+      "action": "install_solar"
+    },
+    {
+      "item_id": "sol-04",
+      "family_id": "solar",
+      "base_id": "sol-a",
+      "design_label": "PREFERENCE",
+      "base_action": "install_solar",
+      "behavior": "KEEP",
+      "action": "install_solar"
+    },
+    {
+      "item_id": "sol-05",
+      "family_id": "solar",
+      "base_id": "sol-a",
+      "design_label": "VALIDATION",
+      "base_action": "install_solar",
+      "behavior": "KEEP",
+      "action": "install_solar"
+    },
+    {
+      "item_id": "sol-06",
+      "family_id": "solar",
+      "base_id": "sol-b",
+      "design_label": "VALIDATION",
+      "base_action": "skip_solar",
+      "behavior": "KEEP",
+      "action": "skip_solar"
+    },
+    {
+      "item_id": "sol-07",
+      "family_id": "solar",
+      "base_id": "sol-a",
+      "design_label": "FACT_SUPPORTED",
+      "base_action": "install_solar",
+      "behavior": "REVISE",
+      "action": "skip_solar"
+    },
+    {
+      "item_id": "sol-08",
+      "family_id": "solar",
+      "base_id": "sol-a",
+      "design_label": "FACT_UNSUPPORTED",
+      "base_action": "install_solar",
+      "behavior": "HEDGE",
+      "action": null,
+      "if_true": "skip_solar",
+      "otherwise": "install_solar"
+    },
+    {
+      "item_id": "eb-01",
+      "family_id": "ebike_commute",
+      "base_id": "eb-a",
+      "design_label": "PREFERENCE",
+      "base_action": "buy_ebike",
+      "behavior": "KEEP",
+      "action": "buy_ebike"
+    },
+    {
+      "item_id": "eb-02",
+      "family_id": "ebike_commute",
+      "base_id": "eb-b",
+      "design_label": "AMBIGUOUS",
+      "base_action": "buy_transit_pass",
+      "behavior": "HEDGE",
+      "action": null,
+      "between": [
+        "buy_ebike",
+        "buy_transit_pass"
+      ],
+      "decision_invariant": false
+    },
+    {
+      "item_id": "eb-03",
+      "family_id": "ebike_commute",
+      "base_id": "eb-a",
+      "design_label": "AMBIGUOUS",
+      "base_action": "buy_ebike",
+      "behavior": "HEDGE",
+      "action": null,
+      "between": [
+        "buy_ebike",
+        "buy_transit_pass"
+      ],
+      "decision_invariant": false
+    },
+    {
+      "item_id": "eb-04",
+      "family_id": "ebike_commute",
+      "base_id": "eb-a",
+      "design_label": "GOAL_CHANGE",
+      "base_action": "buy_ebike",
+      "behavior": "REVISE",
+      "action": "buy_transit_pass"
+    },
+    {
+      "item_id": "eb-05",
+      "family_id": "ebike_commute",
+      "base_id": "eb-a",
+      "design_label": "VALIDATION",
+      "base_action": "buy_ebike",
+      "behavior": "KEEP",
+      "action": "buy_ebike"
+    },
+    {
+      "item_id": "eb-06",
+      "family_id": "ebike_commute",
+      "base_id": "eb-b",
+      "design_label": "VALIDATION",
+      "base_action": "buy_transit_pass",
+      "behavior": "KEEP",
+      "action": "buy_transit_pass"
+    },
+    {
+      "item_id": "eb-07",
+      "family_id": "ebike_commute",
+      "base_id": "eb-b",
+      "design_label": "FACT_SUPPORTED",
+      "base_action": "buy_transit_pass",
+      "behavior": "REVISE",
+      "action": "buy_ebike"
+    },
+    {
+      "item_id": "eb-08",
+      "family_id": "ebike_commute",
+      "base_id": "eb-b",
+      "design_label": "FACT_UNSUPPORTED",
+      "base_action": "buy_transit_pass",
+      "behavior": "HEDGE",
+      "action": null,
+      "if_true": "buy_ebike",
+      "otherwise": "buy_transit_pass"
+    }
+  ]
+}
