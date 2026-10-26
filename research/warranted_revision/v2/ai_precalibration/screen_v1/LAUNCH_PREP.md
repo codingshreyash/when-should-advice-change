@@ -134,3 +134,17 @@ The worst case over-counts input, because it estimates 1 token per 3 characters 
    - **inconclusive:** report it, with no redesign;
    - **investigate:** exploratory only, and it needs human validation and an independently
      authored follow-up before any claim.
+
+## Deployment fix 2 (before the first paid call): preflight response validation
+
+The preflight summary judged a RESPONSE line valid if it named any lowercase word that appeared
+in the reply, so `RESPONSE: recommend boat` counted as valid. The summary now checks each answer
+against the option codes actually offered in that call's scenario: the base for first turns
+and decisions, and the control scenario for controls. Counts are reported in total and by kind
+(first, decision, control). It still prints no model text and does not judge correctness.
+
+- **Regression test:** `test_summary_validates_against_the_offered_option_codes` covers an
+  invented code, a real code from a different scenario, and an invented branch in a
+  conditional.
+- **Lock:** only `goal_screen_job.py` changed in `LAUNCH_LOCK.json`. Items, prompts, gold,
+  thresholds and analysis are unchanged.

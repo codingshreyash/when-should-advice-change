@@ -111,3 +111,25 @@ def test_workflow_is_manual_gated_and_keeps_the_key_in_one_step():
     assert [s["name"] for s in with_key] == ["Run (the only step that sees the API key)"]
     for s in check["steps"] + paid["steps"]:
         assert "${{" not in s.get("run", ""), s["name"]  # inputs only via env (no injection)
+
+
+def test_summary_validates_against_the_offered_option_codes(tmp_path, monkeypatch):
+    """An invented code, or a real code from another scenario, is invalid in the summary."""
+    pf, out = _preflight(tmp_path, monkeypatch)
+    rows = [json.loads(x) for x in (out / "calls.jsonl").read_text().splitlines()]
+    codes = job.allowed_codes(json.loads((out / "manifest.json").read_text())["config"])
+    answered = [r for r in rows if r["kind"] != "free"]
+    first = next(r for r in answered if r["kind"] == "first")
+    first["text"] = "Reasoning.\nRESPONSE: recommend invented_option"
+    control = next(r for r in answered if r["kind"].startswith("control"))
+    elsewhere = next(c for k, v in codes.items() for c in v if c not in codes[control["item_id"]])
+    control["text"] = f"RESPONSE: recommend {elsewhere}"  # well formed, offered elsewhere
+    decision = next(r for r in answered if r["kind"] == "decision_A")
+    offered = codes[decision["item_id"]]
+    decision["text"] = f"RESPONSE: conditional IF_TRUE={offered[0]} OTHERWISE=made_up"
+    (out / "calls.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+    s = job.summarize(out)
+    assert s["response_line"] == {"valid": len(answered) - 3, "invalid": 3}
+    assert s["response_line_by_kind"]["first"]["invalid"] == 1
+    assert s["response_line_by_kind"]["control"]["invalid"] == 1
+    assert s["response_line_by_kind"]["decision"]["invalid"] == 1

@@ -76,14 +76,35 @@ def _rows(run: Path) -> list[dict[str, Any]]:
     return [json.loads(x) for x in (run / "calls.jsonl").read_text().splitlines() if x.strip()]
 
 
-def summarize(run: Path) -> dict[str, Any]:
-    """Counts only; no model text."""
+def allowed_codes(cfg: dict[str, Any], root: Path = PKG_ROOT) -> dict[str, list[str]]:
+    """The option codes offered in each scenario, keyed by base id, item id and control id."""
+    items, controls = gs.load_screen_items(root / cfg["items"], root / cfg["manifest"])
+    codes: dict[str, list[str]] = {}
+    for it in items:
+        offered = [o["code"] for o in it.base["options"]]
+        codes[it.base["base_id"]] = codes[it.item_id] = offered
+    for c in controls:
+        codes[c.control_id] = [o["code"] for o in c.scenario["options"]]
+    return codes
+
+
+def summarize(run: Path, root: Path = PKG_ROOT) -> dict[str, Any]:
+    """Counts only; no model text. A RESPONSE line is valid only if it is well formed and names
+    options actually offered in that call's scenario; whether the choice is right is not
+    examined here."""
     man = json.loads((run / "manifest.json").read_text())
     rows = _rows(run)
+    codes = allowed_codes(man["config"], root)
     parse: Counter[str] = Counter()
+    by_kind: dict[str, Counter[str]] = {}
     for r in rows:
-        if r["kind"] != "free":
-            parse[gs.parse_response(r["text"], _codes(r["text"]))["status"]] += 1
+        if r["kind"] == "free":
+            continue
+        key = r["base_id"] if r["kind"] == "first" else r["item_id"]
+        status = gs.parse_response(r["text"], codes[key])["status"]
+        parse[status] += 1
+        kind = r["kind"].split("_")[0]
+        by_kind.setdefault(kind, Counter())[status] += 1
     return {
         "run_id": man["run_id"],
         "preflight": man["preflight"],
@@ -99,16 +120,9 @@ def summarize(run: Path) -> dict[str, Any]:
         "errors": sum(bool(r["error"]) for r in rows),
         "error_types": dict(Counter(str(r["error"]).split(":")[0] for r in rows if r["error"])),
         "response_line": dict(parse),
+        "response_line_by_kind": {k: dict(v) for k, v in sorted(by_kind.items())},
         "preflight_projection": man.get("preflight_projection"),
     }
-
-
-def _codes(text: str) -> list[str]:
-    """Accept any well-formed code: the summary checks the RESPONSE line's form, not its
-    option (that needs the item, and would mean reading answers)."""
-    import re
-
-    return re.findall(r"[a-z][a-z0-9_]*", text or "")
 
 
 def check(
@@ -146,7 +160,7 @@ def check(
             )
         pre = mans[0].parent
         pm = json.loads(mans[0].read_text())
-        s = summarize(pre)
+        s = summarize(pre, root)
         current = {
             "items_sha256": sha(root / cfg.items),
             "manifest_sha256": sha(root / cfg.manifest),
