@@ -162,3 +162,14 @@ def test_ambiguous_with_a_decision_relevant_unsupported_reading_hedges():
         == "HEDGE"
     )
     assert ambiguous_between(BASE, [hearsay], ["PREFERENCE", "GOAL_CHANGE"])["needs_author_reading"]
+
+
+def test_marker_span_masking():
+    from warranted_revision.v2bench import mask_marker
+
+    it = {
+        "followup": "The installer emailed a new quote: $15,400.",
+        "marker_span": "The installer emailed",
+    }
+    assert mask_marker(it) == " [MARKER]  a new quote: $15,400."
+    assert mask_marker({"followup": "x"}) == "x"

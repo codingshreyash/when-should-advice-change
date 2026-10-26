@@ -232,6 +232,9 @@ def check(path: Path) -> dict[str, Any]:
         except (KeyError, ValueError) as exc:
             problems.append(f"{it['item_id']}: {exc}")
             continue
+        span = it.get("marker_span")
+        if span is not None and span not in it["followup"]:
+            problems.append(f"{it['item_id']}: marker_span is not a substring of the follow-up")
         if it.get("pressure_toward") and it["pressure_toward"] not in opt_codes:
             problems.append(f"{it['item_id']}: pressure_toward not an option")
         rows.append(
@@ -290,7 +293,13 @@ def _keyword_label(text: str) -> str:
     return "AMBIGUOUS" if best == 0 else max(scores, key=lambda k: scores[k])
 
 
-def audit(path: Path, n_perm: int = 100, n_boot: int = 500) -> dict[str, Any]:
+def mask_marker(it: dict[str, Any]) -> str:
+    """The follow-up with its author-marked decision-relevant span replaced by a placeholder."""
+    span = it.get("marker_span") or ""
+    return it["followup"].replace(span, " [MARKER] ") if span else it["followup"]
+
+
+def audit(path: Path, n_perm: int = 100, n_boot: int = 500, masked: bool = False) -> dict[str, Any]:
     """Shortcut audits on follow-up text (and base + follow-up). Leave-one-family-out CV.
 
     At calibration size these are smoke checks only: the statistical plan needs roughly 360-480
@@ -306,7 +315,7 @@ def audit(path: Path, n_perm: int = 100, n_boot: int = 500) -> dict[str, Any]:
     fams = sorted({it["family_id"] for it in items})
     y_lab = [it["design_label"] for it in items]
     y_beh = [beh[it["item_id"]] for it in items]
-    texts = [it["followup"] for it in items]
+    texts = [mask_marker(it) if masked else it["followup"] for it in items]
     full = [bases[it["base_id"]]["narrative"] + " || " + it["followup"] for it in items]
 
     def acc(pred, gold):
@@ -407,6 +416,8 @@ def audit(path: Path, n_perm: int = 100, n_boot: int = 500) -> dict[str, Any]:
         lengths[it["design_label"]].append(len(it["followup"].split()))
     return {
         "note": "Calibration-size smoke audit; not a certification (see 02_stats.md §3).",
+        "masked_marker_spans": masked,
+        "items_with_marker_span": sum(bool(it.get("marker_span")) for it in items),
         "n_items": len(items),
         "n_families": len(fams),
         "label_majority_rate": lab_chance,
@@ -449,6 +460,7 @@ PACKET_COLUMNS = [
     "followup",
     "label",
     "second_label_if_ambiguous",
+    "alternative_readings",
     "advisor_should",
     "confidence_1to3",
     "rationale",
@@ -462,7 +474,9 @@ def _scenario(b: dict[str, Any]) -> str:
     return f"{b['narrative']}\n\nQuestion: {b['question']}\nOptions: {opts}"
 
 
-def packet(path: Path, out: Path, seed: int) -> dict[str, Any]:
+def packet(
+    path: Path, out: Path, seed: int, names: tuple[str, str] = ("reviewer_A", "reviewer_B")
+) -> dict[str, Any]:
     """Two independently shuffled reviewer packets plus a coordinator key.
 
     Reviewers see only blinded ids, the scenario and the follow-up. The key (design labels,
@@ -510,7 +524,7 @@ def packet(path: Path, out: Path, seed: int) -> dict[str, Any]:
     key_text = json.dumps(key, indent=2, sort_keys=True) + "\n"
     (out / "coordinator" / "key.json").write_text(key_text)
     key_sha = hashlib.sha256(key_text.encode()).hexdigest()
-    for reviewer in ("reviewer_A", "reviewer_B"):
+    for reviewer in names:
         d = out / reviewer
         d.mkdir()
         order = items[:]
@@ -697,6 +711,9 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--out", type=Path)
         if name == "packet":
             p.add_argument("--seed", type=int, required=True)
+            p.add_argument("--names", nargs=2, default=["reviewer_A", "reviewer_B"])
+        if name == "audit":
+            p.add_argument("--masked", action="store_true", help="mask author-marked spans")
     g = sub.add_parser("agree")
     g.add_argument("--key", type=Path, required=True)
     g.add_argument("--a", type=Path, required=True)
@@ -707,11 +724,11 @@ def main(argv: list[str] | None = None) -> int:
         res = check(args.items)
         res = {k: v for k, v in res.items() if k != "items"} | {"items": res["items"]}
     elif args.cmd == "audit":
-        res = audit(args.items)
+        res = audit(args.items, masked=args.masked)
     elif args.cmd == "packet":
         if not args.out:
             ap.error("--out is required")
-        res = packet(args.items, args.out, args.seed)
+        res = packet(args.items, args.out, args.seed, tuple(args.names))
     else:
         res = agree(args.key, args.a, args.b, args.out)
     text = json.dumps(res, indent=2, default=str)
