@@ -27,7 +27,10 @@
    "model_class": "AutoModelForCausalLM",
    "dtype": "bfloat16",
    "load_in_4bit": false,
-   "max_batch": 9
+   "max_batch": 9,
+   "tokenizer_kwargs": {
+    "fix_mistral_regex": true
+   }
   }
  },
  "max_tokens_first": 400,

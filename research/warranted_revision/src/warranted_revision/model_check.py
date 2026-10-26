@@ -22,9 +22,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import sys
 import urllib.request
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -166,13 +168,32 @@ def check(cfg_path: Path) -> dict[str, Any]:
         res["problems"].append(f"pinned revision not found: {exc}")
     from transformers import AutoConfig, AutoTokenizer
 
+    warned: list[str] = []
+
+    class _Catch(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            warned.append(record.getMessage())
+
+    catcher = _Catch(logging.WARNING)
+    logging.getLogger("transformers").addHandler(catcher)
     try:
-        tok = AutoTokenizer.from_pretrained(name, revision=rev)
-        conf = AutoConfig.from_pretrained(name, revision=rev)
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            tok = AutoTokenizer.from_pretrained(
+                name, revision=rev, **params.get("tokenizer_kwargs", {})
+            )
+            conf = AutoConfig.from_pretrained(name, revision=rev)
+        warned += [str(w.message) for w in caught]
     except Exception as exc:  # noqa: BLE001 - e.g. a gated repo without HF_TOKEN
         res["problems"].append(f"could not load tokenizer/config: {type(exc).__name__}: {exc}")
         res["ok"] = False
         return res
+    finally:
+        logging.getLogger("transformers").removeHandler(catcher)
+    bad_tok = [w for w in warned if "incorrect tokenization" in w or "incorrect regex" in w]
+    res["tokenizer_warnings"] = warned
+    if bad_tok:
+        res["problems"].append(f"tokenizer warns of incorrect tokenization: {bad_tok[0][:160]}")
     t = check_template(tok, cfg, params.get("chat_template_kwargs", {}))
     res["template"] = t
     res["problems"] += t["problems"]

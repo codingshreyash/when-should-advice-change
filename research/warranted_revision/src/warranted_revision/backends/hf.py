@@ -33,6 +33,7 @@ class HFBackend:
         chat_template_kwargs: dict[str, Any] | None = None,
         allow_unpinned: bool = False,
         model_class: str = "AutoModelForCausalLM",
+        tokenizer_kwargs: dict[str, Any] | None = None,
     ) -> None:
         if not SHA.match(revision) and not allow_unpinned:
             raise ValueError(f"revision {revision!r} is not a 40-hex commit; pin the model")
@@ -62,7 +63,12 @@ class HFBackend:
             )
         else:
             kw["dtype"] = getattr(torch, dtype)
-        self.tok = AutoTokenizer.from_pretrained(model_id, revision=revision)
+        # Model-specific tokenizer fixes are part of the pinned configuration (e.g. Mistral's
+        # ``fix_mistral_regex``, which transformers asks for when the shipped regex is wrong).
+        self.tokenizer_kwargs = tokenizer_kwargs or {}
+        self.tok = AutoTokenizer.from_pretrained(
+            model_id, revision=revision, **self.tokenizer_kwargs
+        )
         self.tok.padding_side = "left"
         if self.tok.pad_token is None:
             self.tok.pad_token = self.tok.eos_token
@@ -84,6 +90,7 @@ class HFBackend:
             "dtype": self.dtype,
             "load_in_4bit": self.load_in_4bit,
             "chat_template_kwargs": self.chat_template_kwargs,
+            "tokenizer_kwargs": self.tokenizer_kwargs,
             "allow_unpinned": self.allow_unpinned,
             "max_batch": self.max_batch,
             "torch": torch.__version__,
