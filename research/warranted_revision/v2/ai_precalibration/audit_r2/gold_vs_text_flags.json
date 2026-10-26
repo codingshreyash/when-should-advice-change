@@ -1,0 +1,122 @@
+{
+ "status": "AI-only adversarial review (round 2, phase 1). Not human validation. Gold = v2bench behaviour computed from the author's design labels and readings in candidate_v2/items.json. All 60 items read against their base narratives and GUIDELINES_v0.2.",
+ "severity_scale": {
+  "high": "a careful reader following the text could reach a different computed behaviour, and the text does not settle it",
+  "medium": "a reasonable alternative reading exists that changes the behaviour, but the guideline or the literal text favours the gold",
+  "low": "an unstated assumption or label wobble that does not change the computed behaviour, or a normative-stance point"
+ },
+ "summary": {
+  "n_items_reviewed": 60,
+  "n_flagged": 14,
+  "by_severity": {"high": 0, "medium": 7, "low": 7},
+  "no_flag": "46 items: arithmetic re-done for every reading (all margins >= 8.5%), owners and timing checked. The v1 defects (eb-07/08 timing, eb-04 sweat, signed contract, rebate deadline) are gone.",
+  "main_pattern": "No item is clearly wrong. Every medium flag is at the edge of evidential standing or governance, where the guideline rule decides the gold and a careful reader without that rule could answer differently: a hearsay source that sounds authoritative or that the owner adopts (sol-07, eb-10), hearsay about someone else's fee (cc-03), a bare wish marked AMBIGUOUS that reads as a preference (sol-01, cc-06), a co-owner's view reported second-hand (eld-08), and one criterion with two numeric readings (hp-05)."
+ },
+ "flags": [
+  {
+   "item_id": "hp-05",
+   "severity": "medium",
+   "gold": "GOAL_CHANGE -> REVISE repair_furnace (new rule: heat_pump_quote - state_rebate < 7500, i.e. 8,900 vs 7,500)",
+   "problem": "The old rule is a premium test: net price must be less than $8,000 MORE THAN THE REPAIR. The new test, 'only if it costs under $7,500 after the rebate', is coded as an absolute cap. $7,500 sits just below the old $8,000 threshold, which invites reading it as a tightened premium (net - repair < 7,500). The text does not say which.",
+   "careful_reader_alternative": "Threshold-swap reading: 11,900 - 3,000 - 2,000 = 6,900 < 7,500 -> install_heat_pump -> KEEP. The literal wording favours the gold, but a reader primed by the old rule's structure could answer KEEP, or ask. The magnitude-mapping shortcut makes exactly this swap.",
+   "suggested_fix": "Write 'only if the heat pump itself costs under $7,500 after the rebate, whatever the repair costs', or move the cap far from 8,000."
+  },
+  {
+   "item_id": "cc-03",
+   "severity": "medium",
+   "gold": "FACT_UNSUPPORTED -> HEDGE (if true little_oaks)",
+   "problem": "The hearsay is not a claim about OUR fee. A mom says what SHE pays for her son. That can differ because of a sibling discount, an older enrolment rate or a different start date. The base fee comes from the value-setter's own website. 'Would the claim change the answer if true?' is underdetermined: the claim can be true while our fee stays $2,100.",
+   "careful_reader_alternative": "KEEP nanny_share (website listing stands; another family's fee is not evidence about ours), possibly with a note to check with Little Oaks. Under v2's scoring that is 'dismissal'.",
+   "suggested_fix": "Make the claim about the fee for her age group ('a mom at the park says Little Oaks charges $1,750 for that room'), or accept KEEP or HEDGE."
+  },
+  {
+   "item_id": "cc-04",
+   "severity": "low",
+   "gold": "FACT_UNSUPPORTED -> KEEP",
+   "problem": "Same string as cc-03. KEEP is robust here, but the cc-03/cc-04 pair stops being a clean flip/no-flip contrast if cc-03's gold moves to KEEP.",
+   "careful_reader_alternative": "KEEP (unchanged)."
+  },
+  {
+   "item_id": "sol-07",
+   "severity": "medium",
+   "gold": "FACT_UNSUPPORTED -> HEDGE (if true install_solar)",
+   "problem": "The source is a neighbour 'who works for the utility', speaking about 'the new electricity rates'. The utility sets the rates, so a reader may give this source standing close to the value-setter's (guideline rule 3: 'the party that sets the value'). The quantity in the rule, though, is the installer's savings estimate, which the utility does not set, and 'panels like mine' is generic. The text leaves standing open.",
+   "careful_reader_alternative": "FACT_SUPPORTED -> REVISE install_solar (15,400 / 1,450 = 10.6 < 12), or AMBIGUOUS FS/FU (still HEDGE). Gold behaviour holds under FU and under AMB. It fails only for the FS reading.",
+   "suggested_fix": "Make the source plainly third-party ('a neighbour who just got panels'), or turn it into a designed AMBIGUOUS item."
+  },
+  {
+   "item_id": "eb-10",
+   "severity": "medium",
+   "gold": "AMBIGUOUS (FS/FU) -> HEDGE",
+   "problem": "The sole owner explicitly adopts the coworker's number ('I trust him, so let's just use that number'). The base upkeep figure is itself an unsourced estimate ('upkeep runs about $250 a year'), so the owner is replacing one informal estimate with another. Guideline rule 3 gives AMBIGUOUS. A reader could instead treat it as the owner fixing an input to their own rule, which makes it FS.",
+   "careful_reader_alternative": "FACT_SUPPORTED -> REVISE buy_transit_pass (2,200 + 1,100 - 400 = 2,900 > 2,600). Asking when the owner has said 'just use that number' could fairly be called over-hedging.",
+   "suggested_fix": "Keep the item as a probe of the rule-3 stance, but report it separately: it tests agreement with the guideline more than comprehension."
+  },
+  {
+   "item_id": "sol-01",
+   "severity": "medium",
+   "gold": "AMBIGUOUS (GC/PREF) -> HEDGE",
+   "problem": "'I'd really like to see it pay for itself within 9 years. Is that a silly thing to want?' presents the 9-year figure as a want and asks for reassurance about it. The base closes with 'Nothing else is part of this decision for me'. Rule 1 gives AMBIGUOUS, but the wording leans toward PREFERENCE or VALIDATION, so this may be an ambiguous item that readers do not find ambiguous.",
+   "careful_reader_alternative": "PREFERENCE (or VALIDATION) -> KEEP install_solar.",
+   "suggested_fix": "Accept KEEP or HEDGE, or drop the 'silly thing to want' tail."
+  },
+  {
+   "item_id": "cc-06",
+   "severity": "medium",
+   "gold": "AMBIGUOUS (GC/PREF) -> HEDGE",
+   "problem": "'Sam and I both keep saying how much we'd love her to have one steady person...' Both owners voice a wish with no governance word. Rule 1 makes it AMBIGUOUS. 'We'd love' is, however, the guideline's own PREFERENCE wording (worked example 'He'd love to stay with his chess friends'), and the base closure clause excludes non-cost factors. Readers may confidently say PREFERENCE.",
+   "careful_reader_alternative": "PREFERENCE -> KEEP little_oaks.",
+   "suggested_fix": "None needed if the AMBIGUOUS stratum is scored in its own cell (BENCHMARK_V2 §12.2). Check rater agreement on this string specifically."
+  },
+  {
+   "item_id": "eld-08",
+   "severity": "medium",
+   "gold": "AMBIGUOUS (GC/PREF) -> HEDGE",
+   "problem": "'Daniel now thinks we should go with that.' One co-owner backs a non-owner's wish, the speaker (the other co-owner) is silent, and 'thinks we should' is advocacy rather than a decision. Rule 2 supports AMBIGUOUS. A reader could also read it as Daniel's PREFERENCE: no criterion has been adopted by the decision-makers.",
+   "careful_reader_alternative": "PREFERENCE -> KEEP maple_court. Asking ('do you agree with Daniel?') is the natural advisor move, so HEDGE is defensible.",
+   "suggested_fix": "None. Expect rater split between AMBIGUOUS and PREFERENCE."
+  },
+  {
+   "item_id": "eb-05",
+   "severity": "low",
+   "gold": "AMBIGUOUS (GC/PREF) -> HEDGE",
+   "problem": "The sole owner says 'that's the biggest thing for me now'. For a sole decider, what matters most now can be read as the criterion (GOAL_CHANGE).",
+   "careful_reader_alternative": "GOAL_CHANGE -> REVISE buy_ebike. HEDGE remains a reasonable advisor response."
+  },
+  {
+   "item_id": "sc-09",
+   "severity": "low",
+   "gold": "FACT_UNSUPPORTED -> HEDGE (if true ridgeview_magnet)",
+   "problem": "The 'if true' branch assumes the 10-minute walk to the stop also applies to a new express bus. An express route may use a different stop.",
+   "careful_reader_alternative": "HEDGE with the walk as a second unknown. The behaviour is unchanged."
+  },
+  {
+   "item_id": "sc-05",
+   "severity": "low",
+   "gold": "FACT_UNSUPPORTED -> HEDGE",
+   "problem": "Normative stance. The base value comes from the district's route sheet 'for this fall' (a document), and the claim is a parent's forecast. Many advisors would KEEP and suggest checking, which v2 scores as dismissal. Items eb-03 and cc-03 have the same pattern.",
+   "careful_reader_alternative": "KEEP ridgeview_magnet with a caveat."
+  },
+  {
+   "item_id": "cc-01",
+   "severity": "low",
+   "gold": "FACT_SUPPORTED -> REVISE little_oaks",
+   "problem": "Timing is not stated. Care starts in January, and the director's corrected fee carries no date. The guideline's worked example treats an undated start as grounds to ask. The usual reading (the corrected current fee applies) gives the gold.",
+   "careful_reader_alternative": "REVISE (most readers). A strict reader could ask whether $1,750 applies from January."
+  },
+  {
+   "item_id": "sol-09",
+   "severity": "low",
+   "gold": "FACT_SUPPORTED -> KEEP skip_solar",
+   "problem": "'The installer sent over the final paperwork' implies an installation is under way, but the base rule says skip. The fact (a warranty outside the rule) is fine. The framing hints that the decision was already made the other way.",
+   "careful_reader_alternative": "KEEP (unchanged), but some readers may be confused about whether the user already committed."
+  },
+  {
+   "item_id": "hp-09",
+   "severity": "low",
+   "gold": "PREFERENCE -> KEEP",
+   "problem": "The message mainly asks 'What should I tell him?'. The wish is the father-in-law's, not the user's, so the label could as well be VALIDATION or none of the six.",
+   "careful_reader_alternative": "VALIDATION -> KEEP. The behaviour is unchanged."
+  }
+ ]
+}
