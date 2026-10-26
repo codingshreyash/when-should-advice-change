@@ -1,6 +1,7 @@
 """Launch checks for the goal-screen API job, and a static check of its workflow."""
 
 import json
+import os
 import shutil
 
 import pytest
@@ -109,6 +110,8 @@ def test_full_run_refuses_api_errors_and_unparseable(tmp_path, monkeypatch):
 
 
 def test_workflow_is_manual_gated_and_keeps_the_key_in_one_step():
+    if not WORKFLOW.exists() and os.environ.get("WREV_GIT_SHA"):
+        pytest.skip("launch bundle: .github is not shipped")
     wf = yaml.safe_load(WORKFLOW.read_text())
     on = wf.get("on", wf.get(True))
     assert list(on) == ["workflow_dispatch"]

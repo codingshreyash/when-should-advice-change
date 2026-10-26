@@ -5,6 +5,7 @@ import json
 import os
 import stat
 import subprocess
+import sys
 
 import pytest
 
@@ -435,3 +436,43 @@ def test_launch_refuses_when_listed_price_exceeds_cap_rate(tmp_path, fake_bin, m
     calls = fake_bin.read_text()
     assert rc != 0 and "brev search gpu" in calls and "brev create price" not in calls
     assert "--type" not in calls  # nothing was created
+
+
+def test_launch_bundle_runs_the_suite_and_the_goal_screen(tmp_path):
+    """Build the bundle exactly as launch does, unpack it and run what the box runs first:
+    the test suite and the goal-screen dry run, importing only from the bundle."""
+    if os.environ.get("WREV_GIT_SHA"):
+        pytest.skip("already inside a launch bundle")
+    ctl = _controller()
+    cfg = PKG_ROOT / "configs" / "goal_screen_qwen.json"
+    bundle = ctl.write_bundle(tmp_path / "b.tar.gz", cfg)
+    import tarfile
+
+    with tarfile.open(bundle) as tar:
+        tar.extractall(tmp_path, filter="data")
+    root = tmp_path / "warranted_revision"
+    env = {**os.environ, "WREV_GIT_SHA": "bundle-test", "PYTHONPATH": str(root / "src")}
+    dry = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "warranted_revision.goal_screen",
+            "--config",
+            "configs/_launch_config.json",
+            "--dry-run",
+        ],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert dry.returncode == 0, dry.stderr[-2000:]
+    assert "expected model calls: 1008" in dry.stdout
+    suite = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert suite.returncode == 0, suite.stdout[-3000:]

@@ -20,12 +20,13 @@ approved.
 | Earlier open-model runs (`bespoke-nimble-9b`, `qwen3.5-9b-base-same-scorer`) | before 2026-10-25 | not in `runs.json` | **unknown**: PI to confirm |
 | Goal-screen preparation (CPU, GitHub Actions dry runs, no API calls) | 2026-10-26 | no provider spend | $0.00 |
 
-**Known prior spend: ≈ $3.32. Remaining, if nothing else counts: ≈ $91.68.** The screen's
+**Known prior spend: ≈ $3.32. Remaining, if nothing else counts: ≈ $91.68.** Spend on this screen so far: ≈ $0.14, leaving ≈ $91.54. The screen's
 $16 allocation fits unless unrecorded prior spending charged to the $95 exceeds about $75.
 
 ## This screen
 
 | run | model | verified rate | cap | billed minutes | cost | deleted and confirmed | outcome |
 |---|---|---|---|---|---|---|---|
-| goal-screen-qwen35-9b-v1 | Qwen3.5-9B @ `c2022362` | – | $8 | – | – | – | not started |
+| goal-screen-qwen35-9b-v1, attempt 1 ([run 40409456269](https://github.com/codingshreyash/when-should-advice-change/actions/runs/40409456269)) | Qwen3.5-9B @ `c2022362` | $1.06 (Brev listing, 21:59 UTC) | $8 | ≈ 7.6 (launch step 22:04:41–22:12:16, including ~6.5 min boot) | **≈ $0.14** | yes, 22:12:14 | failed before any model call: the launch bundle left out `v2/` (items and manifests), so the on-box tests failed; fixed and covered by a bundle test |
+| goal-screen-qwen35-9b-v1, attempt 2 | Qwen3.5-9B @ `c2022362` | – | $8 minus attempt 1 | – | – | – | not started |
 | goal-screen-mistral-nemo-v1 | Mistral-NeMo-Instruct-2407 @ `04d8a905` | – | $8 | – | – | – | not started |

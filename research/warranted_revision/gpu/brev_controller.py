@@ -151,6 +151,21 @@ def build_plan(args: argparse.Namespace) -> dict:
     }
 
 
+#: What the GPU box receives. ``v2`` holds the goal screen's frozen items, manifests and
+#: prompts (format-002 and the first goal-screen launch both failed on files left out);
+#: tests/test_gpu_guard.py runs the suite and the goal-screen dry run from a real bundle.
+BUNDLE = ("pyproject.toml", "PROTOCOL.md", "src", "configs", "data", "gpu", "tests", "v2")
+
+
+def write_bundle(path: Path, config: Path) -> Path:
+    with tarfile.open(path, "w:gz") as tar:
+        for sub in BUNDLE:
+            tar.add(PKG / sub, arcname=f"warranted_revision/{sub}")
+        # The exact config the plan was checked against.
+        tar.add(config, arcname="warranted_revision/configs/_launch_config.json")
+    return path
+
+
 def listed_hourly(search_output: str, instance_type: str) -> float | None:
     """Hourly price of exactly ``instance_type`` from `brev search gpu` (TYPE first, $/HR last)."""
     for line in search_output.splitlines():
@@ -281,12 +296,7 @@ def cmd_launch(args: argparse.Namespace) -> int:
             ):
                 break
             time.sleep(20)
-        bundle = Path(args.state).with_suffix(".tar.gz")
-        with tarfile.open(bundle, "w:gz") as tar:
-            for sub in ("pyproject.toml", "PROTOCOL.md", "src", "configs", "data", "gpu", "tests"):
-                tar.add(PKG / sub, arcname=f"warranted_revision/{sub}")
-            # The exact config the plan was checked against.
-            tar.add(Path(args.config), arcname="warranted_revision/configs/_launch_config.json")
+        bundle = write_bundle(Path(args.state).with_suffix(".tar.gz"), Path(args.config))
         run_step(render("copy_to", name=name, src=str(bundle), dst="wrev.tar.gz"), 600)
         deadline_min = int(min(plan["budget"]["run_deadline_minutes"], remaining() / 60 - 15))
         if deadline_min <= 5:
