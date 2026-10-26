@@ -2,8 +2,11 @@
 
 The regressions read ``results/warranted_revision``, which the launch bundle does not ship;
 they skip only there (the controller sets WREV_GIT_SHA) and fail anywhere else if it is missing.
+Raw ``decisions.jsonl`` is gitignored; on a fresh checkout it is restored from the committed
+``decisions.jsonl.gz``.
 """
 
+import gzip
 import json
 import os
 
@@ -20,7 +23,10 @@ GOLD = PKG_ROOT / "data" / "v0" / "dev_gold.jsonl"
 
 def _run(name):
     path = RESULTS / name
-    if not (path / "decisions.jsonl").exists():
+    raw, gz = path / "decisions.jsonl", path / "decisions.jsonl.gz"
+    if not raw.exists() and gz.exists():
+        raw.write_bytes(gzip.decompress(gz.read_bytes()))
+    if not raw.exists():
         if os.environ.get("WREV_GIT_SHA"):
             pytest.skip("launch bundle: results/ is not shipped")
         pytest.fail(f"missing {path}/decisions.jsonl")
