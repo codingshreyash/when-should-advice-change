@@ -1,0 +1,2 @@
+Reviewer packet annotator_B. Key commitment sha256: 53a70b081cff3bc5ff00e1dddb13b77ebd1e07998e2631491c799c3ba4e94d61
+Read GUIDELINES.md first. Do base_checks.csv before items.csv. Work alone; do not discuss items with the other reviewer until both packets are returned.
