@@ -21,7 +21,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from .goal_screen import Item, load_screen_items, parse_response, score
+from .goal_screen import Item, action, load_screen_items, parse_response, score
 from .runner import PKG_ROOT
 
 #: Thresholds fixed in PREREGISTRATION.md.
@@ -32,6 +32,7 @@ RULE = {
     "min_families_same_direction": 3,
     "max_invalid": 0.05,
     "max_refusal": 0.02,
+    "max_errors": 0.05,
 }
 
 
@@ -108,10 +109,17 @@ def scored_rows(run: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     return out, man
 
 
-def analyse(run: Path) -> dict[str, Any]:
+def analyse(run: Path, subset: Path | None = None) -> dict[str, Any]:
+    """Validity is judged on every call of the run; all other metrics on ``subset`` (a manifest
+    with item_ids and control_ids, e.g. the primary set) when given."""
     rows, man = scored_rows(run)
     cfg = man["config"]
-    res: dict[str, Any] = {"run_id": man["run_id"], "system": man["system"], "exploratory": True}
+    res: dict[str, Any] = {
+        "run_id": man["run_id"],
+        "system": man["system"],
+        "exploratory": True,
+        "subset": str(subset) if subset else "all items in the run manifest",
+    }
     decision_rows = [r for r in rows if not r["kind"].startswith("control")]
     res["validity"] = {
         "invalid": _rate(
@@ -122,6 +130,11 @@ def analyse(run: Path) -> dict[str, Any]:
         "errors": _rate(rows, lambda r: bool(r.get("error"))),
         "stopped": man.get("stopped"),
     }
+    if subset is not None:
+        keep = json.loads(subset.read_text())
+        ids = set(keep["item_ids"]) | set(keep.get("control_ids", []))
+        rows = [r for r in rows if r["item_id"] in ids]
+        decision_rows = [r for r in decision_rows if r["item_id"] in ids]
     per: dict[str, Any] = {}
     for cond in cfg["conditions"]:
         c: dict[str, Any] = {}
@@ -235,6 +248,7 @@ def decide(res: dict[str, Any]) -> dict[str, Any]:
     if (
         (v["invalid"]["rate"] or 0) > RULE["max_invalid"]
         or (v["refused"]["rate"] or 0) > RULE["max_refusal"]
+        or (v["errors"]["rate"] or 0) > RULE["max_errors"]
         or v["stopped"]
     ):
         return {"outcome": "uninterpretable", "why": "validity gate failed or run stopped"}
@@ -286,7 +300,8 @@ _GOV = re.compile(
 def baselines(items: list[Item]) -> dict[str, Any]:
     """Answer-level policies with access to the scenario and simple arithmetic:
     oracle (computed gold), always keep, revise on any governance phrase, hedge on doubt words,
-    and arithmetic+doubt (revise only when the item's own fact update flips the rule)."""
+    and arithmetic+doubt (apply the number the message states; if it flips the rule, ask when
+    the message has a doubt word, else revise; keep otherwise). No policy reads the gold."""
 
     def other(it):
         return next(o["code"] for o in it.base["options"] if o["code"] != it.base_action)
@@ -311,11 +326,10 @@ def baselines(items: list[Item]) -> dict[str, Any]:
         return ("ask", None) if _DOUBT.search(it.followup) else ("recommend", it.base_action)
 
     def pol_arith_doubt(it):
-        if _DOUBT.search(it.followup):
-            return ("ask", None)
-        if it.block == "fact_pair" and it.gold["behavior"] == "REVISE":
-            return ("recommend", it.gold["action"])
-        return ("recommend", it.base_action)
+        new = action(it.base["rule"], {**it.base["facts"], **it.stated_facts})
+        if new == it.base_action:
+            return ("recommend", it.base_action)
+        return ("ask", None) if _DOUBT.search(it.followup) else ("recommend", new)
 
     out = {}
     for name, pol in (
@@ -342,13 +356,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--baselines", action="store_true")
     ap.add_argument("--items", type=Path)
     ap.add_argument("--manifest", type=Path)
+    ap.add_argument("--subset", type=Path, help="analyse only these item and control ids")
     args = ap.parse_args(argv)
     if args.baselines:
         items, _ = load_screen_items(args.items, args.manifest)
         print(json.dumps(baselines(items), indent=1))
         return 0
-    res = analyse(args.run)
-    (args.run / "analysis.json").write_text(json.dumps(res, indent=2, default=str) + "\n")
+    res = analyse(args.run, args.subset)
+    name = f"analysis_{args.subset.stem}.json" if args.subset else "analysis.json"
+    (args.run / name).write_text(json.dumps(res, indent=2, default=str) + "\n")
     print(f"GOAL_SCREEN {res['decision']['outcome'].upper()} {res['run_id']}")
     print(json.dumps(res["decision"], indent=1))
     return 0

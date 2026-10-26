@@ -366,3 +366,30 @@ def test_probe_config_plans_its_own_call_count(tmp_path, fake_bin, capsys):
     )
     out = capsys.readouterr().out
     assert rc == 0 and '"expected_calls": 970' in out
+
+
+def test_goal_screen_plans_its_own_call_count_and_needs_pinning(tmp_path, fake_bin, capsys):
+    ctl = _controller()
+    args = [
+        "plan",
+        "--hourly",
+        "1.06",
+        "--max-usd",
+        "4",
+        "--run-id",
+        "gs-t",
+        "--instance-type",
+        "L40S",
+        "--est-seconds-per-call",
+        "8",
+        "--config",
+    ]
+    rc = ctl.main(args + [str(PKG_ROOT / "configs" / "goal_screen_qwen.json")])
+    assert rc == 0 and '"expected_calls": 1008' in capsys.readouterr().out
+    cfg = json.loads((PKG_ROOT / "configs" / "goal_screen_qwen.json").read_text())
+    cfg["system"]["params"]["revision"] = "main"
+    with pytest.raises(GuardError):
+        check_pinned_model(cfg)  # the single `system` of a goal screen is checked too
+    api = tmp_path / "api.json"
+    api.write_text((PKG_ROOT / "configs" / "goal_screen_sonnet.json").read_text())
+    assert ctl.main(args + [str(api)]) != 0  # API subjects never go through the GPU controller

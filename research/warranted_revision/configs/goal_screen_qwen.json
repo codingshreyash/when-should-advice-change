@@ -1,0 +1,40 @@
+{
+ "experiment": "goal_screen",
+ "items": "v2/ai_precalibration/candidate_v3/items.json",
+ "manifest": "v2/ai_precalibration/screen_v1/run_manifest.json",
+ "conditions": [
+  "N",
+  "S",
+  "F"
+ ],
+ "repeats": 3,
+ "preflight_items": [
+  "eld-05",
+  "eld-02"
+ ],
+ "preflight_controls": [
+  "ic-eld-05",
+  "ic-eld-02"
+ ],
+ "max_calls": 1008,
+ "run_id": "goal-screen-qwen35-9b-v1",
+ "label": "Goal screen, Qwen3.5-9B (pinned), thinking off, greedy + 3 draws at T=0.7",
+ "system": {
+  "kind": "hf",
+  "name": "Qwen/Qwen3.5-9B",
+  "params": {
+   "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+   "model_class": "Qwen3_5ForConditionalGeneration",
+   "dtype": "bfloat16",
+   "load_in_4bit": false,
+   "max_batch": 1,
+   "chat_template_kwargs": {
+    "enable_thinking": false
+   }
+  }
+ },
+ "max_tokens_first": 400,
+ "max_tokens_free": 400,
+ "max_tokens_decision": 400,
+ "sample_temperature": 0.7
+}

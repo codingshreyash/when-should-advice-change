@@ -108,7 +108,8 @@ def check_instance_name(name: str) -> None:
 
 
 def check_pinned_model(config: dict) -> None:
-    for spec in config.get("systems", []):
+    specs = list(config.get("systems", [])) + ([config["system"]] if config.get("system") else [])
+    for spec in specs:
         if spec.get("kind") != "hf":
             continue
         rev = spec.get("params", {}).get("revision", "")

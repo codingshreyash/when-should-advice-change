@@ -27,7 +27,7 @@ install_kernels() {
   timeout 300 python -m pip install -q --only-binary=:all: causal-conv1d || echo "causal-conv1d wheel not available"
 }
 
-IS_PROBE=$(python -c "import json; print(int(json.load(open('$CONFIG')).get('experiment') == 'scaffold_probe'))")
+IS_PROBE=$(python -c "import json; print(int(json.load(open('$CONFIG')).get('experiment') in ('scaffold_probe', 'goal_screen')))")
 if [ "$IS_PROBE" = "1" ] && [ "$BENCH" != "1" ]; then
   # The probe's short direct calls don't need the optional kernels; skip the install time.
   echo "scaffold probe: skipping optional kernel install"
@@ -55,10 +55,19 @@ run_id, config, shard = sys.argv[1:4]
 cfg = json.load(open(config)); cfg["run_id"] = run_id; cfg["shard"] = shard
 cfg["out_root"] = os.path.expanduser("~/results/warranted_revision")
 json.dump(cfg, open("/tmp/wrev/config.json", "w"), indent=2)
-gold = cfg["inputs"].replace("_inputs.jsonl", "_gold.jsonl")
-open("/tmp/wrev/gold_path", "w").write(gold)
+if "inputs" in cfg:
+    open("/tmp/wrev/gold_path", "w").write(cfg["inputs"].replace("_inputs.jsonl", "_gold.jsonl"))
 PY
-if python -c "import json,sys; sys.exit(json.load(open('/tmp/wrev/config.json')).get('experiment') != 'scaffold_probe')"; then
+if python -c "import json,sys; sys.exit(json.load(open('/tmp/wrev/config.json')).get('experiment') != 'goal_screen')"; then
+  # Goal screen: its own runner; the analysis applies the pre-registered rule (exploratory).
+  python -m warranted_revision.goal_screen --config /tmp/wrev/config.json --dry-run
+  timeout "${DEADLINE_MIN}m" python -m warranted_revision.goal_screen --config /tmp/wrev/config.json
+  cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
+  python -m warranted_revision.goal_screen_analysis --run "$OUT" || echo "GOAL_SCREEN ERROR"
+  python -m warranted_revision.goal_screen_analysis --run "$OUT" \
+    --subset v2/ai_precalibration/screen_v1/primary.json || echo "GOAL_SCREEN ERROR"
+  gzip -k "$OUT/calls.jsonl"
+elif python -c "import json,sys; sys.exit(json.load(open('/tmp/wrev/config.json')).get('experiment') != 'scaffold_probe')"; then
   # Scaffold probe: its own runner and records; gold-free gates printed as a PROBE_CHECK line.
   python -m warranted_revision.scaffold_probe --config /tmp/wrev/config.json --dry-run
   timeout "${DEADLINE_MIN}m" python -m warranted_revision.scaffold_probe --config /tmp/wrev/config.json

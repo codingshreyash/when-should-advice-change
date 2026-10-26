@@ -164,6 +164,7 @@ class Item:
     pair_id: str | None
     gold: dict[str, Any]
     base_action: str
+    stated_facts: dict[str, Any] = field(default_factory=dict)  # the number the message states
 
 
 @dataclass
@@ -194,6 +195,9 @@ def load_screen_items(items_path: Path, manifest_path: Path) -> tuple[list[Item]
                 pair_id=it.get("pair_id"),
                 gold=behavior(b, it["design_label"], it["readings"]),
                 base_action=action(b["rule"], b["facts"]),
+                stated_facts=next(
+                    (r["facts_update"] for r in it["readings"] if r.get("facts_update")), {}
+                ),
             )
         )
     data = json.loads(items_path.read_text())

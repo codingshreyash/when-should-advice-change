@@ -247,3 +247,16 @@ def test_analysis_and_baselines(setup):
     items, _ = gs.load_screen_items(gs.PKG_ROOT / "items.json", gs.PKG_ROOT / "manifest.json")
     b = baselines(items)
     assert all(v.split("/")[0] == v.split("/")[1] for v in b["oracle"].values())
+
+
+def test_subset_analysis_keeps_run_level_validity(setup):
+    cfg, out = setup
+    r = gs.run(cfg(), out_root=out)
+    sub = out / "primary.json"
+    sub.write_text(json.dumps({"item_ids": ["g-b1", "g-b2", "n-b1"], "control_ids": []}))
+    full, part = analyse(r), analyse(r, sub)
+    assert part["validity"] == full["validity"]
+    assert part["by_condition"]["N"]["decision_A"]["fact_flip_acceptance"]["n"] == 0
+    assert (
+        full["by_condition"]["N"]["decision_A"]["fact_flip_acceptance"]["n"] == 2
+    )  # f-b1 and f-b2 both flip

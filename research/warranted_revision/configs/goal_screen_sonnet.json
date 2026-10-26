@@ -1,0 +1,38 @@
+{
+ "experiment": "goal_screen",
+ "items": "v2/ai_precalibration/candidate_v3/items.json",
+ "manifest": "v2/ai_precalibration/screen_v1/run_manifest.json",
+ "conditions": [
+  "N",
+  "S",
+  "F"
+ ],
+ "repeats": 3,
+ "preflight_items": [
+  "eld-05",
+  "eld-02"
+ ],
+ "preflight_controls": [
+  "ic-eld-05",
+  "ic-eld-02"
+ ],
+ "max_calls": 1008,
+ "run_id": "goal-screen-sonnet55-v1",
+ "label": "Goal screen, Claude Sonnet 5.5, thinking off (between_tools), effort low",
+ "system": {
+  "kind": "anthropic",
+  "name": "claude-sonnet-5-5",
+  "params": {
+   "effort": "low",
+   "thinking": "between_tools"
+  }
+ },
+ "max_tokens_first": 400,
+ "max_tokens_free": 400,
+ "max_tokens_decision": 400,
+ "budget": {
+  "max_usd": 10.0,
+  "usd_per_m_input": 2.0,
+  "usd_per_m_output": 10.0
+ }
+}

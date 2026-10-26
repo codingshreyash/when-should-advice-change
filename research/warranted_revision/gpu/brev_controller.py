@@ -97,6 +97,16 @@ def build_plan(args: argparse.Namespace) -> dict:
         pcfg = scaffold_probe.ProbeConfig.model_validate(raw)
         scaffold_probe.validate_plan(pcfg)
         n_calls, max_calls = scaffold_probe.expected_calls(pcfg), pcfg.max_calls
+    elif raw.get("experiment") == "goal_screen":
+        from warranted_revision import goal_screen
+
+        gcfg = goal_screen.ScreenConfig.model_validate(raw)
+        if gcfg.system.kind != "hf":
+            raise GuardError("the GPU controller runs open-weights (hf) goal screens only")
+        items, controls = goal_screen.load_screen_items(
+            goal_screen.PKG_ROOT / gcfg.items, goal_screen.PKG_ROOT / gcfg.manifest
+        )
+        n_calls, max_calls = goal_screen.plan_calls(gcfg, items, controls)["total"], gcfg.max_calls
     else:
         cfg = RunConfig.model_validate(raw)
         n_calls, max_calls = expected_calls(cfg, shard_cases(cfg, load_cases(cfg))), cfg.max_calls
