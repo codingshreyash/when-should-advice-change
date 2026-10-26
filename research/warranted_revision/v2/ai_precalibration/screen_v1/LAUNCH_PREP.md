@@ -76,7 +76,7 @@ The worst case over-counts input, because it estimates 1 token per 3 characters 
 - **Brev token.** The Qwen run uses the existing `BREV_API_TOKEN` repository secret through the
   existing GPU workflow.
 
-## Deployment checklist (each step needs your approval; nothing below has been run)
+## Deployment checklist (each paid step needs your approval; no paid step has run)
 
 **One-time setup (you)**
 
@@ -112,7 +112,11 @@ The worst case over-counts input, because it estimates 1 token per 3 characters 
 
 **Qwen (independent of the Sonnet steps)**
 
-7. **Dry run.** Dispatch the existing GPU workflow on `research/warranted-revision-v1` with:
+7. **Dry run: done.** Actions run 40372476583 at `0a987ad` passed: tests green; the
+   controller planned 1,008 calls, a $3.20 worst case, a 151-minute deadline and no provider
+   call. The first attempt (run 40371793274) failed on an existing test that needed gitignored
+   raw results; that was fixed in `0a987ad`. Repeat this dry run with the real hourly price.
+   The inputs were:
    - `config=configs/goal_screen_qwen.json`;
    - `max_gpu_usd=4`;
    - `est_seconds_per_call=8`;
