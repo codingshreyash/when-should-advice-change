@@ -60,8 +60,21 @@ if "inputs" in cfg:
 PY
 if python -c "import json,sys; sys.exit(json.load(open('/tmp/wrev/config.json')).get('experiment') != 'goal_screen')"; then
   # Goal screen: its own runner; the analysis applies the pre-registered rule (exploratory).
+  # A 30-call preflight on this box gates the full run (all calls made, no errors, <= 10%
+  # unparseable, projected runtime x 1.5 within the minutes left); a failed gate stops here
+  # and the controller still copies back and deletes the instance.
+  T0=$(date +%s)
   python -m warranted_revision.goal_screen --config /tmp/wrev/config.json --dry-run
-  timeout "${DEADLINE_MIN}m" python -m warranted_revision.goal_screen --config /tmp/wrev/config.json
+  PRE="$OUT-preflight"
+  timeout "${DEADLINE_MIN}m" python -m warranted_revision.goal_screen --config /tmp/wrev/config.json --preflight
+  LEFT=$(( DEADLINE_MIN - ( $(date +%s) - T0 ) / 60 ))
+  if ! python -m warranted_revision.goal_screen_job gate --run "$PRE" --remaining-min "$LEFT"; then
+    mkdir -p "$OUT"; mv "$PRE" "$OUT/preflight"; cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
+    echo "GOAL_SCREEN PREFLIGHT_GATE FAILED: full run not started"
+    exit 3
+  fi
+  timeout "${LEFT}m" python -m warranted_revision.goal_screen --config /tmp/wrev/config.json
+  mv "$PRE" "$OUT/preflight"
   cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
   python -m warranted_revision.goal_screen_analysis --run "$OUT" || echo "GOAL_SCREEN ERROR"
   python -m warranted_revision.goal_screen_analysis --run "$OUT" \

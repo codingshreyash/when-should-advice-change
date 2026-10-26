@@ -385,7 +385,7 @@ def test_goal_screen_plans_its_own_call_count_and_needs_pinning(tmp_path, fake_b
         "--config",
     ]
     rc = ctl.main(args + [str(PKG_ROOT / "configs" / "goal_screen_qwen.json")])
-    assert rc == 0 and '"expected_calls": 1008' in capsys.readouterr().out
+    assert rc == 0 and '"expected_calls": 1038' in capsys.readouterr().out  # 1,008 + 30 preflight
     cfg = json.loads((PKG_ROOT / "configs" / "goal_screen_qwen.json").read_text())
     cfg["system"]["params"]["revision"] = "main"
     with pytest.raises(GuardError):

@@ -91,6 +91,7 @@ def build_plan(args: argparse.Namespace) -> dict:
     raw["run_id"] = args.run_id
     raw["shard"] = args.shard
     check_pinned_model(raw)
+    extra_calls = 0  # calls made on the box besides the planned run (the goal screen preflight)
     if raw.get("experiment") == "scaffold_probe":
         from warranted_revision import scaffold_probe
 
@@ -107,6 +108,7 @@ def build_plan(args: argparse.Namespace) -> dict:
             goal_screen.PKG_ROOT / gcfg.items, goal_screen.PKG_ROOT / gcfg.manifest
         )
         n_calls, max_calls = goal_screen.plan_calls(gcfg, items, controls)["total"], gcfg.max_calls
+        extra_calls = goal_screen.preflight_plan(gcfg, items, controls)
     else:
         cfg = RunConfig.model_validate(raw)
         n_calls, max_calls = expected_calls(cfg, shard_cases(cfg, load_cases(cfg))), cfg.max_calls
@@ -115,7 +117,7 @@ def build_plan(args: argparse.Namespace) -> dict:
     budget = plan_budget(
         args.hourly,
         args.max_usd,
-        expected_calls=n_calls,
+        expected_calls=n_calls + extra_calls,
         est_seconds_per_call=args.est_seconds_per_call,
         # The optional benchmark runs before the experiment; reserve time for it.
         setup_hours=args.setup_hours + (0.25 if args.bench else 0.0),

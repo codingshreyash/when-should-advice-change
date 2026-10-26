@@ -3,9 +3,10 @@
  "v2/ai_precalibration/screen_v1/run_manifest.json": "b0a965c45882b9a24972a9e5962647f2202f7839efe31b7d7386c2c156450d60",
  "v2/ai_precalibration/screen_v1/primary.json": "ce8b3e39da2d023765c4f8b3891a53635f1aa834aefcac316c1f46f8f5850ee5",
  "v2/ai_precalibration/screen_v1/system_prompts.json": "c4e00467dca9cc2f1ffa16ecfab39f66b51ad6a3af137488f46fe462ebe98637",
- "src/warranted_revision/goal_screen.py": "5df331e77b5bf39e0a4b449f96d322344229d5f0f7bf593b77d56f5205c8a3cc",
+ "src/warranted_revision/goal_screen.py": "6c96d455788458efb347167adcbba1ec9607da900277f010dbbc0bad1c321a08",
  "src/warranted_revision/goal_screen_analysis.py": "2c111ef30fcadccabb50f9946b5878e234b468519ffbb4e03f0e32ef094280dc",
- "src/warranted_revision/goal_screen_job.py": "9264445539617ad8f4a012ff129704cc834c4db1d7ac21159776ba079c84c4d0",
+ "src/warranted_revision/goal_screen_job.py": "26fb7a5392abf7f0dbbbd22a2e08ae3f7412dbfa5e67a656386c0d7c11399058",
  "configs/goal_screen_sonnet.json": "fa3a2f24ef15eaab2446aaa72e581a9dd21afb1840fe64f0cbdd7e120009d389",
- "configs/goal_screen_qwen.json": "e0874ef975cb30d1e2af1613fae03d38cf5e5308514fadceafdab1a2c5f5bec8"
+ "configs/goal_screen_qwen.json": "b9302fccd9dff7b2d22b3fd7e01a82f4c1f6277b1387d49f57661058f54c921a",
+ "configs/goal_screen_mistral_nemo.json": "6916927e25e4a4a8e0d0a03c5336b2743fdc309d0fe91ccc398c63d575ccb02a"
 }

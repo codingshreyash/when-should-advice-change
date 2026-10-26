@@ -47,8 +47,17 @@ FROZEN = [
     "src/warranted_revision/goal_screen_job.py",
     "configs/goal_screen_sonnet.json",
     "configs/goal_screen_qwen.json",
+    "configs/goal_screen_mistral_nemo.json",
 ]
 MAX_PREFLIGHT_INVALID = 0.10
+#: API configs withdrawn after approval; ``check`` refuses them before anything else.
+CANCELLED = {
+    "configs/goal_screen_sonnet.json": "Sonnet replaced by an open-weights model "
+    "(screen_v1/AMENDMENT_2_OPEN_WEIGHTS.md); no API key is used",
+}
+#: The on-box gate starts the full run only if its projected runtime, times this margin,
+#: fits in the minutes left before the controller's deadline.
+RUNTIME_MARGIN = 1.5
 
 
 class LaunchError(RuntimeError):
@@ -125,6 +134,52 @@ def summarize(run: Path, root: Path = PKG_ROOT) -> dict[str, Any]:
     }
 
 
+def gate(run: Path, remaining_min: float, root: Path = PKG_ROOT) -> dict[str, Any]:
+    """On-box preflight gate for an open-weights run: the full run starts only if the preflight
+    made every planned call, had no errors, at most 10% unparseable answers, did not stop, and
+    its measured time per batch projects the full run (times RUNTIME_MARGIN) within the minutes
+    left. Raises LaunchError otherwise, so an over-long run is reported, not cut short."""
+    man = json.loads((run / "manifest.json").read_text())
+    s = summarize(run, root)
+    cfg = gs.ScreenConfig.model_validate(man["config"])
+    items, controls = gs.load_screen_items(root / cfg.items, root / cfg.manifest)
+    full_batches = gs.plan_batches(cfg, items, controls)
+    per_batch = man["elapsed_s"] / max(1, man["planned_batches"])
+    projected_min = per_batch * full_batches / 60
+    s.update(
+        {
+            "seconds_per_batch": round(per_batch, 1),
+            "full_run_batches": full_batches,
+            "projected_full_run_min": round(projected_min, 1),
+            "remaining_min": round(remaining_min, 1),
+        }
+    )
+    problems = [
+        msg
+        for bad, msg in [
+            (s["stopped"], f"stopped: {s['stopped']}"),
+            (s["actual_calls"] != s["expected_calls"], "did not make all planned calls"),
+            (s["errors"] > 0, f"{s['errors']} errors {s['error_types']}"),
+            (
+                s["response_line"].get("invalid", 0) > MAX_PREFLIGHT_INVALID * s["actual_calls"],
+                f"too many unparseable answers {s['response_line']}",
+            ),
+            (
+                projected_min * RUNTIME_MARGIN > remaining_min,
+                f"projected {projected_min:.0f} min x {RUNTIME_MARGIN} exceeds the "
+                f"{remaining_min:.0f} min left before the deadline",
+            ),
+        ]
+        if bad
+    ]
+    s["gate_passed"] = not problems
+    s["gate_problems"] = problems
+    (run / "gate.json").write_text(json.dumps(s, indent=1) + "\n")
+    if problems:
+        raise LaunchError("preflight gate failed: " + "; ".join(problems))
+    return s
+
+
 def check(
     config: str,
     mode: str,
@@ -132,6 +187,8 @@ def check(
     preflight_dir: Path | None = None,
     root: Path = PKG_ROOT,
 ) -> dict[str, Any]:
+    if config in CANCELLED:
+        raise LaunchError(f"{config} is cancelled: {CANCELLED[config]}")
     if config not in ALLOWED:
         raise LaunchError(f"{config} is not an approved API config: {sorted(ALLOWED)}")
     want = ALLOWED[config]
@@ -210,7 +267,18 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("summarize")
     s.add_argument("--run", type=Path, required=True)
     sub.add_parser("lock")
+    g = sub.add_parser("gate")
+    g.add_argument("--run", type=Path, required=True)
+    g.add_argument("--remaining-min", type=float, required=True)
     args = ap.parse_args(argv)
+    if args.cmd == "gate":
+        try:
+            res = gate(args.run, args.remaining_min)
+        except LaunchError as exc:
+            print(f"[gate] FAILED: {exc}", file=sys.stderr)
+            return 3
+        print("[gate] OK " + json.dumps(res))
+        return 0
     if args.cmd == "lock":
         print(json.dumps(write_lock(), indent=1))
         return 0

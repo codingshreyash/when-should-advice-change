@@ -36,6 +36,7 @@ import hashlib
 import json
 import re
 import sys
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal, Protocol
@@ -295,6 +296,22 @@ def preflight_plan(cfg: ScreenConfig, items: list[Item], controls: list[Control]
     return (n_bases + 3 * len(items) + len(controls)) * len(cfg.conditions)
 
 
+def plan_batches(
+    cfg: ScreenConfig, items: list[Item], controls: list[Control], preflight: bool = False
+) -> int:
+    """Generation batches a batching backend runs: each phase of a condition is split into
+    chunks of ``max_batch`` (phases never share a batch)."""
+    b = max(1, int(cfg.system.params.get("max_batch", 1)))
+    if preflight:
+        items = [i for i in items if i.item_id in set(cfg.preflight_items)]
+        controls = [c for c in controls if c.control_id in set(cfg.preflight_controls)]
+    n_bases = len({i.base["base_id"] for i in items})
+    phases = [n_bases, len(items), 2 * len(items)]
+    phases += [] if preflight else [cfg.repeats * len(items)]
+    phases += [(1 if preflight else 2) * len(controls)]
+    return len(cfg.conditions) * sum(-(-n // b) for n in phases if n)
+
+
 # --------------------------------------------------------------------------------------
 # Backends and the budget
 # --------------------------------------------------------------------------------------
@@ -338,7 +355,15 @@ class FakeScreenBackend:
 
     synthetic = True
 
-    def __init__(self, policy: str = "stubborn", usage_in: int | None = None, usage_out: int = 50):
+    def __init__(
+        self,
+        policy: str = "stubborn",
+        usage_in: int | None = None,
+        usage_out: int = 50,
+        batched: bool = False,
+    ):
+        if batched:  # exercise the batched execution path in tests
+            self.complete_many = lambda calls: [self.complete(*c) for c in calls]
         self.policy = policy
         self.label = f"fake:screen_{policy}"
         self.usage_in = usage_in
@@ -403,27 +428,38 @@ class HFScreenBackend:
         return conservative_tokens(system, messages)
 
     def complete(self, system, messages, max_tokens, sample, seed) -> Reply:
+        (rep,) = self.complete_many([(system, messages, max_tokens, sample, seed)])
+        return rep
+
+    def complete_many(self, calls: list[tuple]) -> list[Reply]:
+        """Independent calls of one phase. The inner backend groups them by decoding settings
+        and batches up to ``max_batch`` (left padding; a batch seeds torch with its first
+        request's seed, so sampled draws are reproducible for a fixed batch composition)."""
         from .backends.base import GenRequest
         from .schema import GenParams, Message
 
-        msgs = (Message(role="system", content=system),) + tuple(
-            Message(role=m["role"], content=m["content"])
-            for m in messages  # type: ignore[arg-type]
-        )
-        gen = GenParams(
-            temperature=self.temperature if sample else 0.0,
-            top_p=0.95 if sample else 1.0,
-            max_new_tokens=max_tokens,
-            seed=seed,
-        )
-        (c,) = self.inner.generate([GenRequest(messages=msgs, gen=gen)])
-        return Reply(
-            text=c.text,
-            input_tokens=c.prompt_tokens,
-            output_tokens=c.completion_tokens,
-            stop_reason=c.finish_reason,
-            error=c.error,
-        )
+        reqs = []
+        for system, messages, max_tokens, sample, seed in calls:
+            msgs = (Message(role="system", content=system),) + tuple(
+                Message(role=m["role"], content=m["content"]) for m in messages
+            )
+            gen = GenParams(
+                temperature=self.temperature if sample else 0.0,
+                top_p=0.95 if sample else 1.0,
+                max_new_tokens=max_tokens,
+                seed=seed,
+            )
+            reqs.append(GenRequest(messages=msgs, gen=gen))
+        return [
+            Reply(
+                text=c.text,
+                input_tokens=c.prompt_tokens,
+                output_tokens=c.completion_tokens,
+                stop_reason=c.finish_reason,
+                error=c.error,
+            )
+            for c in self.inner.generate(reqs)
+        ]
 
 
 class AnthropicScreenBackend:
@@ -547,6 +583,16 @@ def build_backend(cfg: ScreenConfig) -> ScreenBackend:
 # --------------------------------------------------------------------------------------
 
 
+@dataclass
+class Req:
+    system: str
+    messages: list[dict[str, str]]
+    max_tokens: int
+    sample: bool
+    seed: int
+    meta: dict[str, Any]
+
+
 def _seed(*parts: object) -> int:
     return int.from_bytes(hashlib.sha256(":".join(map(str, parts)).encode()).digest()[:4], "big")
 
@@ -560,6 +606,7 @@ def run(
     out_root: Path | None = None,
 ) -> Path | None:
     items, controls = load_screen_items(PKG_ROOT / cfg.items, PKG_ROOT / cfg.manifest)
+    _loaded = (items, controls)
     if preflight:
         planned = preflight_plan(cfg, items, controls)
         items = [i for i in items if i.item_id in set(cfg.preflight_items)]
@@ -597,34 +644,22 @@ def run(
     )
     out.mkdir(parents=True, exist_ok=False)
     sha, dirty = git_state()
+    t0 = time.time()
     made = 0
     stopped: str | None = None
     rows: list[dict[str, Any]] = []
 
-    def call(
-        system: str,
-        messages: list[dict[str, str]],
-        max_tokens: int,
-        sample: bool,
-        seed: int,
-        meta: dict[str, Any],
-    ) -> Reply:
+    def record(req: Req, rep: Reply) -> None:
         nonlocal made
-        worst = None
-        if budget is not None:
-            worst = budget.check(be.count_input(system, messages), max_tokens)
-        rep = be.complete(system, messages, max_tokens, sample, seed)
-        if budget is not None and worst is not None:
-            budget.record(rep.input_tokens, rep.output_tokens, worst)
         made += 1
         rows.append(
             {
-                **meta,
-                "seed": seed,
-                "sample": sample,
-                "max_tokens": max_tokens,
+                **req.meta,
+                "seed": req.seed,
+                "sample": req.sample,
+                "max_tokens": req.max_tokens,
                 "messages_sha256": hashlib.sha256(
-                    json.dumps([system, messages]).encode()
+                    json.dumps([req.system, req.messages]).encode()
                 ).hexdigest(),
                 "text": rep.text,
                 "input_tokens": rep.input_tokens,
@@ -635,77 +670,128 @@ def run(
                 "cost_usd": budget.log[-1]["cost"] if budget and budget.log else None,
             }
         )
-        return rep
+
+    def execute(reqs: list[Req]) -> list[Reply]:
+        """One phase of mutually independent calls. A backend with ``complete_many`` and no
+        API budget runs them in batches; otherwise each call is budget-checked and sent alone."""
+        many = getattr(be, "complete_many", None)
+        if budget is None and many is not None:
+            reps = many([(r.system, r.messages, r.max_tokens, r.sample, r.seed) for r in reqs])
+            for r, rep in zip(reqs, reps, strict=True):
+                record(r, rep)
+            return reps
+        reps = []
+        for r in reqs:
+            worst = None
+            if budget is not None:
+                worst = budget.check(be.count_input(r.system, r.messages), r.max_tokens)
+            rep = be.complete(r.system, r.messages, r.max_tokens, r.sample, r.seed)
+            if budget is not None and worst is not None:
+                budget.record(rep.input_tokens, rep.output_tokens, worst)
+            record(r, rep)
+            reps.append(rep)
+        return reps
 
     try:
         for cond in cfg.conditions:
             system = SYSTEM_PROMPTS[cond]
-            firsts: dict[str, tuple[str, str]] = {}
+            # Phase 1: one first turn per base.
+            bases: dict[str, Item] = {}
             for it in items:
-                b = it.base
-                if b["base_id"] not in firsts:
-                    u1 = first_turn(b)
-                    rep = call(
-                        system,
-                        [{"role": "user", "content": u1}],
-                        cfg.max_tokens_first,
-                        False,
-                        _seed(cfg.seed, cond, b["base_id"], "first"),
-                        {
-                            "cond": cond,
-                            "kind": "first",
-                            "base_id": b["base_id"],
-                            "item_id": None,
-                            "family_id": it.family_id,
-                        },
-                    )
-                    firsts[b["base_id"]] = (u1, rep.text)
+                bases.setdefault(it.base["base_id"], it)
+            first_reqs = [
+                Req(
+                    system,
+                    [{"role": "user", "content": first_turn(it.base)}],
+                    cfg.max_tokens_first,
+                    False,
+                    _seed(cfg.seed, cond, bid, "first"),
+                    {
+                        "cond": cond,
+                        "kind": "first",
+                        "base_id": bid,
+                        "item_id": None,
+                        "family_id": it.family_id,
+                    },
+                )
+                for bid, it in bases.items()
+            ]
+            firsts = {
+                r.meta["base_id"]: (r.messages[0]["content"], rep.text)
+                for r, rep in zip(first_reqs, execute(first_reqs), strict=True)
+            }
+            # Phase 2: the follow-up, answered freely, after each item's base.
+            metas, hists = [], []
             for it in items:
                 u1, a1 = firsts[it.base["base_id"]]
-                meta = {
-                    "cond": cond,
-                    "base_id": it.base["base_id"],
-                    "item_id": it.item_id,
-                    "family_id": it.family_id,
-                    "block": it.block,
-                    "pair_id": it.pair_id,
-                }
-                hist = [
-                    {"role": "user", "content": u1},
-                    {"role": "assistant", "content": a1},
-                    {"role": "user", "content": it.followup},
-                ]
-                free = call(
+                metas.append(
+                    {
+                        "cond": cond,
+                        "base_id": it.base["base_id"],
+                        "item_id": it.item_id,
+                        "family_id": it.family_id,
+                        "block": it.block,
+                        "pair_id": it.pair_id,
+                    }
+                )
+                hists.append(
+                    [
+                        {"role": "user", "content": u1},
+                        {"role": "assistant", "content": a1},
+                        {"role": "user", "content": it.followup},
+                    ]
+                )
+            free_reqs = [
+                Req(
                     system,
-                    hist,
+                    h,
                     cfg.max_tokens_free,
                     False,
                     _seed(cfg.seed, cond, it.item_id, "free"),
-                    {**meta, "kind": "free"},
+                    {**m, "kind": "free"},
                 )
-                prefix = hist + [{"role": "assistant", "content": free.text}]
-                for w in ("A", "B"):
-                    call(
+                for it, m, h in zip(items, metas, hists, strict=True)
+            ]
+            frees = execute(free_reqs)
+            prefixes = [
+                h + [{"role": "assistant", "content": f.text}]
+                for h, f in zip(hists, frees, strict=True)
+            ]
+            # Phase 3: the decision request in wordings A and B (greedy).
+            execute(
+                [
+                    Req(
                         system,
-                        prefix + [{"role": "user", "content": decision_turn(it.base, w)}],
+                        p + [{"role": "user", "content": decision_turn(it.base, w)}],
                         cfg.max_tokens_decision,
                         False,
                         _seed(cfg.seed, cond, it.item_id, w),
-                        {**meta, "kind": f"decision_{w}"},
+                        {**m, "kind": f"decision_{w}"},
                     )
-                if not preflight:
-                    for k in range(cfg.repeats):
-                        call(
+                    for it, m, p in zip(items, metas, prefixes, strict=True)
+                    for w in ("A", "B")
+                ]
+            )
+            # Phase 4: repeated draws of wording A (sampled).
+            if not preflight:
+                execute(
+                    [
+                        Req(
                             system,
-                            prefix + [{"role": "user", "content": decision_turn(it.base, "A")}],
+                            p + [{"role": "user", "content": decision_turn(it.base, "A")}],
                             cfg.max_tokens_decision,
                             True,
                             _seed(cfg.seed, cond, it.item_id, "rep", k),
-                            {**meta, "kind": "repeat", "draw": k},
+                            {**m, "kind": "repeat", "draw": k},
                         )
-            for c in controls:
-                for w in ("A",) if preflight else ("A", "B"):
-                    call(
+                        for it, m, p in zip(items, metas, prefixes, strict=True)
+                        for k in range(cfg.repeats)
+                    ]
+                )
+            # Phase 5: integrated-state controls, single-turn.
+            execute(
+                [
+                    Req(
                         system,
                         [{"role": "user", "content": first_turn(c.scenario, WORDING[w])}],
                         cfg.max_tokens_first,
@@ -720,6 +806,10 @@ def run(
                             "base_id": None,
                         },
                     )
+                    for c in controls
+                    for w in (("A",) if preflight else ("A", "B"))
+                ]
+            )
     except BudgetStop as exc:
         stopped = f"budget: {exc}"
     finally:
@@ -741,6 +831,8 @@ def run(
         "config": cfg.model_dump(),
         "expected_calls": planned,
         "actual_calls": made,
+        "elapsed_s": round(time.time() - t0, 1),
+        "planned_batches": plan_batches(cfg, *_loaded, preflight=preflight),
         "stopped": stopped,
         "spend_usd": round(budget.spent, 6) if budget else None,
     }

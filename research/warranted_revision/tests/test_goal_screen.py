@@ -440,3 +440,67 @@ def test_preflight_has_its_own_smaller_cap(setup):
     )
     m = json.loads((gs.run(c, preflight=True, out_root=out) / "manifest.json").read_text())
     assert m["stopped"].startswith("budget") and m["spend_usd"] <= 0.005
+
+
+def test_batched_execution_matches_per_call(setup):
+    cfg, out = setup
+    a = gs.run(cfg(), backend=gs.FakeScreenBackend("follower"), out_root=out / "a")
+    b = gs.run(cfg(), backend=gs.FakeScreenBackend("follower", batched=True), out_root=out / "b")
+    assert _calls(a) == _calls(b)
+    for pre in (False, True):
+        m = json.loads(
+            (
+                gs.run(
+                    cfg(run_id=f"p{pre}"),
+                    preflight=pre,
+                    out_root=out / "c",
+                    backend=gs.FakeScreenBackend("stubborn", batched=True),
+                )
+                / "manifest.json"
+            ).read_text()
+        )
+        assert m["actual_calls"] == m["expected_calls"]
+
+
+def test_hf_backend_batches_with_system_message_and_decoding(monkeypatch):
+    from warranted_revision.schema import Completion
+
+    seen = []
+
+    class Inner:
+        def generate(self, reqs):
+            seen.extend(reqs)
+            return [
+                Completion(
+                    text=f"t{i}",
+                    prompt_tokens=10,
+                    completion_tokens=5,
+                    latency_s=0.1,
+                    finish_reason="stop",
+                )
+                for i in range(len(reqs))
+            ]
+
+    be = object.__new__(gs.HFScreenBackend)
+    be.inner, be.temperature = Inner(), 0.7
+    calls = [
+        ("SYS", [{"role": "user", "content": "u"}], 400, False, 1),
+        (
+            "SYS",
+            [
+                {"role": "user", "content": "u"},
+                {"role": "assistant", "content": "a"},
+                {"role": "user", "content": "v"},
+            ],
+            400,
+            True,
+            2,
+        ),
+    ]
+    reps = be.complete_many(calls)
+    assert [r.text for r in reps] == ["t0", "t1"]
+    assert [m.role for m in seen[1].messages] == ["system", "user", "assistant", "user"]
+    assert seen[1].messages[0].content == "SYS"
+    assert (seen[0].gen.temperature, seen[0].gen.top_p) == (0.0, 1.0)
+    assert (seen[1].gen.temperature, seen[1].gen.top_p, seen[1].gen.seed) == (0.7, 0.95, 2)
+    assert be.complete(*calls[0]).text == "t0"

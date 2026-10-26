@@ -14,6 +14,18 @@ SONNET = "configs/goal_screen_sonnet.json"
 WORKFLOW = PKG_ROOT.parent.parent / ".github/workflows/warranted-revision-goal-screen-api.yml"
 
 
+@pytest.fixture(autouse=True)
+def _api_tests_without_cancellation(request, monkeypatch):
+    """The API launch machinery is still tested; its one config is cancelled (Amendment 2)."""
+    if "cancelled" not in request.node.name:
+        monkeypatch.setattr(job, "CANCELLED", {})
+
+
+def test_sonnet_api_config_is_cancelled():
+    with pytest.raises(job.LaunchError, match="cancelled"):
+        job.check(SONNET, "dry-run", 0.0)
+
+
 def test_launch_lock_is_current():
     job.check_lock()  # frozen files may not change without a recorded relock
 
@@ -133,3 +145,44 @@ def test_summary_validates_against_the_offered_option_codes(tmp_path, monkeypatc
     assert s["response_line_by_kind"]["first"]["invalid"] == 1
     assert s["response_line_by_kind"]["control"]["invalid"] == 1
     assert s["response_line_by_kind"]["decision"]["invalid"] == 1
+
+
+def _hf_preflight(tmp_path, elapsed_s=60.0, **patch):
+    cfg = gs.load_config(PKG_ROOT / "configs/goal_screen_qwen.json", "gate-test")
+    out = gs.run(
+        cfg,
+        preflight=True,
+        backend=gs.FakeScreenBackend("stubborn", batched=True),
+        out_root=tmp_path,
+    )
+    man = json.loads((out / "manifest.json").read_text())
+    man.update({"elapsed_s": elapsed_s, **patch})
+    (out / "manifest.json").write_text(json.dumps(man))
+    return out, man
+
+
+def test_on_box_gate_projects_runtime_from_measured_batches(tmp_path):
+    out, man = _hf_preflight(tmp_path, elapsed_s=120.0)
+    assert man["planned_batches"] == 12 and man["actual_calls"] == 30
+    s = job.gate(out, remaining_min=200)
+    assert s["gate_passed"] and s["full_run_batches"] == 117
+    assert s["seconds_per_batch"] == 10.0 and s["projected_full_run_min"] == 19.5
+    assert json.loads((out / "gate.json").read_text())["gate_passed"]
+
+
+def test_on_box_gate_stops_runs_that_cannot_finish_or_are_invalid(tmp_path):
+    out, _ = _hf_preflight(tmp_path / "a", elapsed_s=12 * 60.0)  # 60 s per batch: 117 min
+    with pytest.raises(job.LaunchError, match="exceeds"):
+        job.gate(out, remaining_min=150)  # 117 x 1.5 > 150
+    assert job.gate(out, remaining_min=180)["gate_passed"]
+    out, _ = _hf_preflight(tmp_path / "b", stopped="budget: x")
+    with pytest.raises(job.LaunchError, match="stopped"):
+        job.gate(out, remaining_min=500)
+    out, _ = _hf_preflight(tmp_path / "c")
+    rows = [json.loads(x) for x in (out / "calls.jsonl").read_text().splitlines()]
+    for r in [r for r in rows if r["kind"] != "free"][:5]:  # 5 of 30 answers > 10%
+        r["text"] = "RESPONSE: recommend not_an_option"
+    rows[-1]["error"] = "OutOfMemoryError: CUDA"
+    (out / "calls.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+    with pytest.raises(job.LaunchError, match="errors.*unparseable"):
+        job.gate(out, remaining_min=500)

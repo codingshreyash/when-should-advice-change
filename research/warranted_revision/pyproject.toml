@@ -18,7 +18,7 @@ v2 = ["scikit-learn>=1.4"]
 api = ["anthropic==1.11.0"]
 # GPU inference stack (only installed on the GPU box; see RUNBOOK.md).
 # Versions actually installed are frozen into each run manifest (pip freeze) on the GPU box.
-gpu = ["torch==2.8.0", "transformers>=4.57", "accelerate>=1.10", "bitsandbytes>=0.47"]
+gpu = ["torch==2.8.0", "transformers==5.20.2", "accelerate>=1.10", "bitsandbytes>=0.47"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
