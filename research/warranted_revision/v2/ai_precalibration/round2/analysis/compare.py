@@ -32,6 +32,8 @@ F = rows("annotations/followup_only/items.csv")
 J = rows("adjudication/final.csv")
 flag_path = P / "audit_r2/gold_vs_text_flags.json"
 flags = json.loads(flag_path.read_text()) if flag_path.exists() else []
+if isinstance(flags, dict):  # the round-2 auditor nests its list under "flags"
+    flags = flags["flags"]
 flags_by = defaultdict(list)
 for f in flags:
     flags_by[f["item_id"]].append(f)
