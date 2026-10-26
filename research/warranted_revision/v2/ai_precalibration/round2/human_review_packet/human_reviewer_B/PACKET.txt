@@ -1,0 +1,2 @@
+Reviewer packet human_reviewer_B. Key commitment sha256: 3aa33a270cb25868872028fab3d5030badec90cb1c27d259062fdd109e758b97
+Read GUIDELINES_v0.2.md first. Do base_checks.csv before items.csv. Work alone; do not discuss items with the other reviewer until both packets are returned.
