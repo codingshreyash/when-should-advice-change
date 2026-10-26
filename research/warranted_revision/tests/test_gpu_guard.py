@@ -71,7 +71,10 @@ def fake_bin(tmp_path, monkeypatch):
     scripts = {
         "brev": f'echo "brev $*" >> {log}; '
         + '[ "$1" = create ] && [ "${@: -1}" = "--dry-run" ] '
-        + '&& echo "g5.xlarge (500GB disk), L4 (500GB disk), g6.xlarge (500GB disk)"; exit 0',
+        + '&& echo "g5.xlarge (500GB disk), L4 (500GB disk), g6.xlarge (500GB disk)"; '
+        + '[ "$1" = search ] && printf "%s\\n" " TYPE  PROVIDER  GPU  \\$/HR" '
+        + '" g5.xlarge  aws  A10G  ${FAKE_PRICE:-\\$0.60}" " L4  gcp  L4  \\$0.55" '
+        + '" g6.xlarge  aws  L4  \\$0.80"; exit 0',
         "ssh": f'echo "ssh $*" >> {log}; [ "${{@: -1}}" = "true" ] && exit 0; exit 3',
         "scp": f'echo "scp $*" >> {log}; exit 0',
     }
@@ -220,8 +223,9 @@ def test_launch_checks_type_before_creating(tmp_path, fake_bin):
         )
     brev = [c for c in fake_bin.read_text().splitlines() if c.startswith("brev ")]
     assert brev[0].startswith("brev login --token")
-    assert brev[1].endswith("--dry-run") and "--type" not in brev[1]
-    assert brev[2].endswith("--type g5.xlarge --timeout 900")
+    assert brev[1] == "brev search gpu"  # price verified before anything is created
+    assert brev[2].endswith("--dry-run") and "--type" not in brev[2]
+    assert brev[3].endswith("--type g5.xlarge --timeout 900")
 
 
 def test_launch_reuses_planned_instance_name(tmp_path, fake_bin):
@@ -393,3 +397,41 @@ def test_goal_screen_plans_its_own_call_count_and_needs_pinning(tmp_path, fake_b
     api = tmp_path / "api.json"
     api.write_text((PKG_ROOT / "configs" / "goal_screen_sonnet.json").read_text())
     assert ctl.main(args + [str(api)]) != 0  # API subjects never go through the GPU controller
+
+
+def test_listed_price_parsing():
+    ctl = _controller()
+    out = (
+        " TYPE  TARGET_DISK  PROVIDER  GPU  COUNT  $/HR\n"
+        " massedcompute_L40S  625  massedcompute:shadeform  L40S  1  $1.06\n"
+        " massedcompute_L40Sx2  1250  massedcompute:shadeform  L40S  2  $2.11\n"
+    )
+    assert ctl.listed_hourly(out, "massedcompute_L40S") == 1.06
+    assert ctl.listed_hourly(out, "massedcompute_L40Sx2") == 2.11
+    assert ctl.listed_hourly(out, "L40S") is None  # exact type only, never a substring
+
+
+def test_launch_refuses_when_listed_price_exceeds_cap_rate(tmp_path, fake_bin, monkeypatch):
+    ctl = _controller()
+    monkeypatch.setenv("FAKE_PRICE", "$0.70")  # g5.xlarge listed above the 0.6 entered
+    rc = ctl.main(
+        [
+            "launch",
+            "--hourly",
+            "0.6",
+            "--max-usd",
+            "2",
+            "--run-id",
+            "price-t",
+            "--instance-type",
+            "g5.xlarge",
+            "--commands-verified",
+            "--state",
+            str(tmp_path / "s.json"),
+            "--results-dir",
+            str(tmp_path / "r"),
+        ]
+    )
+    calls = fake_bin.read_text()
+    assert rc != 0 and "brev search gpu" in calls and "brev create price" not in calls
+    assert "--type" not in calls  # nothing was created

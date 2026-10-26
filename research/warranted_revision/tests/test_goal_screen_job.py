@@ -186,3 +186,11 @@ def test_on_box_gate_stops_runs_that_cannot_finish_or_are_invalid(tmp_path):
     (out / "calls.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
     with pytest.raises(job.LaunchError, match="errors.*unparseable"):
         job.gate(out, remaining_min=500)
+
+
+def test_on_box_gate_fails_with_no_time_left_even_for_a_fast_preflight(tmp_path):
+    out, _ = _hf_preflight(tmp_path, elapsed_s=0.01)  # projects ~0 minutes
+    with pytest.raises(job.LaunchError, match="min left"):
+        job.gate(out, remaining_min=0)
+    with pytest.raises(job.LaunchError, match="min left"):
+        job.gate(out, remaining_min=-3)

@@ -151,6 +151,18 @@ def build_plan(args: argparse.Namespace) -> dict:
     }
 
 
+def listed_hourly(search_output: str, instance_type: str) -> float | None:
+    """Hourly price of exactly ``instance_type`` from `brev search gpu` (TYPE first, $/HR last)."""
+    for line in search_output.splitlines():
+        cols = line.split()
+        if cols and cols[0] == instance_type and cols[-1].startswith("$"):
+            try:
+                return float(cols[-1].lstrip("$"))
+            except ValueError:
+                return None
+    return None
+
+
 def accepted_types(dry_run_output: str) -> set[str]:
     """Parse `brev create --dry-run` output: 'type (NNNGB disk), type (NNNGB disk), ...'."""
     return set(re.findall(r"([^\s,()]+) \(\d+GB disk\)", dry_run_output))
@@ -227,6 +239,23 @@ def cmd_launch(args: argparse.Namespace) -> int:
     results_local = Path(args.results_dir)
     try:
         run_step(render("login", token=token), 120, secret=token)
+        # The caps are computed from --hourly; refuse unless Brev's current listing for this
+        # exact type is no higher (read-only, creates nothing).
+        search = subprocess.run(render("price"), capture_output=True, text=True, timeout=300)
+        listed = listed_hourly(search.stdout, args.instance_type)
+        hourly = float(args.hourly)
+        print(
+            f"[controller] Brev lists {args.instance_type} at ${listed}/h; caps use ${hourly}/h",
+            flush=True,
+        )
+        if listed is None:
+            raise GuardError(f"could not read the current price of {args.instance_type!r}")
+        if listed > hourly + 1e-9:
+            raise GuardError(
+                f"{args.instance_type} is listed at ${listed}/h, above the ${hourly}/h "
+                "the caps were computed from"
+            )
+        plan["listed_hourly_usd"] = listed
         # Ask create which types it accepts (creates nothing). `--type X --dry-run` only
         # echoes X back, and create silently applies default filters such as a 500 GB disk
         # minimum, so a type listed by `brev search` can still be rejected.

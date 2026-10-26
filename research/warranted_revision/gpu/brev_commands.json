@@ -19,6 +19,14 @@
     ],
     "note": "Lists the types create will accept under its default filters (e.g. min 500GB disk), as 'type (NNNGB disk), ...'. The controller refuses unless the chosen type is listed. With --type, --dry-run only echoes the type back, so it is not a check."
   },
+  "price": {
+    "argv": [
+      "brev",
+      "search",
+      "gpu"
+    ],
+    "note": "VERIFIED 2026-10-26 (Actions run 40408720343): table with TYPE first and $/HR last, e.g. 'massedcompute_L40S ... $1.06'. Read-only."
+  },
   "create": {
     "argv": [
       "brev",

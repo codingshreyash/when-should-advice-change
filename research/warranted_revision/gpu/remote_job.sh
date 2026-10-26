@@ -70,6 +70,9 @@ if python -c "import json,sys; sys.exit(json.load(open('/tmp/wrev/config.json'))
   LEFT=$(( DEADLINE_MIN - ( $(date +%s) - T0 ) / 60 ))
   if ! python -m warranted_revision.goal_screen_job gate --run "$PRE" --remaining-min "$LEFT"; then
     mkdir -p "$OUT"; mv "$PRE" "$OUT/preflight"; cp /tmp/wrev/pip_freeze.txt /tmp/wrev/gpu.txt "$OUT/"
+    if [ -f "$OUT/preflight/gate.json" ]; then
+      python -c "import json,sys; print('GOAL_SCREEN_FILE gate.json', json.dumps(json.load(open(sys.argv[1])), separators=(',', ':')))" "$OUT/preflight/gate.json"
+    fi
     echo "GOAL_SCREEN PREFLIGHT_GATE FAILED: full run not started"
     exit 3
   fi
@@ -79,6 +82,14 @@ if python -c "import json,sys; sys.exit(json.load(open('/tmp/wrev/config.json'))
   python -m warranted_revision.goal_screen_analysis --run "$OUT" || echo "GOAL_SCREEN ERROR"
   python -m warranted_revision.goal_screen_analysis --run "$OUT" \
     --subset v2/ai_precalibration/screen_v1/primary.json || echo "GOAL_SCREEN ERROR"
+  python -m warranted_revision.goal_screen_job summarize --run "$OUT" > /dev/null || true
+  # Counts and pre-registered metrics only (no model text) into the job log, one JSON per
+  # line, so the analysis can be read without downloading the artifact.
+  for f in "$OUT"/analysis*.json "$OUT/summary.json" "$OUT/preflight/gate.json"; do
+    if [ -f "$f" ]; then
+      python -c "import json,sys; print('GOAL_SCREEN_FILE', sys.argv[2], json.dumps(json.load(open(sys.argv[1])), separators=(',', ':')))" "$f" "$(basename "$f")"
+    fi
+  done
   gzip -k "$OUT/calls.jsonl"
 elif python -c "import json,sys; sys.exit(json.load(open('/tmp/wrev/config.json')).get('experiment') != 'scaffold_probe')"; then
   # Scaffold probe: its own runner and records; gold-free gates printed as a PROBE_CHECK line.

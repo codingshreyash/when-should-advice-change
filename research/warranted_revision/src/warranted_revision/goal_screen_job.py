@@ -165,6 +165,11 @@ def gate(run: Path, remaining_min: float, root: Path = PKG_ROOT) -> dict[str, An
                 f"too many unparseable answers {s['response_line']}",
             ),
             (
+                remaining_min < 2,
+                f"only {remaining_min:.0f} min left before the deadline (and `timeout 0` would "
+                "mean no limit)",
+            ),
+            (
                 projected_min * RUNTIME_MARGIN > remaining_min,
                 f"projected {projected_min:.0f} min x {RUNTIME_MARGIN} exceeds the "
                 f"{remaining_min:.0f} min left before the deadline",
