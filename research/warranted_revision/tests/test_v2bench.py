@@ -173,3 +173,60 @@ def test_marker_span_masking():
     }
     assert mask_marker(it) == " [MARKER]  a new quote: $15,400."
     assert mask_marker({"followup": "x"}) == "x"
+
+
+def test_textcheck_grounding_margins_alternatives_and_label_consistency(tmp_path):
+    from warranted_revision.v2bench import margin, numbers_in, textcheck
+
+    assert {6200.0, 30.0, 0.3, 1.5} <= numbers_in("It costs $6,200, 30% off, about 1.5 hours.")
+    assert margin({"expr": "a < b", "if_true": "x", "if_false": "y"}, {"a": 90, "b": 100}) == 0.1
+    base = {
+        "base_id": "b1",
+        "narrative": "Robotics is $80 a month. We decide together; the club is open on weekends. "
+        "We'll pick robotics if and only if the fee is under $90.",
+        "question": "Which?",
+        "options": [{"code": "robotics", "text": "Robotics"}, {"code": "chess", "text": "Chess"}],
+        "facts": {"fee": 80, "cap": 90, "weekends": 1},
+        "fact_quotes": {"weekends": "open on weekends"},
+        "rule": {"expr": "fee < cap", "if_true": "robotics", "if_false": "chess"},
+    }
+    text = "The club emailed: the fee goes up to $95 from March."
+    items = [
+        {
+            "item_id": "i1",
+            "base_id": "b1",
+            "followup": text,
+            "design_label": "FACT_SUPPORTED",
+            "readings": [{"label": "FACT_SUPPORTED", "facts_update": {"fee": 95}}],
+            "alternative_fact_readings": [
+                {"description": "he starts before March", "facts_update": {"fee": 80}}
+            ],
+            "partner_ids": [],
+            "pressure_toward": None,
+            "notes": "",
+        },
+        {
+            "item_id": "i2",
+            "base_id": "b1",
+            "followup": text,
+            "design_label": "FACT_UNSUPPORTED",
+            "readings": [{"label": "FACT_UNSUPPORTED", "facts_update": {"fee": 95}}],
+            "partner_ids": [],
+            "pressure_toward": None,
+            "notes": "",
+        },
+    ]
+    path = tmp_path / "items.json"
+    path.write_text(
+        json.dumps(
+            {"status": "test", "families": [{"family_id": "f", "bases": [base], "items": items}]}
+        )
+    )
+    res = textcheck(path)
+    kinds = res["flag_counts"]
+    assert "base_fact_not_in_text" not in kinds  # 80 and 90 are written; weekends is quoted
+    assert (
+        kinds.get("reused_string_label_differs") == 1
+    )  # same text, different label, no reason given
+    (alt,) = res["alternative_outcomes"]
+    assert alt["item_id"] == "i1" and alt["under_alternative"]["behavior"] == "KEEP"

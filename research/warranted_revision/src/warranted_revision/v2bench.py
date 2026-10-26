@@ -272,6 +272,138 @@ def check(path: Path) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------------------
+# Gold-versus-text check
+# --------------------------------------------------------------------------------------
+
+_NUM = re.compile(r"(?<![\w.])\$?(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)(\s?%)?")
+
+
+def numbers_in(text: str) -> set[float]:
+    """Numbers written in a text, with percentages also as fractions."""
+    out: set[float] = set()
+    for m in _NUM.finditer(text):
+        v = float(m.group(1).replace(",", ""))
+        out.add(v)
+        if m.group(2):
+            out.add(v / 100)
+    return out
+
+
+def _sides(expr: str, facts: dict[str, float]) -> tuple[float, float] | None:
+    """Both sides of a single top-level comparison, or None for compound rules."""
+    tree = ast.parse(expr, mode="eval").body
+    if not isinstance(tree, ast.Compare) or len(tree.comparators) != 1:
+        return None
+    left = ast.Expression(body=tree.left)
+    right = ast.Expression(body=tree.comparators[0])
+    env: dict[str, Any] = {"__builtins__": {}}
+    lv = eval(compile(left, "<l>", "eval"), env, dict(facts))  # noqa: S307
+    rv = eval(compile(right, "<r>", "eval"), env, dict(facts))  # noqa: S307
+    return float(lv), float(rv)
+
+
+def margin(rule: dict[str, str], facts: dict[str, float]) -> float | None:
+    """Relative distance from the rule's threshold, |left - right| / |right|."""
+    sides = _sides(rule["expr"], facts)
+    if sides is None or sides[1] == 0:
+        return None
+    return abs(sides[0] - sides[1]) / abs(sides[1])
+
+
+def textcheck(path: Path, min_margin: float = 0.08) -> dict[str, Any]:
+    """Reproducible checks that each item's gold follows facts the text establishes.
+
+    * every base fact value is written in the narrative, and every updated value in the
+      follow-up (a value that is not written must be derivable; it is flagged for review);
+    * margins before and after each reading's update are at least ``min_margin``;
+    * author-declared ``alternative_fact_readings`` (timing, scope, dependencies the text leaves
+      open) are evaluated, and any that changes the computed behaviour is listed;
+    * a string reused across bases keeps the same design label unless the author gives a
+      ``label_differs_reason`` (a message's type must not follow the numbers).
+    """
+    bases, items = load(path)
+    flags: list[dict[str, Any]] = []
+    for b in bases.values():
+        nums = numbers_in(b["narrative"])
+        quotes = b.get("fact_quotes", {})  # facts encoded from words (yes/no, 7:30, "six")
+        for k, v in b["facts"].items():
+            if float(v) in nums:
+                continue
+            q = quotes.get(k)
+            if q and q in b["narrative"]:
+                continue
+            kind = "fact_quote_not_in_text" if q else "base_fact_not_in_text"
+            flags.append({"where": b["base_id"], "kind": kind, "fact": k, "value": v})
+        m = margin(b["rule"], b["facts"])
+        if m is not None and m < min_margin:
+            flags.append({"where": b["base_id"], "kind": "thin_base_margin", "margin": round(m, 4)})
+    alternatives = []
+    for it in items:
+        b = bases[it["base_id"]]
+        nums = numbers_in(it["followup"])
+        for r in it["readings"]:
+            uq = r.get("update_quotes", {})
+            for k, v in r.get("facts_update", {}).items():
+                if float(v) not in nums and not (uq.get(k) and uq[k] in it["followup"]):
+                    flags.append(
+                        {
+                            "where": it["item_id"],
+                            "kind": "updated_value_not_in_followup",
+                            "fact": k,
+                            "value": v,
+                        }
+                    )
+            if r["label"] in ("GOAL_CHANGE", "FACT_SUPPORTED", "FACT_UNSUPPORTED"):
+                facts = {**b["facts"], **r.get("facts_update", {})}
+                rule = r.get("rule_update") or b["rule"]
+                try:
+                    m = margin(rule, facts)
+                except (KeyError, NameError):
+                    m = None
+                if m is not None and m < min_margin:
+                    flags.append(
+                        {
+                            "where": it["item_id"],
+                            "kind": "thin_post_update_margin",
+                            "reading": r["label"],
+                            "margin": round(m, 4),
+                        }
+                    )
+        gold = behavior(b, it["design_label"], it["readings"])
+        for alt in it.get("alternative_fact_readings", []):
+            alt_base = {**b, "facts": {**b["facts"], **alt.get("facts_update", {})}}
+            got = behavior(alt_base, it["design_label"], it["readings"])
+            if (got.get("behavior"), got.get("action")) != (
+                gold.get("behavior"),
+                gold.get("action"),
+            ):
+                alternatives.append(
+                    {
+                        "item_id": it["item_id"],
+                        "alternative": alt.get("description", ""),
+                        "gold": gold,
+                        "under_alternative": got,
+                    }
+                )
+    by_text: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for it in items:
+        by_text[it["followup"]].append(it)
+    for its in by_text.values():
+        if len(its) > 1 and len({i["design_label"] for i in its}) > 1:
+            if not all(i.get("label_differs_reason") for i in its):
+                flags.append(
+                    {"where": [i["item_id"] for i in its], "kind": "reused_string_label_differs"}
+                )
+    return {
+        "n_items": len(items),
+        "min_margin": min_margin,
+        "flags": flags,
+        "flag_counts": dict(Counter(f["kind"] for f in flags)),
+        "alternative_outcomes": alternatives,
+    }
+
+
+# --------------------------------------------------------------------------------------
 # Shortcut audits
 # --------------------------------------------------------------------------------------
 
@@ -466,6 +598,22 @@ PACKET_COLUMNS = [
     "rationale",
     "minutes",
 ]
+#: Annotation v0.2 separates what a message communicates (``label``) from what it warrants
+#: (``what_changes``, ``advisor_should``, ``computation_notes``); see GUIDELINES_v0.2.md.
+PACKET_COLUMNS_V02 = [
+    "uid",
+    "scenario",
+    "followup",
+    "label",
+    "second_label_if_ambiguous",
+    "alternative_readings",
+    "what_changes",
+    "advisor_should",
+    "computation_notes",
+    "confidence_1to3",
+    "rationale",
+]
+COLUMNS = {"v0.1": PACKET_COLUMNS, "v0.2": PACKET_COLUMNS_V02}
 BASE_COLUMNS = ["base_uid", "scenario", "rule_selects", "rule_reading_notes"]
 
 
@@ -475,7 +623,12 @@ def _scenario(b: dict[str, Any]) -> str:
 
 
 def packet(
-    path: Path, out: Path, seed: int, names: tuple[str, str] = ("reviewer_A", "reviewer_B")
+    path: Path,
+    out: Path,
+    seed: int,
+    names: tuple[str, str] = ("reviewer_A", "reviewer_B"),
+    columns: str = "v0.1",
+    item_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     """Two independently shuffled reviewer packets plus a coordinator key.
 
@@ -487,6 +640,12 @@ def packet(
     if chk["problems"]:
         raise SystemExit(f"item file has problems: {chk['problems'][:3]}")
     bases, items = load(path)
+    if item_ids is not None:  # a subset packet (e.g. the human review sample)
+        missing = set(item_ids) - {it["item_id"] for it in items}
+        if missing:
+            raise SystemExit(f"unknown item ids {sorted(missing)[:3]}")
+        items = [it for it in items if it["item_id"] in set(item_ids)]
+        bases = {b: v for b, v in bases.items() if b in {it["base_id"] for it in items}}
     rng = random.Random(seed)
     uid = {
         it["item_id"]: hashlib.sha256(f"{seed}:{it['item_id']}".encode()).hexdigest()[:10]
@@ -530,7 +689,7 @@ def packet(
         order = items[:]
         rng.shuffle(order)
         with (d / "items.csv").open("w", newline="") as fh:
-            w = csv.DictWriter(fh, fieldnames=PACKET_COLUMNS)
+            w = csv.DictWriter(fh, fieldnames=COLUMNS[columns])
             w.writeheader()
             for it in order:
                 w.writerow(
@@ -705,13 +864,17 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("check", "audit", "packet"):
+    for name in ("check", "audit", "packet", "textcheck"):
         p = sub.add_parser(name)
         p.add_argument("--items", type=Path, required=True)
         p.add_argument("--out", type=Path)
         if name == "packet":
             p.add_argument("--seed", type=int, required=True)
             p.add_argument("--names", nargs=2, default=["reviewer_A", "reviewer_B"])
+            p.add_argument("--columns", choices=sorted(COLUMNS), default="v0.1")
+            p.add_argument(
+                "--item-ids", type=Path, help="JSON list of item ids for a subset packet"
+            )
         if name == "audit":
             p.add_argument("--masked", action="store_true", help="mask author-marked spans")
     g = sub.add_parser("agree")
@@ -725,14 +888,17 @@ def main(argv: list[str] | None = None) -> int:
         res = {k: v for k, v in res.items() if k != "items"} | {"items": res["items"]}
     elif args.cmd == "audit":
         res = audit(args.items, masked=args.masked)
+    elif args.cmd == "textcheck":
+        res = textcheck(args.items)
     elif args.cmd == "packet":
         if not args.out:
             ap.error("--out is required")
-        res = packet(args.items, args.out, args.seed, tuple(args.names))
+        ids = json.loads(args.item_ids.read_text()) if args.item_ids else None
+        res = packet(args.items, args.out, args.seed, tuple(args.names), args.columns, ids)
     else:
         res = agree(args.key, args.a, args.b, args.out)
     text = json.dumps(res, indent=2, default=str)
-    if args.cmd in ("check", "audit") and args.out:
+    if args.cmd in ("check", "audit", "textcheck") and args.out:
         args.out.write_text(text + "\n")
     print(text)
     return 0
