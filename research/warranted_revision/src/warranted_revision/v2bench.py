@@ -714,7 +714,7 @@ def packet(
                 w.writerow({"base_uid": buid[b], "scenario": _scenario(bases[b])})
         (d / "PACKET.txt").write_text(
             f"Reviewer packet {reviewer}. Key commitment sha256: {key_sha}\n"
-            "Read GUIDELINES.md first. Do base_checks.csv before items.csv. Work alone; do not "
+            f"Read {'GUIDELINES_v0.2.md' if columns == 'v0.2' else 'GUIDELINES.md'} first. Do base_checks.csv before items.csv. Work alone; do not "
             "discuss items with the other reviewer until both packets are returned.\n"
         )
     return {"items": len(items), "bases": len(bases), "key_sha256": key_sha, "out": str(out)}
