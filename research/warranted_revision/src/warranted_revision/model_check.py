@@ -51,7 +51,7 @@ def protocol_messages(cfg: gs.ScreenConfig) -> dict[str, list[dict[str, str]]]:
     items, controls = gs.load_screen_items(PKG_ROOT / cfg.items, PKG_ROOT / cfg.manifest)
     it = max(items, key=lambda i: len(gs.first_turn(i.base)) + len(i.followup))
     ctl = max(controls, key=lambda c: len(gs.first_turn(c.scenario, gs.WORDING["B"])))
-    filler = "x " * 600  # stands in for a long reply
+    filler = " ".join(["x"] * 600)  # stands in for a long reply (no trailing whitespace)
     u1 = gs.first_turn(it.base)
     hist = [
         {"role": "user", "content": u1},
@@ -87,15 +87,19 @@ def check_template(tok: Any, cfg: gs.ScreenConfig, kwargs: dict[str, Any]) -> di
                 out["problems"].append(
                     f"{cond}/{shape}: system prompt appears {text.count(system)}x"
                 )
-            pos, ok = 0, True
-            for m in msgs:
-                at = text.find(m["content"], pos)
+            # Templates may strip whitespace around turns; compare stripped content and name
+            # the first turn that cannot be found in order.
+            pos = 0
+            for i, m in enumerate(msgs):
+                body = m["content"].strip()
+                at = text.find(body, pos)
                 if at < 0:
-                    ok = False
+                    seen = "elsewhere" if body in text else "absent"
+                    out["problems"].append(
+                        f"{cond}/{shape}: turn {i} ({m['role']}) {seen}: {body[:40]!r}"
+                    )
                     break
-                pos = at + len(m["content"])
-            if not ok:
-                out["problems"].append(f"{cond}/{shape}: turns missing or out of order")
+                pos = at + len(body)
             users = [text.find(m["content"]) for m in msgs if m["role"] == "user"]
             sys_at = text.find(system)
             if sys_at < users[0]:

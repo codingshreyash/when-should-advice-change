@@ -9,8 +9,11 @@ class Tok:
     """Renders like a chat template: system first (Qwen style) or before the last user turn
     (Mistral style); ``drop_system`` and ``raises`` simulate broken templates."""
 
-    def __init__(self, style="first", drop_system=False, raises=False):
+    def __init__(
+        self, style="first", drop_system=False, raises=False, strip=False, drop_assistant=False
+    ):
         self.style, self.drop, self.raises = style, drop_system, raises
+        self.strip, self.drop_assistant = strip, drop_assistant
 
     def apply_chat_template(self, msgs, tokenize, add_generation_prompt, **kw):
         if self.raises:
@@ -19,6 +22,10 @@ class Tok:
         last_user = max(i for i, m in enumerate(turns) if m["role"] == "user")
         out = "" if self.drop or self.style != "first" else f"<s>{sys_msg}</s>"
         for i, m in enumerate(turns):
+            if m["role"] == "assistant" and self.drop_assistant:
+                continue
+            body = m["content"].strip() if self.strip else m["content"]
+            m = {**m, "content": body}
             pre = (
                 f"{sys_msg}\n\n"
                 if self.style == "last" and i == last_user and not self.drop
@@ -64,3 +71,13 @@ def test_memory_estimate():
         C(), 12_247_782_400, gs.load_config(PKG_ROOT / "configs/goal_screen_qwen.json"), 2500
     )
     assert m["weights_gb_bf16"] == 24.5 and m["fits"] is True
+
+
+def test_whitespace_stripping_passes_but_a_dropped_turn_fails():
+    stripped = Tok(strip=True)
+    cfg = _cfg()
+    msgs = mc.protocol_messages(cfg)
+    msgs["free"][1]["content"] += "  \n"  # a reply with trailing whitespace
+    assert not mc.check_template(stripped, cfg, {})["problems"]
+    probs = mc.check_template(Tok(drop_assistant=True), cfg, {})["problems"]
+    assert any("(assistant) absent" in p for p in probs)
