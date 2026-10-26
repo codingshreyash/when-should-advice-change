@@ -371,8 +371,14 @@ def textcheck(path: Path, min_margin: float = 0.08) -> dict[str, Any]:
                     )
         gold = behavior(b, it["design_label"], it["readings"])
         for alt in it.get("alternative_fact_readings", []):
-            alt_base = {**b, "facts": {**b["facts"], **alt.get("facts_update", {})}}
-            got = behavior(alt_base, it["design_label"], it["readings"])
+            # An alternative reading of the facts applies on top of the base facts and of each
+            # reading's own update (e.g. "the higher price only applies from March").
+            upd = alt.get("facts_update", {})
+            alt_base = {**b, "facts": {**b["facts"], **upd}}
+            alt_readings = [
+                {**r, "facts_update": {**r.get("facts_update", {}), **upd}} for r in it["readings"]
+            ]
+            got = behavior(alt_base, it["design_label"], alt_readings)
             if (got.get("behavior"), got.get("action")) != (
                 gold.get("behavior"),
                 gold.get("action"),
