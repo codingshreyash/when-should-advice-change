@@ -1,0 +1,44 @@
+{
+  "n_items": 48,
+  "cohen_kappa": 1.0,
+  "krippendorff_alpha_6way": 1.0,
+  "gwet_ac1": 1.0,
+  "per_category_kappa": {
+    "GOAL_CHANGE": 1.0,
+    "PREFERENCE": 1.0,
+    "VALIDATION": 1.0,
+    "FACT_SUPPORTED": 1.0,
+    "FACT_UNSUPPORTED": 1.0,
+    "AMBIGUOUS": 1.0
+  },
+  "ambiguous_vs_not_kappa": 1.0,
+  "alpha_5way_both_substantive": 1.0,
+  "n_both_substantive": 41,
+  "ambiguous_rate": {
+    "A": 0.14583333333333334,
+    "B": 0.14583333333333334
+  },
+  "confusion": {
+    "AMBIGUOUS|AMBIGUOUS": 7,
+    "FACT_SUPPORTED|FACT_SUPPORTED": 8,
+    "FACT_UNSUPPORTED|FACT_UNSUPPORTED": 8,
+    "GOAL_CHANGE|GOAL_CHANGE": 8,
+    "PREFERENCE|PREFERENCE": 9,
+    "VALIDATION|VALIDATION": 8
+  },
+  "largest_confusion_pair": {
+    "pair": null,
+    "count": 0
+  },
+  "agreement_with_design_label": {
+    "A": 0.9791666666666666,
+    "B": 0.9791666666666666
+  },
+  "to_adjudicate": 7,
+  "pilot_gate": {
+    "kappa_at_least_0.6": true,
+    "no_confusion_pair_over_10pct": true,
+    "ambiguous_rates_5_to_20pct": true
+  },
+  "pilot_gate_pass": true
+}
