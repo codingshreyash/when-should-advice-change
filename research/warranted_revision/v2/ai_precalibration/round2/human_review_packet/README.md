@@ -9,7 +9,21 @@
 The selection rule was committed (`round2/analysis/compare.py`, commit 3e00f8f) before the
 auditor's findings were read. Reviewers are not told which items are which.
 
-**What to send.** Send each person only their own folder (`human_reviewer_A/` or
+**Status:** approved to prepare (2026-10-26); ready to send.
+
+**What to send.** Send only `send_to_reviewer_A.zip` or `send_to_reviewer_B.zip`, one per
+person, and do not give reviewers access to this repository: it contains the AI annotations,
+the key and the audits. Each zip holds `START_HERE.md`, the guidelines, `base_checks.csv` and
+`items.csv`, and asks reviewers not to use AI assistants.
+
+**Scoring** (after both return):
+
+1. `python -m warranted_revision.v2bench agree --key <this dir>/coordinator/key.json --a … --b …
+   --out …` gives agreement and the blind-first adjudication files for a **human** adjudicator.
+2. `python v2/ai_precalibration/round2/human_review_packet/score_humans.py --a … --b … --out …`
+   compares the human answers with the gold and, separately, with the AI judgements.
+
+Earlier text: Send each person only their own folder (`human_reviewer_A/` or
 `human_reviewer_B/`, each holding the items, base checks and `GUIDELINES_v0.2.md`). Keep
 `coordinator/key.json` private; its sha256 is in each `PACKET.txt`. Reviewers must not see any
 AI annotation, adjudication or audit file.
