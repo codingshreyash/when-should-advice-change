@@ -107,12 +107,21 @@ jobs:
             --config "$CONFIG" --shard "$SHARD" --est-seconds-per-call "$EST_SPC" $BENCH_FLAG
 
       - name: Install Brev CLI
-        if: ${{ !inputs.dry_run }}
-        # Unverified installer URL; confirm against the official Brev docs before enabling.
+        # Installed for dry runs too, so the price listing below can be read without a launch.
         run: |
           bash -c "$(curl -fsSL https://raw.githubusercontent.com/brevdev/brev-cli/main/bin/install-latest.sh)"
           # Command templates were checked against v0.6.335; a different version is logged here.
           brev --version
+
+      - name: Current Brev listing for the instance type (read-only, no instance created)
+        env:
+          BREV_API_TOKEN: ${{ secrets.BREV_API_TOKEN }}
+        run: |
+          brev login --token "$BREV_API_TOKEN" > /dev/null
+          brev search --help | head -40 || true
+          brev search > "$GITHUB_WORKSPACE/brev_search.txt" 2>&1 || true
+          head -5 "$GITHUB_WORKSPACE/brev_search.txt"
+          grep -i -- "$INSTANCE_TYPE" "$GITHUB_WORKSPACE/brev_search.txt" || echo "[price] $INSTANCE_TYPE not in brev search"
 
       - name: Launch, run, copy back, delete
         if: ${{ !inputs.dry_run }}
