@@ -430,3 +430,13 @@ def test_subset_analysis_keeps_run_level_validity(setup):
     assert part["by_condition"]["N"]["first_turn"]["bases"] == 2  # first turns survive the filter
     assert part["planned_counts"]["fact_flip"] == 0
     assert full["by_condition"]["N"]["decision_A"]["conditioned"]["fact_flip_acceptance"]["n"] == 2
+
+
+def test_preflight_has_its_own_smaller_cap(setup):
+    cfg, out = setup
+    c = cfg(
+        budget={"max_usd": 8.0, "usd_per_m_input": 2.2, "usd_per_m_output": 11.0},
+        preflight_max_usd=0.005,
+    )
+    m = json.loads((gs.run(c, preflight=True, out_root=out) / "manifest.json").read_text())
+    assert m["stopped"].startswith("budget") and m["spend_usd"] <= 0.005

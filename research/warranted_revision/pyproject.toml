@@ -11,9 +11,11 @@ requires-python = ">=3.10"
 dependencies = ["pydantic>=2.5,<3", "matplotlib>=3.7"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.8"]
+dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.8", "pyyaml>=6"]
 # Benchmark v2 shortcut audits (CPU only).
 v2 = ["scikit-learn>=1.4"]
+# Claude API subject for the goal screen (the SDK version the runner was tested against).
+api = ["anthropic==1.11.0"]
 # GPU inference stack (only installed on the GPU box; see RUNBOOK.md).
 # Versions actually installed are frozen into each run manifest (pip freeze) on the GPU box.
 gpu = ["torch==2.8.0", "transformers>=4.57", "accelerate>=1.10", "bitsandbytes>=0.47"]

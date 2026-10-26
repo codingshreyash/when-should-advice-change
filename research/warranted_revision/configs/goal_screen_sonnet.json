@@ -31,8 +31,8 @@
  "max_tokens_free": 400,
  "max_tokens_decision": 400,
  "budget": {
-  "max_usd": 10.0,
-  "usd_per_m_input": 2.0,
-  "usd_per_m_output": 10.0
+  "max_usd": 8.0,
+  "usd_per_m_input": 2.2,
+  "usd_per_m_output": 11.0
  }
 }

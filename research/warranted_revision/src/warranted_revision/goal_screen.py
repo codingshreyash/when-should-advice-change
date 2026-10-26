@@ -266,6 +266,7 @@ class ScreenConfig(BaseModel):
     seed: int = 20261027
     preflight_items: list[str] = Field(default_factory=list)
     preflight_controls: list[str] = Field(default_factory=list)
+    preflight_max_usd: float = Field(default=1.0, gt=0)  # the preflight's own, smaller cap
     out_root: str = "../../results/warranted_revision"
     shard: str = "1/1"  # accepted for controller compatibility; never sharded
 
@@ -587,7 +588,10 @@ def run(
     if dry_run:
         return None
     be = backend or build_backend(cfg)
-    budget = Budget(cfg.budget) if cfg.budget else None
+    budget = None
+    if cfg.budget is not None:
+        cap = min(cfg.budget.max_usd, cfg.preflight_max_usd) if preflight else cfg.budget.max_usd
+        budget = Budget(cfg.budget.model_copy(update={"max_usd": cap}))
     out = (out_root or (PKG_ROOT / cfg.out_root)) / (
         cfg.run_id + ("-preflight" if preflight else "")
     )

@@ -1,0 +1,141 @@
+# Manual goal-screen run against the Claude API (research/warranted_revision, screen_v1).
+#
+# Nothing runs on push or on a schedule. Three modes, each dispatched by hand:
+#   dry-run    tests + launch checks + call plan; no API key is read and no API call is made.
+#   preflight  the 30-call cost preflight (own cap $1). Needs approve_usd = the config's cap.
+#   full       the full run (1,008 calls, cap $8). Needs approve_usd and the Actions run id of
+#              an accepted preflight; the launch check refuses if that preflight had API
+#              errors, stopped, missed calls, >10% unparseable answers, or projects over the cap.
+#
+# The paid job runs in the `goal-screen-paid` environment: put ANTHROPIC_API_KEY there as an
+# environment secret and add yourself as a required reviewer, so every paid run waits for an
+# explicit approval in the GitHub UI. The key is exposed to the single step that calls the API.
+# The in-code budget is pre-request accounting, not a provider-enforced cap: set a workspace
+# spend limit in the Claude Console for a hard cap.
+name: warranted-revision goal screen (API)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run (no API call), preflight (30 calls, <= $1) or full (<= $8)"
+        type: choice
+        options: [dry-run, preflight, full]
+        default: dry-run
+      config:
+        description: "Approved API config"
+        type: choice
+        options: [configs/goal_screen_sonnet.json]
+        default: configs/goal_screen_sonnet.json
+      run_id:
+        description: "Unique run id (letters, digits, . _ -)"
+        required: true
+      approve_usd:
+        description: "Type the config's approved cap in USD (8) to allow a paid mode"
+        required: true
+        default: "0"
+      preflight_run_id:
+        description: "full only: the Actions run id of the accepted preflight"
+        required: false
+        default: ""
+
+concurrency:
+  group: warranted-revision-goal-screen-api
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  # Inputs reach shell steps only through environment variables (no inline interpolation).
+  MODE: ${{ inputs.mode }}
+  CONFIG: ${{ inputs.config }}
+  RUN_ID: ${{ inputs.run_id }}
+  APPROVE_USD: ${{ inputs.approve_usd }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: research/warranted_revision
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install CPU package and run the test suite
+        run: |
+          python -m pip install -q -e '.[dev,v2,api]'
+          python -m pytest -q
+      - name: Launch checks and call plan (no API call)
+        run: |
+          python -m warranted_revision.goal_screen_job check --config "$CONFIG" --mode dry-run
+          python -m warranted_revision.goal_screen --config "$CONFIG" --run-id "$RUN_ID" --dry-run
+
+  paid:
+    needs: check
+    if: ${{ inputs.mode != 'dry-run' }}
+    runs-on: ubuntu-latest
+    environment: goal-screen-paid
+    timeout-minutes: 240
+    permissions:
+      contents: read
+      actions: read  # to download the preflight artifact for a full run
+    defaults:
+      run:
+        working-directory: research/warranted_revision
+    env:
+      PREFLIGHT_FLAG: ${{ inputs.mode == 'preflight' && '--preflight' || '' }}
+      OUT: ${{ github.workspace }}/results/warranted_revision/${{ inputs.run_id }}${{ inputs.mode == 'preflight' && '-preflight' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: python -m pip install -q -e '.[api]'
+
+      - name: Download the accepted preflight
+        if: ${{ inputs.mode == 'full' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: goal-screen-preflight
+          run-id: ${{ inputs.preflight_run_id }}
+          github-token: ${{ github.token }}
+          path: ${{ github.workspace }}/preflight
+
+      - name: Launch checks (spend approval, frozen hashes, preflight acceptance)
+        run: |
+          PF=""
+          if [ "$MODE" = "full" ]; then PF="--preflight-dir $GITHUB_WORKSPACE/preflight"; fi
+          python -m warranted_revision.goal_screen_job check --config "$CONFIG" --mode "$MODE" \
+            --approve-usd "$APPROVE_USD" $PF
+
+      - name: Run (the only step that sees the API key)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          test -n "$ANTHROPIC_API_KEY" || { echo "ANTHROPIC_API_KEY is not set in the goal-screen-paid environment"; exit 1; }
+          python -m warranted_revision.goal_screen --config "$CONFIG" --run-id "$RUN_ID" $PREFLIGHT_FLAG
+
+      - name: Cost and validity summary (counts only, no model text)
+        if: ${{ always() }}
+        run: python -m warranted_revision.goal_screen_job summarize --run "$OUT"
+
+      - name: Pre-registered analysis (full run only)
+        if: ${{ inputs.mode == 'full' }}
+        run: |
+          python -m warranted_revision.goal_screen_analysis --run "$OUT"
+          python -m warranted_revision.goal_screen_analysis --run "$OUT" \
+            --subset v2/ai_precalibration/screen_v1/primary.json
+
+      - name: Upload results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: goal-screen-${{ inputs.mode }}
+          path: ${{ env.OUT }}
+          retention-days: 90
+          if-no-files-found: warn
