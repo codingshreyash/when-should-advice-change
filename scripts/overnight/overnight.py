@@ -119,6 +119,8 @@ def agent_env(keep_api_key: bool, pass_id: str) -> dict[str, str]:
     if keep_api_key and "ANTHROPIC_API_KEY" in os.environ:
         env["ANTHROPIC_API_KEY"] = os.environ["ANTHROPIC_API_KEY"]
     env["OVERNIGHT_PASS"] = pass_id
+    # Return the agent's shell to the project root after every command.
+    env["CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR"] = "1"
     return env
 
 
@@ -199,8 +201,13 @@ class Runner:
     # ----------------------------------------------------------------- one pass
 
     def tools_for(self, p: dict[str, Any]) -> tuple[list[str], list[str]]:
-        allowed = COMMON_TOOLS + list(p.get("tools", [])) + [f"Edit({g})" for g in p["writes"]]
-        denied = DENIED_TOOLS + [f"Edit({g})" for g in self.cfg["protected"]]
+        # Edit rules are anchored to the worktree's absolute path ("//" prefix): a relative rule
+        # is resolved against the session's current directory, so after `cd sub && ...` an
+        # allowed write was refused and a protected path could slip past a relative deny rule
+        # (found by the real smoke run).
+        root = f"/{self.wt}"
+        allowed = COMMON_TOOLS + list(p.get("tools", [])) + [f"Edit({root}/{g})" for g in p["writes"]]
+        denied = DENIED_TOOLS + [f"Edit({root}/{g})" for g in self.cfg["protected"]]
         return allowed, denied
 
     def claude(

@@ -123,8 +123,12 @@ def test_full_queue_commits_each_pass_and_scrubs_credentials(repo, tmp_path):
     argv = next(c["argv"] for c in calls if c["pass"] == "01_verdict")
     assert "--strict-mcp-config" in argv and argv[argv.index("--permission-mode") + 1] == "dontAsk"
     denied = argv[argv.index("--disallowedTools") + 1:]
-    assert "Bash(git push:*)" in denied and "Bash(brev:*)" in denied and "Edit(data/**)" in denied
-    assert "WebSearch" in argv and "Edit(docs/overnight/01_RESEARCH_VERDICT.md)" in argv
+    root = f"/{wt.resolve()}"
+    assert "Bash(git push:*)" in denied and "Bash(brev:*)" in denied and f"Edit({root}/data/**)" in denied
+    assert "WebSearch" in argv and f"Edit({root}/docs/overnight/01_RESEARCH_VERDICT.md)" in argv
+    # every Edit rule is anchored to the worktree (relative rules follow the session's cwd)
+    assert all(a.startswith(f"Edit({root}/") for a in argv if a.startswith("Edit("))
+    assert all(c["env"].count("CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR") for c in calls)
     argv2 = next(c["argv"] for c in calls if c["pass"] == "02_evidence")
     assert "WebSearch" not in argv2
     # pass 1 could not see the initial assessment; pass 5 could; it is back afterwards
