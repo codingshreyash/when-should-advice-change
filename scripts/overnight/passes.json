@@ -1,0 +1,176 @@
+{
+ "_doc": "Finite pass queue for scripts/overnight/overnight.py. Each pass is one fresh headless Claude Code session. 'writes' are the only paths a pass may create or change (checked after the pass with git status, in addition to the tool permission rules). 'tools' are extra allowed tools on top of the common read-only set. 'checks' are commands the runner itself runs after the pass; all must exit 0.",
+ "protected": [
+  "data/**",
+  "results/**",
+  "report/**",
+  "PROTOCOL.md",
+  "README.md",
+  ".github/**",
+  "docs/findings.md",
+  "docs/PREREGISTRATION_DECISION_PROCEDURES.md",
+  "docs/NIMBLE_OVERLAP_AUDIT.md",
+  "docs/PROPOSAL_GAP.md",
+  "docs/labeling.md",
+  "docs/overnight/00_INITIAL_ASSESSMENT.md",
+  "scripts/lib/**",
+  "scripts/run/**",
+  "scripts/overnight/**",
+  "research/warranted_revision/NEGATIVE_METHODS_REPORT.md",
+  "research/warranted_revision/v2/**",
+  "research/warranted_revision/configs/decision_procedure_full.json",
+  "research/warranted_revision/configs/decision_procedure_pilot.json"
+ ],
+ "smoke": [
+  {
+   "id": "00_smoke",
+   "prompt": "prompts/00_smoke.md",
+   "output": "docs/overnight/00_SMOKE.md",
+   "headings": [
+    "## Files read",
+    "## Test result",
+    "## Permission check"
+   ],
+   "writes": [
+    "docs/overnight/00_SMOKE.md"
+   ],
+   "tools": [],
+   "max_turns": 12,
+   "timeout_min": 15,
+   "checks": [],
+   "must_not_exist": [
+    "docs/overnight/SHOULD_NOT_EXIST.md"
+   ]
+  }
+ ],
+ "passes": [
+  {
+   "id": "01_verdict",
+   "prompt": "prompts/01_research_verdict.md",
+   "output": "docs/overnight/01_RESEARCH_VERDICT.md",
+   "headings": [
+    "## Strongest argument for continuing",
+    "## Strongest argument for stopping",
+    "## Novelty and measurement threats",
+    "## Overstated or unsupported claims",
+    "## Ranked recommendation"
+   ],
+   "writes": [
+    "docs/overnight/01_RESEARCH_VERDICT.md"
+   ],
+   "tools": [
+    "WebSearch",
+    "WebFetch"
+   ],
+   "max_turns": 60,
+   "timeout_min": 60,
+   "checks": [],
+   "hide": [
+    "docs/overnight/00_INITIAL_ASSESSMENT.md"
+   ]
+  },
+  {
+   "id": "02_evidence",
+   "prompt": "prompts/02_existing_evidence.md",
+   "output": "docs/overnight/02_EXISTING_EVIDENCE.md",
+   "headings": [
+    "## Reproduced legacy numbers",
+    "## Pressure versus neutral mention",
+    "## Relevant versus irrelevant updates",
+    "## Option order",
+    "## Abstention and refusals",
+    "## Choice changes versus probability changes",
+    "## Comparisons the existing data cannot support"
+   ],
+   "writes": [
+    "docs/overnight/02_EXISTING_EVIDENCE.md",
+    "docs/overnight/analysis/**"
+   ],
+   "tools": [],
+   "max_turns": 80,
+   "timeout_min": 90,
+   "checks": []
+  },
+  {
+   "id": "03_audit",
+   "prompt": "prompts/03_implementation_audit.md",
+   "output": "docs/overnight/03_IMPLEMENTATION_AUDIT.md",
+   "headings": [
+    "## Tests and dry runs executed",
+    "## Findings",
+    "## Eligibility and the not-evaluable outcome",
+    "## Recommended pre-run amendments"
+   ],
+   "writes": [
+    "docs/overnight/03_IMPLEMENTATION_AUDIT.md",
+    "docs/overnight/analysis/**"
+   ],
+   "tools": [],
+   "max_turns": 80,
+   "timeout_min": 90,
+   "checks": []
+  },
+  {
+   "id": "04_fixes",
+   "prompt": "prompts/04_safe_fixes.md",
+   "output": "docs/overnight/04_IMPLEMENTATION_CHANGES.md",
+   "headings": [
+    "## Changes made",
+    "## Changes considered and not made",
+    "## Tests after the changes"
+   ],
+   "writes": [
+    "docs/overnight/04_IMPLEMENTATION_CHANGES.md",
+    "docs/overnight/labeling_packet/**",
+    "docs/PREREG_AMENDMENT_*.md",
+    "research/warranted_revision/src/**",
+    "research/warranted_revision/tests/**",
+    "research/warranted_revision/gpu/**",
+    "research/warranted_revision/configs/decision_procedure_lock.json",
+    "scripts/data/labeling.py",
+    "tests/**"
+   ],
+   "tools": [],
+   "max_turns": 100,
+   "timeout_min": 120,
+   "checks": [
+    "tests",
+    "lock",
+    "amendment_if_relocked"
+   ],
+   "requires": [
+    "03_audit"
+   ]
+  },
+  {
+   "id": "05_brief",
+   "prompt": "prompts/05_morning_brief.md",
+   "output": "docs/overnight/MORNING_BRIEF.md",
+   "headings": [
+    "## 1. Completed overnight",
+    "## 2. New findings supported by evidence",
+    "## 3. Tests run",
+    "## 4. Files changed and commits",
+    "## 5. Problems and blockers",
+    "## 6. Is the four-arm experiment defensible",
+    "## 7. Needs human input",
+    "## 8. Single next action",
+    "## 9. Budget",
+    "## 10. Verdict"
+   ],
+   "verdict_line": true,
+   "writes": [
+    "docs/overnight/MORNING_BRIEF.md"
+   ],
+   "tools": [],
+   "max_turns": 30,
+   "timeout_min": 30,
+   "checks": [],
+   "always_run": true
+  }
+ ],
+ "check_commands": {
+  "tests": "cd research/warranted_revision && python3 -m pytest -q -p no:cacheprovider",
+  "lock": "PYTHONPATH=research/warranted_revision/src python3 -m warranted_revision.decision_procedure lock"
+ }
+}
