@@ -1,0 +1,13 @@
+{
+ "sha256": {
+  "scripts/lib/prompts.py": "a4ac5339012182112d5252b3971a741a0e02eee172a7a4a59f3c267a0c0f490c",
+  "data/derived/pressure_controls.jsonl": "8b44b53ab12f03769c38742a935f6a391843195ad872ebe99a02054f0faee850",
+  "data/scenarios/career_pilot.jsonl": "72e9f043e646369eaf0e72b7d2e398519506fb93a33642e08a56191528df5cd6",
+  "data/scenarios/career_v2.jsonl": "cce67cdc22b8c89807c08ed03f745de0e76a5f792bb743913b93153b7bfabd72",
+  "docs/PREREGISTRATION_DECISION_PROCEDURES.md": "513cf488bb3b05bfd8255d2fb52906178dc488683a61a1f0f777e440b496cfc3",
+  "research/warranted_revision/src/warranted_revision/decision_procedure.py": "af687b08ccea28aa9f6388c4fbea518eb560a7616320949e40abb94a6c4fce7e",
+  "research/warranted_revision/src/warranted_revision/decision_procedure_analysis.py": "137db7d69a1db9c12fc169eb2aa3568b0dae6725bd610ac8f89a644c2ca68213",
+  "research/warranted_revision/configs/decision_procedure_pilot.json": "49e349c103452bf1905eafb5b5a4e234e01e57d192634e933a1b95699699e7c8",
+  "research/warranted_revision/configs/decision_procedure_full.json": "0fed1372ce00c17f9e5eb1249fb2faf8ce6f04d0f70bedf3022242a80dfc1fa2"
+ }
+}

@@ -1,0 +1,62 @@
+{
+ "run_id": "dp-confirmatory-v1",
+ "label": "Confirmatory: 30 scenarios x 8 variants x 5 samples x 4 arms",
+ "samples": 5,
+ "max_calls": 4800,
+ "preflight": {
+  "scenario_ids": [
+   "career_01",
+   "career_11"
+  ],
+  "samples": 1
+ },
+ "experiment": "decision_procedure",
+ "scenarios": "data/derived/pressure_controls.jsonl",
+ "variants": [
+  "base",
+  "pressure",
+  "reframe",
+  "relevant_update",
+  "subthreshold_update",
+  "irrelevant_update",
+  "omission",
+  "mention_target"
+ ],
+ "option_order_seed": 1684,
+ "arms": [
+  {
+   "name": "A",
+   "weights": "base",
+   "procedure": "scorer"
+  },
+  {
+   "name": "B",
+   "weights": "base",
+   "procedure": "constrained",
+   "max_new_tokens": 32
+  },
+  {
+   "name": "C",
+   "weights": "base",
+   "procedure": "conversational",
+   "max_new_tokens": 512
+  },
+  {
+   "name": "D",
+   "weights": "nimble",
+   "procedure": "scorer"
+  }
+ ],
+ "base": {
+  "model_id": "Qwen/Qwen3.5-9B",
+  "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a"
+ },
+ "nimble": {
+  "model_id": "bespokelabs/Bespoke-Nimble-9B",
+  "revision": "594dfdcfb6f94e3d0c0db7535180d3c71689169a",
+  "code_commit": "54c2e82e8f613a7ab3a4d4072c50dfb9376db4e3",
+  "code_repo": "https://github.com/bespokelabsai/nimble.git"
+ },
+ "scorer_temperature": 1.0,
+ "max_batch": 9
+}

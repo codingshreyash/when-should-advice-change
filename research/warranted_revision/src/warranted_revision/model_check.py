@@ -209,6 +209,62 @@ def check(cfg_path: Path) -> dict[str, Any]:
     return res
 
 
+def _hub_file(repo: str, rev: str, name: str) -> dict[str, Any]:
+    req = urllib.request.Request(f"https://huggingface.co/{repo}/resolve/{rev}/{name}")
+    if os.environ.get("HF_TOKEN"):
+        req.add_header("Authorization", f"Bearer {os.environ['HF_TOKEN']}")
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read())
+
+
+def check_decision_procedure(cfg_path: Path) -> dict[str, Any]:
+    """Both pinned revisions exist; the adapter's ``schema_config.json`` names the
+    preregistered base; the base's chat template (thinking off) renders the longest
+    conversational prompt, which fits the context with ``max_new_tokens``."""
+    from . import decision_procedure as dp
+
+    cfg = dp.load_config(cfg_path)
+    res: dict[str, Any] = {"config": str(cfg_path), "model": cfg.base.model_id, "problems": []}
+    for pin in (cfg.base, cfg.nimble):
+        try:
+            _hub(f"{pin.model_id}/revision/{pin.revision}")
+        except Exception as exc:  # noqa: BLE001
+            res["problems"].append(f"{pin.model_id}@{pin.revision[:8]} not found: {exc}")
+    try:
+        contract = _hub_file(cfg.nimble.model_id, cfg.nimble.revision, "schema_config.json")
+        res["nimble_contract"] = {k: contract.get(k) for k in ("model", "revision", "max_length")}
+        dp.check_contract(contract, cfg)
+    except Exception as exc:  # noqa: BLE001
+        res["problems"].append(f"contract: {type(exc).__name__}: {exc}")
+    from transformers import AutoConfig, AutoTokenizer
+
+    tok = AutoTokenizer.from_pretrained(cfg.base.model_id, revision=cfg.base.revision)
+    conf = AutoConfig.from_pretrained(cfg.base.model_id, revision=cfg.base.revision)
+    items = [i for i in dp.build_items(cfg) if i.procedure != "scorer"]
+    longest = max(items, key=lambda i: len(i.text))
+    text = tok.apply_chat_template(
+        [{"role": "user", "content": longest.text}],
+        tokenize=False,
+        add_generation_prompt=True,
+        enable_thinking=False,
+    )
+    n = len(tok(text)["input_ids"])
+    ctx = getattr(getattr(conf, "text_config", conf), "max_position_embeddings", None)
+    res["template"] = {
+        "longest_prompt_tokens": n,
+        "context_window": ctx,
+        "prompt_once": text.count(longest.text) == 1,
+        "ends_with_empty_think": text.rstrip().endswith("</think>"),
+    }
+    if text.count(longest.text) != 1:
+        res["problems"].append("the chat template does not contain the prompt exactly once")
+    max_new = max(a.max_new_tokens or 0 for a in cfg.arms)
+    if ctx is not None and n + max_new > ctx:
+        res["problems"].append(f"longest prompt {n} + {max_new} > context {ctx}")
+    res["ok"] = not res["problems"]
+    return res
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -217,6 +273,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path)
     args = ap.parse_args(argv)
     raw = json.loads(args.config.read_text())
+    if raw.get("experiment") == "decision_procedure":
+        res = check_decision_procedure(args.config)
+        text = json.dumps(res, indent=1)
+        if args.out:
+            args.out.write_text(text + "\n")
+        print(text)
+        print(f"[model_check] {'OK' if res['ok'] else 'FAILED'} {res['model']}")
+        return 0 if res["ok"] else 1
     if raw.get("experiment") != "goal_screen":
         print(f"[model_check] skipped: {args.config} is not a goal-screen config")
         return 0

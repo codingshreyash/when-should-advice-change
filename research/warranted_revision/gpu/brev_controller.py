@@ -109,6 +109,23 @@ def build_plan(args: argparse.Namespace) -> dict:
         )
         n_calls, max_calls = goal_screen.plan_calls(gcfg, items, controls)["total"], gcfg.max_calls
         extra_calls = goal_screen.preflight_plan(gcfg, items, controls)
+    elif raw.get("experiment") == "decision_procedure":
+        from warranted_revision import decision_procedure as dp
+
+        dcfg = dp.DPConfig.model_validate(raw)
+        dp.check_lock()
+        dp.check_config_locked(dcfg)
+        est = dp.estimate_seconds(dcfg)
+        n_calls, max_calls = dp.plan(dcfg)["calls"], dcfg.max_calls
+        extra_calls = est["calls"] - n_calls
+        # Scorer calls and generation batches cost very different times, so the per-call
+        # figure comes from the experiment's own estimate (model preparation included).
+        print(
+            f"[controller] decision_procedure estimate: {est['seconds'] / 60:.0f} min on the box "
+            f"for {est['calls']} calls; --est-seconds-per-call {args.est_seconds_per_call} ignored",
+            flush=True,
+        )
+        args.est_seconds_per_call = est["seconds_per_call"]
     else:
         cfg = RunConfig.model_validate(raw)
         n_calls, max_calls = expected_calls(cfg, shard_cases(cfg, load_cases(cfg))), cfg.max_calls
@@ -158,9 +175,15 @@ BUNDLE = ("pyproject.toml", "PROTOCOL.md", "src", "configs", "data", "gpu", "tes
 
 
 def write_bundle(path: Path, config: Path) -> Path:
+    from warranted_revision.decision_procedure import CS1684_FILES, CS1684_LABELS, resolve
+
     with tarfile.open(path, "w:gz") as tar:
         for sub in BUNDLE:
             tar.add(PKG / sub, arcname=f"warranted_revision/{sub}")
+        # The CS 1684 decision-procedure experiment reads the original project's prompts,
+        # scenarios and (once they exist) blind labels from the repository root.
+        for rel in CS1684_FILES + tuple(r for r in CS1684_LABELS if resolve(r).exists()):
+            tar.add(resolve(rel), arcname=f"warranted_revision/cs1684/{rel}")
         # The exact config the plan was checked against.
         tar.add(config, arcname="warranted_revision/configs/_launch_config.json")
     return path

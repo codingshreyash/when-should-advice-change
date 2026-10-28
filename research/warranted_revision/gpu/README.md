@@ -82,3 +82,29 @@ rewrites `RUN_LOG.md` with totals. Fill in `actual_cost_usd` once Brev's charge 
   (97-100% ledgers parsed, structured 18/18). Fast kernels can't load with torch 2.8's
   Triton; no speedup (2.0 s/call either way, identical outputs). Report regenerated
   locally after a report-step crash. See `results/warranted_revision/format-001/NOTES.md`.
+
+## CS 1684 decision-procedure experiment
+
+Preregistration: `docs/PREREGISTRATION_DECISION_PROCEDURES.md` (repository root). Arms A–D on
+Qwen3.5-9B @ `c2022362` (A: Nimble scorer, no adapter; B: constrained generation; C:
+conversational generation; D: Bespoke-Nimble @ `594dfdcf` through the scorer). The configs
+are hash-locked in `configs/decision_procedure_lock.json`, and the controller refuses a config
+that differs from them in anything other than run id. `remote_job.sh` hands these configs to
+`gpu/decision_procedure_job.sh`, which builds its own environment at Nimble's pinned code
+(`54c2e82e`), checks that the adapter names the preregistered base, merges, and runs.
+
+**Not yet launched.** The technical pilot waits for the two blind labels.
+
+| step | `config` | `max_gpu_usd` | planned worst case | contents |
+|---|---|---|---|---|
+| pilot | `configs/decision_procedure_pilot.json` | 2 | $1.60 | 128 calls; counts only, with timing projected onto the full run |
+| full | `configs/decision_procedure_full.json` | 3 | $2.40 | 64-call preflight + gate, then 4,800 calls and the preregistered analysis |
+
+`est_seconds_per_call` is ignored for these configs, because the controller uses the
+experiment's own estimate, which includes model preparation. Results come back in the job
+log:
+- `DP_FILE` lines carry the summary, gate and analysis;
+- `DP_CALLS` lines carry the gzip+base64 raw rows.
+
+Rebuild them with
+`python -m warranted_revision.decision_procedure recover --log job.log --out <dir>`.

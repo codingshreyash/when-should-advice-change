@@ -74,7 +74,7 @@ format is the only thing that changes.
 | A | Qwen3.5-9B (the pinned base of Nimble) | decision-only: Nimble scorer, no adapter (as in the legacy runs) |
 | B | Qwen3.5-9B | constrained: generate one option code (the same instruction `run_chat.py` gives Claude) |
 | C | Qwen3.5-9B | conversational: short written advice ending in a code (the same instruction `run_chat.py` gives Claude) |
-| D | Bespoke-Nimble-9B @ `bd792f44` | decision-only (the adapter contrast against A) |
+| D | Bespoke-Nimble-9B @ `bd792f44` | decision-only (the adapter contrast against A). *Superseded by the preregistration, which uses `594dfdcf`: that is the checkpoint whose training data the overlap audit could check (`docs/NIMBLE_OVERLAP_AUDIT.md`).* |
 
 - **Stimuli.** The existing 30 career scenarios, all seven prompts, frozen. No new items.
 - **Replicates.** Five deterministic option permutations, as `PROTOCOL.md` specifies. One

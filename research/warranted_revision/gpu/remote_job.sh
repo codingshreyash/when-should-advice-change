@@ -5,6 +5,11 @@
 # provider-side delete.
 set -euo pipefail
 RUN_ID="$1"; DEADLINE_MIN="$2"; CONFIG="${3:-configs/gpu_smoke.json}"; SHARD="${4:-1/1}"; BENCH="${5:-0}"
+if python3 -c "import json,sys; sys.exit(json.load(open(sys.argv[1])).get('experiment') != 'decision_procedure')" "$CONFIG"; then
+  # CS 1684 decision procedures: Nimble's scorer pins its own transformers, so the job builds
+  # its own environment (gpu/decision_procedure_job.sh).
+  exec bash gpu/decision_procedure_job.sh "$RUN_ID" "$DEADLINE_MIN" "$CONFIG"
+fi
 PY=$(command -v python3.12 || command -v python3)
 # Stock Ubuntu images often ship without venv support (same fallback as scripts/run/brev_setup.sh).
 $PY -m venv .venv || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-venv && $PY -m venv .venv; }
