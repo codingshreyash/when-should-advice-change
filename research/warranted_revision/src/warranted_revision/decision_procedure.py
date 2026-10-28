@@ -51,6 +51,7 @@ CS1684_FILES = (
     "data/scenarios/career_pilot.jsonl",
     "data/scenarios/career_v2.jsonl",
     "docs/PREREGISTRATION_DECISION_PROCEDURES.md",
+    "scripts/data/labeling.py",
 )
 #: Blind-label files, bundled when they exist (they are produced after this code is frozen).
 CS1684_LABELS = ("data/labeling/career_pilot_blind.jsonl", "data/labeling/career_v2_blind.jsonl")
@@ -134,6 +135,8 @@ class DPConfig(Strict):
     label: str = ""
     #: The technical pilot reports counts only; the analysis refuses it.
     technical_pilot: bool = False
+    #: Amendment 2: the controller refuses a launch whose --max-usd exceeds this.
+    max_usd_cap: float | None = Field(default=None, gt=0)
     scenarios: str = "data/derived/pressure_controls.jsonl"
     scenario_ids: list[str] | None = None  # None = every scenario in the file
     variants: list[str] = list(VARIANTS)
@@ -524,14 +527,19 @@ def run(
     *,
     preflight: bool = False,
     clock: Callable[[], float] = time.time,
+    require_labels: bool = True,
 ) -> dict[str, Any]:
     """Make every planned call and write ``calls.jsonl`` and ``manifest.json``.
 
     A failed call is recorded with its error (never retried or dropped), so the gate and the
-    analysis see it. Returns the manifest.
+    analysis see it. Returns the manifest. Refuses unless the blind labels are locked
+    (amendment 2); ``require_labels=False`` exists for the fake-backend tests only and is not
+    reachable from the command line.
     """
     check_lock()
     check_config_locked(cfg)
+    if require_labels:
+        check_labels_locked()
     items = build_items(cfg, preflight=preflight)
     if len(items) > cfg.max_calls:
         raise GateError(f"{len(items)} calls planned > max_calls {cfg.max_calls}")
@@ -731,6 +739,11 @@ LOCKED = (
     "research/warranted_revision/src/warranted_revision/decision_procedure_analysis.py",
     "research/warranted_revision/configs/decision_procedure_pilot.json",
     "research/warranted_revision/configs/decision_procedure_full.json",
+    # amendment 2: the launch path is frozen too
+    "research/warranted_revision/gpu/decision_procedure_job.sh",
+    "research/warranted_revision/gpu/remote_job.sh",
+    "research/warranted_revision/gpu/brev_controller.py",
+    "research/warranted_revision/src/warranted_revision/gpu_guard.py",
 )
 
 
@@ -752,6 +765,36 @@ def check_config_locked(cfg: DPConfig) -> None:
             if ref.model_dump(exclude=drop) == want:
                 return
     raise GateError("config differs from every locked decision-procedure config")
+
+
+def locked_labels() -> dict[str, str]:
+    """sha256 of the blind label files as they are now, if all exist; checked for the
+    provenance ``labeling.py score`` writes (amendment 1). Empty if none exist yet."""
+    present = [r for r in CS1684_LABELS if resolve(r).exists()]
+    if not present:
+        return {}
+    if len(present) != len(CS1684_LABELS):
+        raise GateError(f"only some blind label files exist: {present}")
+    from .decision_procedure_analysis import load_labels  # lazy: the analysis imports this module
+
+    load_labels([resolve(r) for r in present])
+    return {r: sha256(resolve(r)) for r in present}
+
+
+def check_labels_locked() -> None:
+    """Amendment 2: no model run, the technical pilot included, before both blind label
+    files exist, carry blind provenance and match the hashes recorded in the lock."""
+    want = json.loads(LOCK.read_text()).get("labels") if LOCK.exists() else None
+    if not want:
+        raise GateError(
+            "no blind labels are locked: collect the two blind labels, score them with "
+            "scripts/data/labeling.py, then `decision_procedure lock --write` (amendment 2)"
+        )
+    have = locked_labels()
+    if have != want:
+        raise GateError(
+            f"blind label files differ from the locked hashes: {sorted(set(have.items()) ^ set(want.items()))}"
+        )
 
 
 def check_lock() -> None:
@@ -872,8 +915,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if a.cmd == "lock":
         if a.write:
-            LOCK.write_text(json.dumps({"sha256": current_hashes()}, indent=1) + "\n")
-            print(f"[lock] wrote {LOCK}")
+            labels = locked_labels()
+            LOCK.write_text(
+                json.dumps({"sha256": current_hashes(), "labels": labels}, indent=1) + "\n"
+            )
+            print(f"[lock] wrote {LOCK} ({len(labels)} blind label files locked)")
             return 0
         try:
             check_lock()

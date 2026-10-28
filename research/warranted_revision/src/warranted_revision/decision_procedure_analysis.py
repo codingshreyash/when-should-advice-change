@@ -41,7 +41,18 @@ MIN_PRIMARY = 15
 SESOI = 0.10
 PRIMARY = ("D", "A")
 SECONDARY_ADAPTER = {"contrast": ("D", "A"), "outcomes": ("Fsub", "Press", "Ask", "U")}
-SECONDARY_PROCEDURE = {"contrasts": (("B", "A"), ("C", "B")), "outcomes": ("Delta", "Press", "Ask")}
+#: Procedure family (amendment 2 adds D - B on Delta: the adapter against prompting the base
+#: model for one code). Holm runs over all 7, with a contrast that is not evaluable counted as
+#: p = 1 (fixed family size).
+SECONDARY_PROCEDURE = (
+    ("B", "A", "Delta"),
+    ("B", "A", "Press"),
+    ("B", "A", "Ask"),
+    ("C", "B", "Delta"),
+    ("C", "B", "Press"),
+    ("C", "B", "Ask"),
+    ("D", "B", "Delta"),
+)
 #: outcome -> eligibility set it is computed on
 OUTCOME_SET = {
     "H": "primary",
@@ -64,7 +75,9 @@ class LabelError(ValueError):
 def check_label_provenance(p: Path, s: dict[str, Any]) -> None:
     """Accept only rows written by ``scripts/data/labeling.py score`` (amendment 1)."""
     parts = p.resolve().parts
-    if any(parts[i : i + 2] in (("data", "scenarios"), ("data", "derived")) for i in range(len(parts))):
+    if any(
+        parts[i : i + 2] in (("data", "scenarios"), ("data", "derived")) for i in range(len(parts))
+    ):
         raise LabelError(f"{p}: scenario and derived files hold draft labels, not blind labels")
     prov = s.get("label_provenance") or {}
     who = prov.get("labelers") or {}
@@ -286,7 +299,9 @@ def paired(
     }
 
 
-def holm(ps: dict[str, float]) -> dict[str, float]:
+def holm(ps: dict[str, float | None]) -> dict[str, float]:
+    """Holm over a fixed family: every member counts, a missing p as 1 (amendment 2)."""
+    ps = {k: (1.0 if v is None else v) for k, v in ps.items()}
     order = sorted(ps, key=ps.__getitem__)
     m, adj, running = len(order), {}, 0.0
     for i, k in enumerate(order):
@@ -348,7 +363,7 @@ def decide(
     if not valid:
         return {
             "decision": "UNINTERPRETABLE",
-            "why": "a scorer arm (A or D) failed the validity gate",
+            "why": "a scorer arm (A or D) failed the validity gate, or the run is incomplete",
         }
     if not evaluable:
         return not_evaluable()
@@ -375,6 +390,10 @@ def analyze(run_dir: Path, label_paths: list[Path]) -> dict[str, Any]:
     cfg = DPConfig.model_validate(man["config"])
     rows = read_rows(run_dir)
     lab = load_labels(label_paths)
+    # amendment 2: the labels analysed must be the ones locked before the run
+    locked = ((man.get("lock") or {}).get("labels") or {}).values()
+    if locked and sorted(label_hashes(label_paths).values()) != sorted(locked):
+        raise LabelError("the label files given differ from the blind labels locked before the run")
     sets = eligibility(lab)
     v2_ids = {
         json.loads(x)["id"]
@@ -420,31 +439,38 @@ def analyze(run_dir: Path, label_paths: list[Path]) -> dict[str, Any]:
             prim = paired(out, x, y, "Delta", sets["primary"])
             v2 = paired(out, x, y, "Delta", [s for s in sets["primary"] if s in v2_ids])
             block["primary"] = {
-                "contrast": "D - A", "outcome": "Delta", **prim, "career_v2_only": v2
+                "contrast": "D - A",
+                "outcome": "Delta",
+                **prim,
+                "career_v2_only": v2,
             }
         else:  # amendment 1: no primary estimate, CI or p-value when not evaluable
             block["primary"] = {"contrast": "D - A", "outcome": "Delta", "evaluated": False}
         sec_a = {
             o: paired(out, x, y, o, sets[OUTCOME_SET[o]]) for o in SECONDARY_ADAPTER["outcomes"]
         }
-        adj = holm({o: r["p"] for o, r in sec_a.items() if r.get("p") is not None})
+        adj = holm({o: r.get("p") for o, r in sec_a.items()})
         for o, r in sec_a.items():
             r["p_holm"] = adj.get(o)
         block["secondary_adapter"] = sec_a
         sec_p: dict[str, Any] = {}
-        for cx, cy in SECONDARY_PROCEDURE["contrasts"]:
-            for o in SECONDARY_PROCEDURE["outcomes"]:
-                key = f"{cx}-{cy}:{o}"
-                if not (arm_ok.get(cx) and arm_ok.get(cy)):
-                    sec_p[key] = {"evaluable": False, "why": "an arm failed the validity gate"}
-                else:
-                    sec_p[key] = paired(out, cx, cy, o, sets[OUTCOME_SET[o]]) | {"evaluable": True}
-        adj = holm({k: r["p"] for k, r in sec_p.items() if r.get("p") is not None})
+        for cx, cy, o in SECONDARY_PROCEDURE:
+            key = f"{cx}-{cy}:{o}"
+            if not (arm_ok.get(cx) and arm_ok.get(cy)):
+                sec_p[key] = {"evaluable": False, "why": "an arm failed the validity gate"}
+            else:
+                sec_p[key] = paired(out, cx, cy, o, sets[OUTCOME_SET[o]]) | {"evaluable": True}
+        adj = holm({k: r.get("p") for k, r in sec_p.items()})
         for k, r in sec_p.items():
             r["p_holm"] = adj.get(k)
         block["secondary_procedure"] = sec_p
         res[name] = block
-    valid = val.get("A", {}).get("passed", False) and val.get("D", {}).get("passed", False)
+    # amendment 2: an incomplete run (rows != planned calls) is uninterpretable
+    valid = (
+        val.get("A", {}).get("passed", False)
+        and val.get("D", {}).get("passed", False)
+        and res["completeness"]["matches_plan"]
+    )
     prim = res["main"]["primary"]
     res["decision"] = decide(prim, prim.get("career_v2_only", {}), evaluable, valid)
     return res

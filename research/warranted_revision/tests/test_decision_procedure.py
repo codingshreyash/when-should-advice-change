@@ -251,7 +251,7 @@ class Clock:
 
 def test_fake_run_writes_rows_and_passes_the_gate(tmp_path):
     cfg = dp.load_config(PILOT)
-    man = dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock())
+    man = dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock(), require_labels=False)
     rows = dp.read_rows(tmp_path / "r")
     assert len(rows) == man["planned_calls"] == 128
     assert {r["arm"] for r in rows} == set("ABCD")
@@ -264,15 +264,27 @@ def test_fake_run_writes_rows_and_passes_the_gate(tmp_path):
     assert s["passed"] and s["by_arm"]["C"]["parse_rate"] == 1.0
     assert json.loads((tmp_path / "r" / "gate.json").read_text())["passed"]
     with pytest.raises(dp.GateError, match="exists"):
-        dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock())
+        dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock(), require_labels=False)
 
 
 def test_gate_fails_on_unparseable_variant_and_scorer_errors(tmp_path):
     cfg = dp.load_config(PILOT)
-    dp.run(cfg, fake_backends(cfg, bad_variant="omission"), tmp_path / "a", clock=Clock())
+    dp.run(
+        cfg,
+        fake_backends(cfg, bad_variant="omission"),
+        tmp_path / "a",
+        clock=Clock(),
+        require_labels=False,
+    )
     with pytest.raises(dp.GateError, match="arm C: .*omission"):
         dp.gate(tmp_path / "a", remaining_min=60)
-    dp.run(cfg, fake_backends(cfg, fail_scorer=True), tmp_path / "b", clock=Clock())
+    dp.run(
+        cfg,
+        fake_backends(cfg, fail_scorer=True),
+        tmp_path / "b",
+        clock=Clock(),
+        require_labels=False,
+    )
     with pytest.raises(dp.GateError, match="scorer errors"):
         dp.gate(tmp_path / "b", remaining_min=60)
     rows = dp.read_rows(tmp_path / "b")
@@ -281,7 +293,7 @@ def test_gate_fails_on_unparseable_variant_and_scorer_errors(tmp_path):
 
 def test_gate_fails_when_the_projection_does_not_fit(tmp_path):
     cfg = dp.load_config(PILOT)
-    dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock(step=60))
+    dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock(step=60), require_labels=False)
     with pytest.raises(dp.GateError, match="projected"):
         dp.gate(tmp_path / "r", remaining_min=10, full_cfg=dp.load_config(FULL))
     with pytest.raises(dp.GateError, match="min left"):
@@ -290,7 +302,7 @@ def test_gate_fails_when_the_projection_does_not_fit(tmp_path):
 
 def test_summary_has_counts_only(tmp_path):
     cfg = dp.load_config(PILOT)
-    dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock())
+    dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock(), require_labels=False)
     text = json.dumps(dp.summarize(tmp_path / "r"))
     for s in scenarios().values():
         for code in s["options"]:
@@ -301,7 +313,7 @@ def test_log_transport_round_trip(tmp_path, capsys, monkeypatch):
     monkeypatch.setattr(dp, "CHUNK", 2000)  # several chunks, as a real run prints
     cfg = dp.load_config(PILOT)
     run = tmp_path / "r"
-    dp.run(cfg, fake_backends(cfg), run, clock=Clock())
+    dp.run(cfg, fake_backends(cfg), run, clock=Clock(), require_labels=False)
     (run / "summary.json").write_text(json.dumps(dp.summarize(run)))
     dp.emit_files(run, ("summary.json",))
     dp.emit_calls(run)
@@ -346,7 +358,7 @@ def labels_file(tmp_path, mutate=None, provenance=True):
 
 def full_fake_run(tmp_path, **kw):
     cfg = dp.load_config(FULL)
-    dp.run(cfg, fake_backends(cfg, **kw), tmp_path / "full", clock=Clock())
+    dp.run(cfg, fake_backends(cfg, **kw), tmp_path / "full", clock=Clock(), require_labels=False)
     return tmp_path / "full"
 
 
@@ -378,7 +390,7 @@ def test_analysis_null_and_invalid_generative_arm(tmp_path):
     assert res["main"]["secondary_procedure"]["B-A:Press"] == {
         "evaluable": False,
         "why": "an arm failed the validity gate",
-        "p_holm": None,
+        "p_holm": 1.0,
     }
     out = {
         "D": {"s1": {"Delta": 0.2}, "s2": {"Delta": 0.0}},
@@ -495,11 +507,18 @@ def test_holm_and_z():
 
 def test_analysis_refuses_the_pilot_and_preflight(tmp_path):
     cfg = dp.load_config(PILOT)
-    dp.run(cfg, fake_backends(cfg), tmp_path / "p", clock=Clock())
+    dp.run(cfg, fake_backends(cfg), tmp_path / "p", clock=Clock(), require_labels=False)
     with pytest.raises(SystemExit, match="counts only"):
         dpa.analyze(tmp_path / "p", [labels_file(tmp_path)])
     full = dp.load_config(FULL)
-    dp.run(full, fake_backends(full), tmp_path / "pre", preflight=True, clock=Clock())
+    dp.run(
+        full,
+        fake_backends(full),
+        tmp_path / "pre",
+        preflight=True,
+        clock=Clock(),
+        require_labels=False,
+    )
     with pytest.raises(SystemExit, match="counts only"):
         dpa.analyze(tmp_path / "pre", [labels_file(tmp_path)])
 
@@ -509,7 +528,7 @@ def test_analysis_refuses_the_pilot_and_preflight(tmp_path):
 
 def test_controller_plans_fit_the_caps():
     ctl = _load(PKG / "gpu/brev_controller.py", "ctl_dp")
-    for cfg, cap in ((PILOT, "2"), (FULL, "3")):
+    for cfg, cap in ((PILOT, "1.6"), (FULL, "3.4")):
         args = ctl.argparse.Namespace(
             config=str(cfg),
             run_id="dp-test",
@@ -553,3 +572,85 @@ def test_bundle_carries_the_cs1684_files_and_dry_runs_on_its_own(tmp_path):
     assert (
         subprocess.run(["bash", "-n", str(box / "gpu/decision_procedure_job.sh")]).returncode == 0
     )
+
+
+# --------------------------------------------------------------------------- amendment 2
+
+
+def test_run_refuses_until_blind_labels_are_locked(tmp_path):
+    cfg = dp.load_config(PILOT)
+    with pytest.raises(dp.GateError, match="no blind labels are locked"):
+        dp.run(cfg, fake_backends(cfg), tmp_path / "r", clock=Clock())
+
+
+def test_labels_lock_round_trip(tmp_path, monkeypatch):
+    a, b = tmp_path / "a", tmp_path / "b"
+    a.mkdir()
+    b.mkdir()
+    la, lb = labels_file(a), labels_file(b)
+    lock = tmp_path / "lock.json"
+    lock.write_text(dp.LOCK.read_text())
+    monkeypatch.setattr(dp, "LOCK", lock)
+    monkeypatch.setattr(dp, "CS1684_LABELS", (str(la), str(lb)))
+    assert dp.main(["lock", "--write"]) == 0
+    assert set(json.loads(lock.read_text())["labels"]) == {str(la), str(lb)}
+    dp.check_labels_locked()
+    cfg = dp.load_config(FULL)
+    dp.run(cfg, fake_backends(cfg), tmp_path / "full", clock=Clock())  # labels required and present
+    res = dpa.analyze(tmp_path / "full", [la, lb])
+    assert set(res["label_sha256"].values()) == set(json.loads(lock.read_text())["labels"].values())
+    other = labels_file(
+        tmp_path, mutate=lambda sid, exp: exp.update(omission=[exp["omission"], exp["base"]])
+    )
+    assert dpa.label_hashes([other]) != dpa.label_hashes([la])
+    with pytest.raises(dpa.LabelError, match="locked"):
+        dpa.analyze(tmp_path / "full", [other, lb])
+    la.write_text(la.read_text().replace('"blind"', '"blind" ', 1))
+    with pytest.raises(dp.GateError, match="differ from the locked"):
+        dp.check_labels_locked()
+
+
+def test_lock_write_refuses_labels_without_provenance(tmp_path, monkeypatch):
+    lock = tmp_path / "lock.json"
+    lock.write_text(dp.LOCK.read_text())
+    monkeypatch.setattr(dp, "LOCK", lock)
+    monkeypatch.setattr(dp, "CS1684_LABELS", (str(labels_file(tmp_path, provenance=False)),))
+    with pytest.raises(dpa.LabelError):
+        dp.main(["lock", "--write"])
+
+
+def test_controller_refuses_caps_above_the_preregistered_ones():
+    ctl = _load(PKG / "gpu/brev_controller.py", "ctl_dp_caps")
+    for cfg, cap in ((PILOT, "2"), (FULL, "3.5")):
+        args = ctl.argparse.Namespace(
+            config=str(cfg),
+            run_id="dp-test",
+            shard="1/1",
+            hourly="1.06",
+            max_usd=cap,
+            est_seconds_per_call=6.0,
+            setup_hours=0.5,
+            bench=False,
+            instance_type="massedcompute_L40S",
+        )
+        with pytest.raises(ctl.GuardError, match="preregistered cap"):
+            ctl.build_plan(args)
+    assert dp.load_config(PILOT).max_usd_cap + dp.load_config(FULL).max_usd_cap == pytest.approx(
+        5.0
+    )
+
+
+def test_incomplete_run_is_uninterpretable(tmp_path):
+    run = full_fake_run(tmp_path)
+    rows = (run / "calls.jsonl").read_text().splitlines()
+    (run / "calls.jsonl").write_text("\n".join(rows[:-10]) + "\n")
+    res = dpa.analyze(run, [labels_file(tmp_path)])
+    assert not res["completeness"]["matches_plan"]
+    assert res["decision"]["decision"] == "UNINTERPRETABLE"
+
+
+def test_holm_family_is_fixed_and_includes_d_minus_b(tmp_path):
+    assert dpa.holm({"a": 0.01, "b": None}) == {"a": 0.02, "b": 1.0}
+    res = dpa.analyze(full_fake_run(tmp_path), [labels_file(tmp_path)])
+    sec = res["main"]["secondary_procedure"]
+    assert len(sec) == 7 and "D-B:Delta" in sec and sec["D-B:Delta"]["estimate"] is not None

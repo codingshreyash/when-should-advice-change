@@ -93,12 +93,12 @@ that differs from them in anything other than run id. `remote_job.sh` hands thes
 `gpu/decision_procedure_job.sh`, which builds its own environment at Nimble's pinned code
 (`54c2e82e`), checks that the adapter names the preregistered base, merges, and runs.
 
-**Not yet launched.** The technical pilot waits for the two blind labels.
+**Not yet launched.** Nothing runs until the two blind labels are scored and locked (`lock --write`); `run` and `launch` refuse otherwise (amendment 2). The caps are preregistered in the configs and enforced by the controller.
 
 | step | `config` | `max_gpu_usd` | planned worst case | contents |
 |---|---|---|---|---|
-| pilot | `configs/decision_procedure_pilot.json` | 2 | $1.60 | 128 calls; counts only, with timing projected onto the full run |
-| full | `configs/decision_procedure_full.json` | 3 | $2.40 | 64-call preflight + gate, then 4,800 calls and the preregistered analysis |
+| pilot | `configs/decision_procedure_pilot.json` | 1.60 | $1.28 | 128 calls; counts only, with timing projected onto the full run |
+| full | `configs/decision_procedure_full.json` | 3.40 | $2.72 | 64-call preflight + gate, then 4,800 calls and the preregistered analysis |
 
 `est_seconds_per_call` is ignored for these configs, because the controller uses the
 experiment's own estimate, which includes model preparation. Results come back in the job

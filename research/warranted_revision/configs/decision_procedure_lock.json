@@ -5,9 +5,15 @@
   "data/scenarios/career_pilot.jsonl": "72e9f043e646369eaf0e72b7d2e398519506fb93a33642e08a56191528df5cd6",
   "data/scenarios/career_v2.jsonl": "cce67cdc22b8c89807c08ed03f745de0e76a5f792bb743913b93153b7bfabd72",
   "docs/PREREGISTRATION_DECISION_PROCEDURES.md": "513cf488bb3b05bfd8255d2fb52906178dc488683a61a1f0f777e440b496cfc3",
-  "research/warranted_revision/src/warranted_revision/decision_procedure.py": "af687b08ccea28aa9f6388c4fbea518eb560a7616320949e40abb94a6c4fce7e",
-  "research/warranted_revision/src/warranted_revision/decision_procedure_analysis.py": "6b9525d396453a280e9e204e8c499721df2c2ed6a04a397e621f16003ffbfa50",
-  "research/warranted_revision/configs/decision_procedure_pilot.json": "49e349c103452bf1905eafb5b5a4e234e01e57d192634e933a1b95699699e7c8",
-  "research/warranted_revision/configs/decision_procedure_full.json": "0fed1372ce00c17f9e5eb1249fb2faf8ce6f04d0f70bedf3022242a80dfc1fa2"
- }
+  "scripts/data/labeling.py": "aee52fc53e536e9c56eececfb212f10df7b2d7eccce4bd775913d7946fecbfdc",
+  "research/warranted_revision/src/warranted_revision/decision_procedure.py": "6b460e72aef5894e51a5ae3aa2f1765dd732a3b56f8ebbae4f94212caeb5f254",
+  "research/warranted_revision/src/warranted_revision/decision_procedure_analysis.py": "17768598d869f85903e475008079110952d36b6d2a29ea240b7e1879f38dfdbe",
+  "research/warranted_revision/configs/decision_procedure_pilot.json": "2079acd63988380430f7413f1e042f268aae731c04df6cda717bd7c62820d148",
+  "research/warranted_revision/configs/decision_procedure_full.json": "d6331823c3e955174066118c2152bf36640ad75fea6272ab7c7ef0a9321beaef",
+  "research/warranted_revision/gpu/decision_procedure_job.sh": "53a7d09cc26b6c6ef96385ed18d09b8fab2def4eb09d53cfde9859b327555d60",
+  "research/warranted_revision/gpu/remote_job.sh": "354e4a131bd5f3b913241e506c9578be8fc650b4b5b03acaef9efd153789df8c",
+  "research/warranted_revision/gpu/brev_controller.py": "d49d7f1818dd681a69c97c6252404935a233fd776293c9c11c3b46014ac27c93",
+  "research/warranted_revision/src/warranted_revision/gpu_guard.py": "9e17aef75d0e503ddbbd5308cee96cd7eba772ea3bfe3d33a1f1c384c3c63d97"
+ },
+ "labels": {}
 }

@@ -58,5 +58,6 @@
   "code_repo": "https://github.com/bespokelabsai/nimble.git"
  },
  "scorer_temperature": 1.0,
- "max_batch": 9
+ "max_batch": 9,
+ "max_usd_cap": 3.4
 }

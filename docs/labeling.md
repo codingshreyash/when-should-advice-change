@@ -1,6 +1,6 @@
 # Blind labeling (two people who did NOT write the scenarios)
 
-Sheets live in `data/labeling/`. Each scenario file has two:
+Sheets live in `data/labeling/`. A clean packet to hand out (both blank sheets plus one-page instructions) is in `docs/overnight/labeling_packet/`. Each scenario file has two:
 
 - `<name>_sheet.csv`: hand this out. Rows are shuffled and have opaque ids
   (`r001`, ...), so nothing in the sheet says which variant a row is.
@@ -29,7 +29,10 @@ For labelers:
 
 Scoring (whoever holds the key):
 
-    python3 scripts/data/labeling.py score data/scenarios/career_v2.jsonl labeler_A.csv labeler_B.csv
+    python3 scripts/data/labeling.py make data/scenarios/career_v2.jsonl   # recreates the private key
+    python3 scripts/data/labeling.py score data/scenarios/career_v2.jsonl labeler_A.csv labeler_B.csv \
+        --labeler-a <initials A> --labeler-b <initials B>
+    PYTHONPATH=research/warranted_revision/src python3 -m warranted_revision.decision_procedure lock --write
 
 prints agreement and Cohen's kappa per variant and writes
 `data/labeling/career_v2_blind.jsonl`, where disagreements are kept as a list of

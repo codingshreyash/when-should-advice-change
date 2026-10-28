@@ -115,6 +115,11 @@ def build_plan(args: argparse.Namespace) -> dict:
         dcfg = dp.DPConfig.model_validate(raw)
         dp.check_lock()
         dp.check_config_locked(dcfg)
+        if dcfg.max_usd_cap is not None and float(args.max_usd) > dcfg.max_usd_cap + 1e-9:
+            raise GuardError(
+                f"--max-usd {args.max_usd} exceeds this config's preregistered cap "
+                f"${dcfg.max_usd_cap} (amendment 2)"
+            )
         est = dp.estimate_seconds(dcfg)
         n_calls, max_calls = dp.plan(dcfg)["calls"], dcfg.max_calls
         extra_calls = est["calls"] - n_calls
@@ -263,6 +268,13 @@ def cmd_launch(args: argparse.Namespace) -> int:
         print("[controller] refusing: --instance-type is required")
         return 2
     plan = build_plan(args)
+    if plan["config"].get("experiment") == "decision_procedure":
+        from warranted_revision import decision_procedure as dp
+
+        try:
+            dp.check_labels_locked()  # amendment 2: labels before any launch, pilot included
+        except dp.GateError as exc:
+            raise GuardError(str(exc)) from exc
     state_path = Path(args.state)
     # Keep the instance name the plan step already printed, if it planned this same run.
     if state_path.exists():
