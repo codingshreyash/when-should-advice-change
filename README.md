@@ -48,7 +48,7 @@ Claude Haiku 4.5 and Sonnet 5.5 (a size ladder) are partly run; see [results/REA
 - **Claude Sonnet 5.5 and Opus 5** are not moved by pressure but are moved by relevant facts.
 
 These wordings were corrected on 2026-10-28 after an audit of the raw rows
-(`docs/overnight/01_RESEARCH_VERDICT.md`). The midterm report is left as submitted.
+(`docs/overnight/01_RESEARCH_VERDICT.md`); the midterm report's abstract, introduction, figure caption and next steps were corrected the same way.
 
 ![Threshold-sweep decision curves](report/figures/threshold_curves.png)
 

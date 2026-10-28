@@ -21,15 +21,16 @@
 A good advisor changes a recommendation when a fact that matters changes, and not
 when the user merely pushes for an answer. We test this on 30 career decisions with
 matched relevant, irrelevant and pressure variants, and on threshold sweeps where
-one number decides the answer. We see three behaviors under pressure. A 9B open model
-shows \emph{deference}: it moves toward the answer the user wants more than it moves
-for real evidence. Claude Haiku~4.5 shows \emph{opposition}: it moves away from the
-requested answer. Claude Sonnet~5.5 and Opus~5 show \emph{evidence-sensitive
-stability}: pressure does not move them, relevant facts do, and on the scenarios run
-so far they place decision boundaries exactly where the stated rules put them.
-Pressure therefore is not a single sycophancy dial: deference and opposition are both
-failures of warranted updating. Results are preliminary: labels are drafts, the
-newest runs are exploratory, and why Haiku opposes is not yet known.
+one number decides the answer. Pressure affects models in different directions. A 9B
+open model moves its answer distribution more for a stated preference than for a
+relevant fact, though it is also unstable under pure rewording, and whether this is
+deference or priming by naming the option is untested. Claude Haiku~4.5 moves
+\emph{away} from the requested answer, mostly toward asking for more information.
+Claude Opus~5 is not moved by pressure, is moved by relevant facts, and places every
+decision boundary exactly at the stated threshold; Sonnet~5.5 does so in 3 of the 4
+sweeps run so far. Measuring only unwanted change would miss the second pattern.
+All results are preliminary: labels are the authors' drafts, most cells are one
+sample, and blind labeling is in progress.
 \end{abstract}
 
 \section{Introduction}
@@ -45,14 +46,13 @@ right move is to X'') that adds no fact and changes no stated priority. A prefer
 that \emph{is} decision-relevant (``I care more about my weekends than the raise'')
 is not pressure.
 
-Most sycophancy benchmarks count unwanted change only, which rewards a model that
-never moves. Measuring wanted and unwanted change on the same decisions, and sweeping
-the deciding number across its threshold, shows three distinct behaviors
-(Figure~\ref{fig:sweep}, Table~\ref{tab:ladder}): \textbf{deference} (Qwen3.5-9B moves
-more for a stated preference than for a relevant fact), \textbf{opposition} (Claude
-Haiku~4.5 picks the option the user did \emph{not} ask for, an apparent reactance whose
-cause we have not isolated), and \textbf{evidence-sensitive stability} (Sonnet~5.5 and
-Opus~5 move for facts, not for pressure).
+Counting only unwanted change rewards a model that never moves. Measuring wanted and
+unwanted change on the same decisions, and sweeping the deciding number across its
+threshold, separates three patterns (Figure~\ref{fig:sweep}, Table~\ref{tab:ladder}):
+Qwen3.5-9B moves more for a stated preference than for a relevant fact (deference and
+lexical priming are not yet separated); Claude Haiku~4.5 moves away from the requested
+option, mostly toward asking for more information (cause not isolated); and Sonnet~5.5
+and Opus~5 move for facts, not for pressure.
 
 \section{Related Work}
 
@@ -110,10 +110,10 @@ is exploratory (run before blind labels) or legacy (fixed option order).
 \includegraphics[width=\textwidth]{figures/threshold_curves.pdf}
 \caption{Threshold sweep: share of answers choosing the high-side option as the
 deciding number moves from 0.5$\times$ to 1.5$\times$ its threshold (dashed: the
-correct step). Sonnet and Opus switch exactly at the threshold and pressure barely
-moves them; Haiku's boundary is blurred, and pressure pushes it \emph{away} from the
-requested option. Exploratory: one sample per prompt; Sonnet's run is incomplete
-(3 of 8 scenarios); \emph{need more information} counts as not choosing the high side.}
+correct step). Opus switches exactly at the threshold and pressure does not move it;
+Sonnet does the same on 3 of its 4 sweeps; Haiku's boundary is blurred, and pressure
+pushes it \emph{away} from the requested option. Exploratory: one sample per prompt;
+Sonnet's run is incomplete (4 of 8 scenarios, one partial); \emph{need more information} counts as not choosing the high side.}
 \label{fig:sweep}
 \end{figure*}
 
@@ -154,28 +154,30 @@ so this shows an order problem without measuring how much of Haiku's gap it expl
 the code now keeps one order per scenario, and a matched rerun will tell. Haiku also asks for more
 information more often (15--17 of 30 omissions).
 
-\textbf{Decision boundaries: exact, or blurred and opposed.} On the sweep
+\textbf{Decision boundaries: exact, or blurred and pushed away.} On the sweep
 (Figure~\ref{fig:sweep}), Opus answering with a code was right on all 192 prompts: its
 switch point sits exactly at the threshold in every scenario and pressure never moves
 it. In written advice it missed 8 of 190, mostly \emph{need more information} on
-near-ties (``about 1\% of the stakes''). Sonnet matches Opus on the scenarios it
-finished. Haiku's switch point is off by a factor of about 1.45 on average: it ignores one
+near-ties (``about 1\% of the stakes''). Sonnet is exact on 3 of the 4 sweeps it ran;
+on the buyout sweep it switches at 0.79$\times$ the threshold. Haiku's switch point is off by a factor of about 1.45 on average: it ignores one
 scenario's expense rule entirely, and in another switches well before the threshold,
 as if leaving out the stated 20\% costs. Under
 pressure it moves the other way: asked to endorse the high-side option, its written
-advice chose that option 9 times out of 64 instead of 26 and the low-side option 26
-times instead of 22, and pressure toward the low side raised its high-side choices
+advice chose that option 9 times out of 64 instead of 26, the low-side option 26
+times instead of 22, and \emph{need more information} 29 times instead of 16, so most
+displaced answers became requests for information rather than the other option; and pressure toward the low side raised its high-side choices
 from 26 to 29 and cut low-side ones from 22 to 13. Code answers show the same reversal, and it holds within each position of the
 high-side option in the list, so it is not the order confound.
 Opus's written advice leans the same way, twice refusing to ``tell you what you want
 to hear'' and choosing the wrong option.
 
-\textbf{The 9B models cave.} In legacy runs (fixed option order, one sample),
+\textbf{The 9B base model moves for pressure.} In legacy runs (fixed option order, one sample),
 Qwen3.5-9B moves its option distribution more under pressure (mean total variation
 0.54) than under a relevant update (0.36) in 23 of 30 scenarios (sign test
 $p=0.005$), shifts to the requested option in 18 of 29, and changes its answer on 16 relevant
 updates but reaches the labeled answer on only 8; $d'$ against pressure and reframe
-is 0.04. Nimble discriminates better (AUROC 0.71 vs.\ 0.46, by the same margin against
+is 0.04, and it also changes its answer on 12 of 30 pure rewordings, so part of
+this is general instability. Nimble discriminates better (AUROC 0.71 vs.\ 0.46, by the same margin against
 pressure and against reframe) but still shifts in 11 of 27 and never asks for missing
 information, which its training never taught. Whether the 9B pull is deference or
 lexical priming waits on a neutral-mention control.
@@ -195,13 +197,18 @@ exploratory, shuffled options per variant, and are incomplete for Sonnet's sweep
 the Opus rerun. Thirty authored
 scenarios in one domain is small, and our sweep rules are explicit, which makes them
 easier than real advice. Fact versus goal updates are underpowered (6 non-fact items).
-Next, in order: (1) blind labels for all seven variants and a matched-order rerun of
-the Claude runs with five samples; (2) the existing pressure controls on the 9B models,
-so deference can be told apart from lexical priming; (3) a staged, fully paired Haiku test (no
-pressure, neutral mention of each option, and several phrasings of a request for each,
-in one option order) to see whether opposition exceeds any mention effect in both
-directions; (4) harder sweeps whose thresholds are implied rather than stated;
-(5) a balanced AITA set (posts from a released dataset, not redistributed).
+A side investigation of premise search and goal-change robustness found no
+advantage over simple majority voting and no goal-change failure in Qwen3.5-9B; it is
+closed and reported separately as a negative result.
+
+Next, in order: (1) blind labels for all seven variants from two people who did not
+write the scenarios; (2) a preregistered, fixed-weights comparison of four decision
+procedures on Qwen3.5-9B: the Nimble scorer without and with the adapter, constrained
+generation of one code, and written advice, on all 30 scenarios with irrelevant,
+subthreshold and neutral-mention controls, five option permutations and a scenario
+bootstrap; it isolates the adapter and separates deference from lexical priming, and
+we checked that our scenarios do not overlap Nimble's published training data;
+(3) a matched-order rerun of the Claude runs if API credit allows.
 
 \bibliography{references}
 
