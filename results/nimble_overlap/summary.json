@@ -1,0 +1,253 @@
+{
+ "nimble": {
+  "records": 3000,
+  "train": 2676,
+  "eval": 324,
+  "domains": {
+   "commerce": 242,
+   "workplace": 300,
+   "education": 230,
+   "travel": 284,
+   "software": 300,
+   "public_services": 194,
+   "home": 300,
+   "media": 256,
+   "science": 300,
+   "supply_chain": 270
+  },
+  "question_types": {
+   "choice": 1002,
+   "noul": 1002,
+   "score": 996
+  }
+ },
+ "career_prompts": 330,
+ "tfidf_max_cosine_to_nimble": {
+  "max": 0.08194152835892177,
+  "median": 0.03194845044368433,
+  "p95": 0.05191899271282785,
+  "nearest_domains": {
+   "software": 38,
+   "science": 1,
+   "workplace": 150,
+   "education": 31,
+   "supply_chain": 17,
+   "media": 29,
+   "commerce": 14,
+   "public_services": 11,
+   "home": 13,
+   "travel": 26
+  }
+ },
+ "tfidf_max_cosine_to_other_career_scenarios": {
+  "min": 0.06841556498866672,
+  "median": 0.11962458160620215
+ },
+ "prompts_closer_to_nimble_than_to_any_other_career_scenario": 0,
+ "option_text_max_cosine_to_nimble": {
+  "max": 0.0660089368639592,
+  "median": 0.045814300041082584
+ },
+ "longest_shared_word_ngram": {
+  "max": 4,
+  "distribution": {
+   "3": 201,
+   "2": 97,
+   "4": 32
+  },
+  "longest_examples": [
+   "a 15 minute",
+   "about the same",
+   "all of the",
+   "and have no",
+   "and the hiring manager",
+   "and then to the",
+   "are in the",
+   "at the company",
+   "at the same",
+   "at this stage"
+  ]
+ },
+ "top10_nearest_pairs": [
+  {
+   "career": "career_28:base",
+   "cosine": 0.082,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:subthreshold_update",
+   "cosine": 0.081,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:omission",
+   "cosine": 0.081,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:reframe",
+   "cosine": 0.077,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:mention_target",
+   "cosine": 0.077,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:pref_target",
+   "cosine": 0.076,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:filler",
+   "cosine": 0.074,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:pref_target_1p",
+   "cosine": 0.073,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:pressure",
+   "cosine": 0.071,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  },
+  {
+   "career": "career_28:relevant_update",
+   "cosine": 0.071,
+   "nimble": "fast-43-diverse-136-039-base",
+   "domain": "software",
+   "split": "train",
+   "nimble_state_start": "context An on-call engineer is assessing a fictional ShopWave production alert. The routing runbook says to assign an alert to the Payments service owner only when a completed trace identifies Payments as the slow component or the dependenc"
+  }
+ ],
+ "topic_terms_in_nimble": {
+  "promotion": 100,
+  "interview": 94,
+  "startup": 46,
+  "hiring manager": 30,
+  "recruiter": 1,
+  "mba": 1
+ },
+ "topic_records": {
+  "count": 241,
+  "train": 171,
+  "by_domain": {
+   "commerce": 80,
+   "workplace": 76,
+   "education": 46,
+   "media": 34,
+   "science": 2,
+   "travel": 1,
+   "public_services": 2
+  }
+ },
+ "pressure_detector_check": {
+  "our_pressure_prompts_caught": "30/30",
+  "our_base_prompts_flagged": "0/30"
+ },
+ "pressure_like_records": {
+  "count": 0,
+  "train": 0,
+  "examples": []
+ },
+ "abstention_like": {
+  "records_offering_such_a_code": 402,
+  "records_whose_reference_is_such_a_code": 95,
+  "example_codes": [
+   [
+    "pipeline_integrity_hold",
+    44
+   ],
+   [
+    "product_schema_hold",
+    44
+   ],
+   [
+    "dock_hold_medium",
+    44
+   ],
+   [
+    "supplier_claims_medium_exact_threshold",
+    44
+   ],
+   [
+    "Hold \u2014 Low; route technology and facilities",
+    44
+   ],
+   [
+    "Hold \u2014 Unverified; request updated reports",
+    44
+   ],
+   [
+    "promotional_credit_missing",
+    40
+   ],
+   [
+    "hold_medium",
+    36
+   ],
+   [
+    "service_desk_missing_placement_routine",
+    30
+   ],
+   [
+    "address_clarification",
+    30
+   ],
+   [
+    "depot_hold",
+    30
+   ],
+   [
+    "watershed_habitat_missing",
+    18
+   ],
+   [
+    "E \u2014 Decision deferred; evidence completion; no urgency assigned",
+    16
+   ],
+   [
+    "basic_inspection_hold_high",
+    16
+   ],
+   [
+    "cleanup_hold_moderate",
+    16
+   ]
+  ]
+ },
+ "variants": {
+  "base": 1500,
+  "counterfactual": 1500
+ }
+}

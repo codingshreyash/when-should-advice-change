@@ -119,6 +119,12 @@ the Nimble runs or for the career refusal recheck.
 | `claude-opus-5__career30_subthreshold.log` | `subthreshold/claude-opus-5__career30.jsonl` (still uses the old variant name `irrelevant_update`) |
 | `claude-opus-5__threshold_sweep.log` | `threshold_sweep/claude-opus-5__threshold_sweep.jsonl` |
 
+## nimble_overlap/
+
+| file | contents | produced by | date | status |
+|---|---|---|---|---|
+| `summary.json` | Overlap audit of the 330 career prompts against Bespoke-Nimble's published train/eval data: lexical similarity, shared n-grams, topic, pressure-like and abstention-like records. It contains no model output. | `scripts/analysis/nimble_overlap.py` | 2026-10-28 | audit; read in [`docs/NIMBLE_OVERLAP_AUDIT.md`](../docs/NIMBLE_OVERLAP_AUDIT.md) |
+
 ## Model-size ladder (partial)
 
 [`scripts/run/run_model_ladder.sh`](../scripts/run/run_model_ladder.sh) runs Claude
