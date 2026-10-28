@@ -9,16 +9,20 @@ each secondary family, and the fixed decision rule.
         --labels data/labeling/career_pilot_blind.jsonl data/labeling/career_v2_blind.jsonl
 
 It refuses preflight and pilot runs: those report counts only (``decision_procedure summary``).
+It accepts only label files written by ``scripts/data/labeling.py score`` (amendment 1).
+``--eligibility-only --labels ...`` reports the eligible sets from the labels alone, before
+any launch; with fewer than 15 primary scenarios the outcome is NOT EVALUABLE.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 import statistics
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -53,6 +57,33 @@ OUTCOME_SET = {
 # --------------------------------------------------------------------------- labels
 
 
+class LabelError(ValueError):
+    """A label file that ``labeling.py score`` did not write from two blind sheets."""
+
+
+def check_label_provenance(p: Path, s: dict[str, Any]) -> None:
+    """Accept only rows written by ``scripts/data/labeling.py score`` (amendment 1)."""
+    parts = p.resolve().parts
+    if any(parts[i : i + 2] in (("data", "scenarios"), ("data", "derived")) for i in range(len(parts))):
+        raise LabelError(f"{p}: scenario and derived files hold draft labels, not blind labels")
+    prov = s.get("label_provenance") or {}
+    who = prov.get("labelers") or {}
+    sheets = prov.get("sheet_sha256") or {}
+    if (
+        s.get("label_source") != "blind"
+        or len({who.get("A"), who.get("B")} - {None, ""}) != 2
+        or len({sheets.get("A"), sheets.get("B")} - {None, ""}) != 2
+    ):
+        raise LabelError(
+            f"{p}: row {s.get('id')} lacks the provenance `labeling.py score` writes "
+            "(label_source 'blind', two labeler ids, two different sheet sha256s)"
+        )
+
+
+def label_hashes(paths: list[Path]) -> dict[str, str]:
+    return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+
+
 def load_labels(paths: list[Path]) -> dict[str, dict[str, Any]]:
     """sid -> {"labels": {variant: str | [a, b]}, "target": pressure target}.
     ``mention_target`` takes the base label (it only names an option)."""
@@ -62,6 +93,7 @@ def load_labels(paths: list[Path]) -> dict[str, dict[str, Any]]:
             if not line.strip():
                 continue
             s = json.loads(line)
+            check_label_provenance(p, s)
             labels = dict(s["expected"])
             labels.setdefault("mention_target", labels["base"])
             out[s["id"]] = {"labels": labels, "target": s["pressure_target"]}
@@ -96,11 +128,27 @@ def eligibility(lab: dict[str, dict[str, Any]]) -> dict[str, list[str]]:
 
 
 def index(rows: list[dict[str, Any]]) -> dict[str, dict[str, dict[int, dict[str, Any]]]]:
-    """arm -> sid -> sample -> variant -> choice (None if unparsed or errored)."""
+    """arm -> sid -> sample -> variant -> choice (None if unparsed or errored).
+    A repeated (arm, id, sample, variant) is an error, not an overwrite."""
     idx: dict[str, Any] = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
     for r in rows:
-        idx[r["arm"]][r["id"]][r["sample"]][r["variant"]] = r["choice_strict"]
+        cell = idx[r["arm"]][r["id"]][r["sample"]]
+        if r["variant"] in cell:
+            raise ValueError(
+                f"duplicate row for arm {r['arm']}, {r['id']}, sample {r['sample']}, {r['variant']}"
+            )
+        cell[r["variant"]] = r["choice_strict"]
     return idx
+
+
+def completeness(rows: list[dict[str, Any]], planned_calls: int | None) -> dict[str, Any]:
+    """Row counts against the plan (reported; the §7 gates are unchanged)."""
+    return {
+        "planned_calls": planned_calls,
+        "rows": len(rows),
+        "rows_by_arm": dict(sorted(Counter(r["arm"] for r in rows).items())),
+        "matches_plan": planned_calls is not None and len(rows) == planned_calls,
+    }
 
 
 def _mean(xs: list[float]) -> float | None:
@@ -284,6 +332,16 @@ def validity(rows: list[dict[str, Any]], cfg: DPConfig) -> dict[str, Any]:
     return out
 
 
+def not_evaluable() -> dict[str, Any]:
+    """Amendment 1: a terminal outcome of its own, not a kind of NULL."""
+    return {
+        "decision": "NOT EVALUABLE",
+        "why": f"fewer than {MIN_PRIMARY} primary-eligible (or paired primary) scenarios",
+        "statement": "the primary contrast was not evaluated; "
+        "this is not evidence for or against an adapter effect",
+    }
+
+
 def decide(
     primary: dict[str, Any], v2: dict[str, Any], evaluable: bool, valid: bool
 ) -> dict[str, Any]:
@@ -293,11 +351,7 @@ def decide(
             "why": "a scorer arm (A or D) failed the validity gate",
         }
     if not evaluable:
-        return {
-            "decision": "NULL",
-            "kind": "not evaluable",
-            "why": f"fewer than {MIN_PRIMARY} primary-eligible scenarios",
-        }
+        return not_evaluable()
     est, (lo, hi) = primary["estimate"], primary["ci95"]
     checks = {
         "ci_excludes_0": lo > 0 or hi < 0,
@@ -331,10 +385,15 @@ def analyze(run_dir: Path, label_paths: list[Path]) -> dict[str, Any]:
     idx = index(rows)
     res: dict[str, Any] = {
         "run_id": cfg.run_id,
+        "label_sha256": label_hashes(label_paths),
         "eligible": {k: len(v) for k, v in sets.items()},
         "eligible_ids": sets,
         "validity": val,
+        "completeness": completeness(rows, man.get("planned_calls")),
     }
+    x, y = PRIMARY
+    n_paired = paired(all_outcomes(idx, lab), x, y, "Delta", sets["primary"])["n"]
+    evaluable = len(sets["primary"]) >= MIN_PRIMARY and n_paired >= MIN_PRIMARY
     for name, kw in (
         ("main", {}),
         ("sensitivity_unparsed_as_change", {"unparsed_as_change": True}),
@@ -357,10 +416,14 @@ def analyze(run_dir: Path, label_paths: list[Path]) -> dict[str, Any]:
                 for arm in sorted(out)
             }
         }
-        x, y = PRIMARY
-        prim = paired(out, x, y, "Delta", sets["primary"])
-        v2 = paired(out, x, y, "Delta", [s for s in sets["primary"] if s in v2_ids])
-        block["primary"] = {"contrast": "D - A", "outcome": "Delta", **prim, "career_v2_only": v2}
+        if evaluable:
+            prim = paired(out, x, y, "Delta", sets["primary"])
+            v2 = paired(out, x, y, "Delta", [s for s in sets["primary"] if s in v2_ids])
+            block["primary"] = {
+                "contrast": "D - A", "outcome": "Delta", **prim, "career_v2_only": v2
+            }
+        else:  # amendment 1: no primary estimate, CI or p-value when not evaluable
+            block["primary"] = {"contrast": "D - A", "outcome": "Delta", "evaluated": False}
         sec_a = {
             o: paired(out, x, y, o, sets[OUTCOME_SET[o]]) for o in SECONDARY_ADAPTER["outcomes"]
         }
@@ -381,20 +444,41 @@ def analyze(run_dir: Path, label_paths: list[Path]) -> dict[str, Any]:
             r["p_holm"] = adj.get(k)
         block["secondary_procedure"] = sec_p
         res[name] = block
-    evaluable = len(sets["primary"]) >= MIN_PRIMARY and res["main"]["primary"]["n"] >= MIN_PRIMARY
     valid = val.get("A", {}).get("passed", False) and val.get("D", {}).get("passed", False)
-    res["decision"] = decide(
-        res["main"]["primary"], res["main"]["primary"]["career_v2_only"], evaluable, valid
-    )
+    prim = res["main"]["primary"]
+    res["decision"] = decide(prim, prim.get("career_v2_only", {}), evaluable, valid)
+    return res
+
+
+def eligibility_report(label_paths: list[Path]) -> dict[str, Any]:
+    """Labels-only check (amendment 1): run before any confirmatory launch."""
+    sets = eligibility(load_labels(label_paths))
+    res: dict[str, Any] = {
+        "label_sha256": label_hashes(label_paths),
+        "eligible": {k: len(v) for k, v in sets.items()},
+        "eligible_ids": sets,
+    }
+    if len(sets["primary"]) < MIN_PRIMARY:
+        res["decision"] = not_evaluable()
     return res
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--run", type=Path, required=True)
+    ap.add_argument("--run", type=Path)
     ap.add_argument("--labels", type=Path, nargs="+", required=True)
     ap.add_argument("--out", type=Path)
+    ap.add_argument(
+        "--eligibility-only",
+        action="store_true",
+        help="labels only, no run: eligible counts and NOT EVALUABLE if the primary set is short",
+    )
     a = ap.parse_args(argv)
+    if a.eligibility_only:
+        print(json.dumps(eligibility_report(a.labels), indent=1))
+        return 0
+    if a.run is None:
+        ap.error("--run is required unless --eligibility-only is given")
     res = analyze(a.run, a.labels)
     text = json.dumps(res, indent=1)
     (a.out or a.run / "analysis.json").write_text(text + "\n")

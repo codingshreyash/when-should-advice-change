@@ -320,17 +320,26 @@ def test_log_transport_round_trip(tmp_path, capsys, monkeypatch):
 # --------------------------------------------------------------------------- analysis
 
 
-def labels_file(tmp_path, mutate=None):
-    """Synthetic 'blind' labels: the draft labels, as the labeling script would write them."""
+#: test-only provenance in the shape `labeling.py score` writes; not a real labelling round
+FAKE_PROVENANCE = {
+    "labelers": {"A": "test-a", "B": "test-b"},
+    "sheet_sha256": {"A": "0" * 64, "B": "1" * 64},
+}
+
+
+def labels_file(tmp_path, mutate=None, provenance=True):
+    """Synthetic label file for the analysis code. Its labels are the scenario author's drafts
+    with fake provenance; they exercise the code only and are not blind labels."""
     p = tmp_path / "blind.jsonl"
     rows = []
     for s in scenarios().values():
         exp = {v: s["expected"][v] for v in CORE}
         if mutate:
             mutate(s["id"], exp)
-        rows.append(
-            json.dumps({"id": s["id"], "expected": exp, "pressure_target": s["pressure_target"]})
-        )
+        row = {"id": s["id"], "expected": exp, "pressure_target": s["pressure_target"]}
+        if provenance:
+            row |= {"label_source": "blind", "label_provenance": FAKE_PROVENANCE}
+        rows.append(json.dumps(row))
     p.write_text("\n".join(rows) + "\n")
     return p
 
@@ -383,7 +392,7 @@ def test_analysis_null_and_invalid_generative_arm(tmp_path):
     assert d["kind"] == "inconclusive at this precision"
     d = dpa.decide({"estimate": 0.2, "ci95": [0.05, 0.35]}, {"estimate": -0.1}, True, True)
     assert d["decision"] == "NULL" and not d["checks"]["career_v2_same_sign"]
-    assert dpa.decide({}, {}, False, True)["kind"] == "not evaluable"
+    assert dpa.decide({}, {}, False, True)["decision"] == "NOT EVALUABLE"
     assert dpa.decide({}, {}, True, False)["decision"] == "UNINTERPRETABLE"
 
 
@@ -403,16 +412,52 @@ def test_eligibility_rules(tmp_path):
     assert all(lab[s]["target"] != lab[s]["labels"]["base"] for s in sets["pressure"])
 
 
-def test_too_few_eligible_scenarios_is_a_not_evaluable_null(tmp_path):
+def test_too_few_eligible_scenarios_is_not_evaluable_and_reports_no_estimate(tmp_path):
     run = full_fake_run(tmp_path)
 
     def mutate(sid, exp):
         if int(sid.split("_")[1]) > 10:
             exp["base"] = [exp["base"], "x"]
 
-    res = dpa.analyze(run, [labels_file(tmp_path, mutate)])
+    labels = labels_file(tmp_path, mutate)
+    res = dpa.analyze(run, [labels])
     assert res["eligible"]["primary"] < dpa.MIN_PRIMARY
-    assert res["decision"]["kind"] == "not evaluable"
+    assert res["decision"]["decision"] == "NOT EVALUABLE" and "kind" not in res["decision"]
+    for block in ("main", "sensitivity_unparsed_as_change"):
+        prim = res[block]["primary"]
+        assert prim["evaluated"] is False
+        assert not {"estimate", "ci95", "p", "career_v2_only"} & set(prim)
+    pre = dpa.eligibility_report([labels])  # the same outcome from the labels alone
+    assert pre["eligible"] == res["eligible"] and pre["decision"] == res["decision"]
+    assert "decision" not in dpa.eligibility_report([labels_file(tmp_path)])
+
+
+def test_analysis_refuses_labels_without_blind_provenance(tmp_path):
+    with pytest.raises(dpa.LabelError):
+        dpa.load_labels([labels_file(tmp_path, provenance=False)])
+    for rel in ("data/scenarios/career_pilot.jsonl", "data/scenarios/career_v2.jsonl"):
+        with pytest.raises(dpa.LabelError):
+            dpa.load_labels([dp.resolve(rel)])
+    p = labels_file(tmp_path)
+    p.write_text(p.read_text().replace('"test-b"', '"test-a"'))  # one labeler twice
+    with pytest.raises(dpa.LabelError):
+        dpa.load_labels([p])
+
+
+def test_analysis_records_label_hashes_and_completeness(tmp_path):
+    run = full_fake_run(tmp_path)
+    labels = labels_file(tmp_path)
+    res = dpa.analyze(run, [labels])
+    assert res["label_sha256"] == {str(labels): dp.sha256(labels)}
+    man = json.loads((run / "manifest.json").read_text())
+    assert res["completeness"]["planned_calls"] == man["planned_calls"]
+    assert res["completeness"]["matches_plan"]
+
+
+def test_duplicate_rows_are_an_error():
+    row = {"arm": "A", "id": "s1", "sample": 0, "variant": "base", "choice_strict": "a"}
+    with pytest.raises(ValueError, match="duplicate"):
+        dpa.index([row, row | {"choice_strict": "b"}])
 
 
 def test_unparsed_pairs_drop_or_count_as_change():
