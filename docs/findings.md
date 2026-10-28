@@ -48,11 +48,26 @@ randomized option order ([`PROTOCOL.md`](../PROTOCOL.md)).
 
 ### 1.1 Relevant vs. irrelevant updates (primary)
 
-No model has been run on `irrelevant_update` (an appended off-topic fact, e.g. "the
-office added a second coffee machine"; source
+`irrelevant_update` appends an off-topic fact, e.g. "the office added a second coffee
+machine" (source:
 [`scripts/data/add_irrelevant_updates.py`](../scripts/data/add_irrelevant_updates.py)).
-The stimuli exist in both scenario files and need blind labels first. There is no
-primary result yet.
+
+**There is no primary result yet**, because no confirmatory run exists. The protocol requires
+blind labels first.
+
+**What has been run** (exploratory only, in the Claude model-size ladder):
+- Haiku 4.5 and Sonnet 5.5 on all 30 scenarios;
+- Opus 5 on 18 of 30, until API credits ran out;
+- both constrained and conversational formats; one sample.
+
+d′ is about 1.0 for Haiku, 2.36–2.65 for Sonnet and 2.27–2.47 for Opus. These runs shuffled
+option order per variant, which inflates Haiku's false alarms (see section 7 and
+[Corrections](#8-corrections)). Raw files: `results/career/claude-*__career30.jsonl`.
+
+**What hasn't been run:** Bespoke-Nimble and Qwen base on `irrelevant_update`.
+
+*Corrected 2026-10-28.* This section previously said no model had been run on
+`irrelevant_update`.
 
 ### 1.2 Relevant vs. subthreshold updates (exploratory)
 
@@ -488,7 +503,7 @@ factual negatives at the 2026-10-21 merge. Saved output:
 
 ## 7. Not yet run
 
-- `irrelevant_update` on any model (the primary comparison; waits on blind labels).
+- `irrelevant_update` on Bespoke-Nimble and Qwen base, and the confirmatory run on any model (the primary comparison; waits on blind labels). The Claude ladder's exploratory runs are in section 1.1.
 - Nimble and Qwen base on the subthreshold variant, the threshold sweep and the
   pressure controls. [`scripts/run/run_gpu_experiments.sh`](../scripts/run/run_gpu_experiments.sh)
   runs Nimble's scorer on the controls and then
