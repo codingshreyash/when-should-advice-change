@@ -1,15 +1,27 @@
 # When should advice change? A negative methods report on measuring warranted revision
 
-**Status:** final report of the warranted-revision study (October 2026). It recommends ending
-this research direction. All numbers come from the committed records cited in each section;
-nothing here is new analysis.
+**Status:** closing record of the warranted-revision / premise-search research direction
+(`research/warranted_revision/`, October 2026). It recommends ending that direction. All
+numbers come from the committed records cited in each section; nothing here is new analysis.
+
+**Scope.** This report closes the premise-search work and the goal-autonomy screen. It does
+**not** close the original CS 1684 project (the 30 career scenarios, the Claude, Bespoke-Nimble
+and Qwen comparisons, and the confirmatory protocol in `PROTOCOL.md`). Several of that
+project's questions remain open; see `docs/PROPOSAL_GAP.md` at the repository root.
+
+**What is and isn't complete.**
+- Only one model, Qwen3.5-9B, completed the final screen. Mistral-NeMo stopped at its
+  preflight gate.
+- Human annotation was not completed. Every item and label is AI-made, and the prepared
+  23-item human review returned no results.
 
 ## Abstract
 
 We set out to measure whether language-model advisors revise a recommendation when, and only
 when, a follow-up message warrants it: a new fact, a new constraint, or a change of criteria
-by the person who owns the decision. Over four stages the question narrowed, and each stage
-ended in a negative or null result.
+by the person who owns the decision. Over four stages the question narrowed. Three stages
+ended in empirical negative or null results (1, 2 and 4); stage 3 was a literature audit,
+not an experiment.
 
 1. **Method.** Label-free "premise search" added nothing detectable beyond sampling plus
    majority voting. Its verifier checked self-consistency, not premises.
@@ -18,16 +30,18 @@ ended in a negative or null result.
    wording. Arithmetic plus a hearsay word list reproduced 70% of the gold behaviours, and
    perfect agreement among AI annotators came from shared guidelines, not demonstrated
    validity.
-3. **Novelty.** Sensitivity to whether a *fact* update changes the decision is already
-   measured by BeliefTrack (Xu et al., EMNLP 2026). The two-sided estimand and the
-   anti-sycophancy trade-off on evidence are also published.
+3. **Novelty (literature audit, not an empirical result).** Sensitivity to whether a *fact*
+   update changes the decision is already measured by BeliefTrack (Xu et al., EMNLP 2026).
+   The two-sided estimand and the anti-sycophancy trade-off on evidence are also published.
+   This narrowed the question; it is not evidence about any model.
 4. **The remaining question.** Do anti-sycophancy or evidence-filtering instructions suppress
-   *legitimate, owner-authorized goal changes*? A pre-registered screen answered no for the
-   one model that could be evaluated:
-   - Qwen3.5-9B accepted 12/12 goal changes that should flip the answer under every prompt
-     condition;
+   *legitimate, owner-authorized goal changes*? A pre-registered screen found no such effect
+   in the one model that completed it, Qwen3.5-9B:
+   - with the goal-aware anti-sycophancy prompt (S), it accepted 12/12 goal changes that
+     should flip the answer, in both decision wordings;
+   - with the neutral prompt (N), it accepted 12/12 in wording A and **10/12 in wording B**;
    - it never revised when a goal change left the right answer unchanged;
-   - the goal-aware anti-sycophancy prompt cost nothing.
+   - S cost nothing relative to N.
 
    Mistral-NeMo-12B failed the pre-registered response-format gate and was not evaluated.
 
@@ -40,7 +54,7 @@ whole project, as a negative result.
 |---|---|---|
 | v0 benchmark and premise search | Does searching over readings of a follow-up ("premises") improve warranted revision? | Search ≈ a 4-sample vote; the verifier measures self-consistency (§2) |
 | v2 benchmark, AI pre-calibration | Can warranted vs unwarranted follow-ups be labelled reliably and without lexical shortcuts? | Labels are wording-defined; shortcuts reach 70% (§3) |
-| novelty audit | Is paired-base consequence sensitivity new? | Not for fact updates: BeliefTrack covers it (§4) |
+| novelty audit (literature, no experiment) | Is paired-base consequence sensitivity new? | Not for fact updates: BeliefTrack covers it (§4) |
 | goal-autonomy screen | Do anti-sycophancy or evidence-filter prompts suppress legitimate goal changes? | No, in the evaluable model (§5) |
 
 Each stage was frozen before the next began. Earlier data, configs and preregistrations were
@@ -67,7 +81,8 @@ the informative runs.
     challenge set.
   - "I'll only X if…" was scored as "if and only if" in 14/40 dev cases.
   - Greedy pressure turns never moved (0/36). Sampled turns did (12/45 vs 0/45 for neutral
-    mentions), so the ceiling was a decoding artefact.
+    mentions), so the pressure ceiling held only under greedy decoding. That decoding causes
+    it is a hypothesis; the scaffold probe that would have separated causes was never run.
 
 **Conclusion.** These are the failure modes Huang et al. (ICLR 2024) predict for label-free
 self-verification. The planned pilot was cancelled before launch, and its frozen
@@ -108,9 +123,12 @@ of standing or goals. It cannot test whether a model *infers* one. A 23-item hum
 packet was prepared and blinded to settle the contested items; no human results were
 available for this report.
 
-## 4. Negative result 3: what remained novel was narrow
+## 4. Novelty audit: what remained novel was narrow
 
 **Sources:** `agent_reports/01_novelty.md`; `v2/ai_precalibration/novelty_belieftrack/NOVELTY_AUDIT.md`.
+
+**This section is a literature audit, not an empirical result.** No model was run for it. It
+narrowed the question that §5 tested; it adds no evidence about model behaviour.
 
 - **The two-sided estimand is published:** resist unsupported pressure while keeping warranted
   updates (SycoBench-600, Belief-R, SycEval).
@@ -205,11 +223,20 @@ scoring tuned on observed output.
 
 ### Interpretation
 
-The screen measured whether a model *honours* a clearly authorized change, not whether it
-*infers* one. Every goal change states who decides and gives a complete new criterion. Under
-those conditions a 9B instruction-following model applied the change, and an instruction
-against sycophancy that explicitly licenses such changes did no harm. The result says nothing
-about:
+The observed result is that one 9B instruction-following model applied clearly authorized
+goal changes, and that an instruction against sycophancy which explicitly licenses such
+changes did no measurable harm. The screen measured whether a model *honours* a clearly
+authorized change, not whether it *infers* one.
+
+**Why it sat at ceiling is a hypothesis, not a finding.** The screen did not vary any of these
+factors, so none of the following is demonstrated:
+- every goal change stated who decides and gave a complete new criterion, which may make the
+  task easy for any capable instruction follower;
+- the S prompt explicitly licensed owner-authorized changes, which may have pre-empted
+  suppression;
+- the items may be easy for this model family in particular.
+
+The result says nothing about:
 - implicit or ambiguous goal changes;
 - training-based anti-sycophancy methods;
 - larger models;
@@ -220,10 +247,11 @@ about:
 1. **Agreement among AI annotators from one provider is not validation.** A context-blind
    baseline that reproduces the labels shows where agreement comes from. Masked-text audits
    show whether a contrast is defined by its wording.
-2. **Explicit-rule items invite shortcuts and ceilings.** Making gold computable makes it
-   checkable, but also makes the task solvable by arithmetic plus phrase-spotting. Paired
-   bases (the same text with different consequences) defeat follow-up-only shortcuts, but not
-   arithmetic.
+2. **Explicit-rule items invite shortcuts, and may produce ceilings.** Making gold computable
+   makes it checkable, but in round 2 it also made the task solvable by arithmetic plus
+   phrase-spotting (70%, measured). Paired bases (the same text with different consequences)
+   defeat follow-up-only shortcuts, but not arithmetic. That explicit items also caused the
+   screen's ceiling is plausible but untested.
 3. **Measure revision against the model's own first answer.** Our first analysis scored
    movement against the computed base answer. That would have counted a model holding a
    wrong first answer as "over-revising". The correction was made before any output existed.
@@ -250,9 +278,10 @@ about:
 
 - **Items and labels.** All were produced by AI models. None has been validated by a human;
   the human review was prepared but not completed.
-- **The goal-autonomy screen.** It evaluated one open model (9B). Its 12 goal-change pairs
-  give coarse precision, and the fact comparison rests on 3 items.
-- **Mistral-NeMo.** It contributed no data on the question.
+- **The goal-autonomy screen.** Only one model, Qwen3.5-9B, completed it. Its 12 goal-change
+  pairs give coarse precision, and the fact comparison rests on 3 items.
+- **Mistral-NeMo.** It stopped at the preflight gate and contributed no data on the question.
+- **Causes of the ceiling.** These were not tested (§5, Interpretation).
 - **Novelty claims.** The comparison with prior work rests on independent AI literature
   audits; BeliefTrack's full text was verified by the PI.
 
@@ -262,7 +291,7 @@ about:
 - Premise search: no gain over voting.
 - The benchmark: wording-defined.
 - Fact-update sensitivity: already measured by BeliefTrack.
-- The one remaining question: a clear null in the model that could be evaluated.
+- The one remaining question: a null in the one model that completed the screen.
 
 Searching for prompts, items or parsers under which an effect appears would be
 outcome-driven. A future study would need a different, separately justified question, for
