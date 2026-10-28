@@ -26,11 +26,11 @@ open model moves its answer distribution more for a stated preference than for a
 relevant fact, though it is also unstable under pure rewording, and whether this is
 deference or priming by naming the option is untested. Claude Haiku~4.5 moves
 \emph{away} from the requested answer, mostly toward asking for more information.
-Claude Opus~5 is not moved by pressure, is moved by relevant facts, and places every
-decision boundary exactly at the stated threshold; Sonnet~5.5 does so in 3 of the 4
-sweeps run so far. Measuring only unwanted change would miss the second pattern.
+Claude Opus~5 rarely moved toward the requested answer and followed the stated
+decision rules, although pressure sometimes produced refusals or overcorrections;
+Sonnet~5.5 matched the threshold on the 3 sweeps it completed. Measuring only unwanted change would miss the second pattern.
 All results are preliminary: labels are the authors' drafts, most cells are one
-sample, and blind labeling is in progress.
+sample, and blind labeling has not yet been completed.
 \end{abstract}
 
 \section{Introduction}
@@ -38,8 +38,9 @@ sample, and blind labeling is in progress.
 People ask language models for consequential career advice, and the recommendation
 should follow the situation, not the user's tone. We study \emph{warranted decision
 updating}: \textbf{can a model tell an input change that should alter a
-recommendation from one that should not?} The primary test is factual. A
-\emph{relevant update} changes one fact and the right answer with it; two factual
+recommendation from one that should not?} The primary test is
+relevant-update discrimination. A \emph{relevant update} changes one fact or stated
+priority, and the right answer with it (24 of our 30 change a fact, 6 a priority or goal); two factual
 negatives change a fact without changing the right answer. A secondary test is
 \emph{pressure}: a request to endorse an option (``They really want to hear that the
 right move is to X'') that adds no fact and changes no stated priority. A preference
@@ -52,7 +53,7 @@ threshold, separates three patterns (Figure~\ref{fig:sweep}, Table~\ref{tab:ladd
 Qwen3.5-9B moves more for a stated preference than for a relevant fact (deference and
 lexical priming are not yet separated); Claude Haiku~4.5 moves away from the requested
 option, mostly toward asking for more information (cause not isolated); and Sonnet~5.5
-and Opus~5 move for facts, not for pressure.
+and Opus~5 move for relevant updates and rarely toward the requested answer.
 
 \section{Related Work}
 
@@ -64,7 +65,7 @@ reasoning \citep{shi2023distracted}, and contrast sets probe a model's local dec
 boundary with minimal edits \citep{gardner2020contrast}. Rewriting the user's
 statement as a question \citep{dubois2026ask}, querying a counterfactual copy that
 never sees the biasing text \citep{christian2026selfblinding}, and synthetic
-fine-tuning data \citep{wei2023simple} reduce sycophancy. We add matched relevant,
+fine-tuning data \citep{wei2023simple} reduce sycophancy. We evaluate matched relevant,
 irrelevant and pressure variants of the same decision on one metric, decision-only
 models \citep{nimble,laya,jev}, and threshold sweeps that turn ``did it flip'' into
 ``where does it flip''.
@@ -98,11 +99,14 @@ where one fact flips the answer; the \textbf{Qwen3.5-9B} base model runs through
 same scorer with the adapter removed, so only the adapter differs. Both score every
 option. \textbf{Claude} Haiku~4.5, Sonnet~5.5 and Opus~5 answer either with an option
 code (\emph{code only}) or with a short paragraph ending in a code (\emph{written
-advice}). The primary metric is $d'_{\text{fact}} = z(\tilde h) - z(\tilde f)$, hit = the
-answer changes on a relevant update, false alarm = it changes on a factual negative,
+advice}). The primary metric is relevant-update discrimination, $d'_{\text{rel}} = z(\tilde h) -
+z(\tilde f)$: hit = the answer changes on a relevant update, false alarm = it changes
+on an irrelevant update ($d'_{\text{sub}}$ uses the subthreshold edits instead). Because
+6 relevant updates change a priority or goal rather than a fact, $d'_{\text{rel}}$ does not
+isolate factual reasoning;
 $\tilde p = (k + 0.5)/(n + 1)$ \citep{macmillan2005detection}, with intervals from 2,000
 bootstrap resamples over scenarios. We report correct updates apart from any change.
-Labels are the authors' drafts; blind relabeling is in progress, so every result below
+Labels are the authors' drafts; blind labeling has not yet been completed, so every result below
 is exploratory (run before blind labels) or legacy (fixed option order).
 
 \begin{figure*}[t]
@@ -111,9 +115,9 @@ is exploratory (run before blind labels) or legacy (fixed option order).
 \caption{Threshold sweep: share of answers choosing the high-side option as the
 deciding number moves from 0.5$\times$ to 1.5$\times$ its threshold (dashed: the
 correct step). Opus switches exactly at the threshold and pressure does not move it;
-Sonnet does the same on 3 of its 4 sweeps; Haiku's boundary is blurred, and pressure
+Sonnet does the same on the 3 sweeps it completed; Haiku's boundary is blurred, and pressure
 pushes it \emph{away} from the requested option. Exploratory: one sample per prompt;
-Sonnet's run is incomplete (4 of 8 scenarios, one partial); \emph{need more information} counts as not choosing the high side.}
+Sonnet's run is incomplete (3 of 8 scenarios complete, a fourth only 5 of 24 prompts); \emph{need more information} counts as not choosing the high side.}
 \label{fig:sweep}
 \end{figure*}
 
@@ -123,7 +127,7 @@ Sonnet's run is incomplete (4 of 8 scenarios, one partial); \emph{need more info
 \toprule
 & & \multicolumn{2}{c}{Relevant update} & Irrelevant & Subthreshold & & & Omission \\
 \cmidrule(lr){3-4}
-Model & Format & changed & correct & changed & changed & $d'_{\text{fact}}$ [95\% CI] & $d'_{\text{sub}}$ & asks \\
+Model & Format & changed & correct & changed & changed & $d'_{\text{rel}}$ [95\% CI] & $d'_{\text{sub}}$ & asks \\
 \midrule
 Haiku 4.5 & code only & 14/30 & 12/30 & 4/30 & 3/30 & 0.98 [0.37, 1.82] & 1.13 & 15/30 \\
  & written & 18/30 & 17/30 & 7/30 & 5/30 & 0.95 [0.34, 1.66] & 1.17 & 17/30 \\
@@ -142,10 +146,10 @@ of 30 scenarios when API credits ran out.}
 
 \section{Results}
 
-\textbf{Factual discrimination: Sonnet and Opus, but not Haiku.} Sonnet and Opus
+\textbf{Relevant-update discrimination: Sonnet and Opus, but not Haiku.} Sonnet and Opus
 change their answer on 65--77\% of relevant updates and on almost no factual negatives
-($d'_{\text{fact}}$ 2.3--2.7; Table~\ref{tab:ladder}). Haiku changes on fewer relevant
-updates and on more negatives, for $d'_{\text{fact}} \approx 1$, and is right both
+($d'_{\text{rel}}$ 2.3--2.7; Table~\ref{tab:ladder}). Haiku changes on fewer relevant
+updates and on more negatives, for $d'_{\text{rel}} \approx 1$, and is right both
 before and after the update in only 8--12 of 30 scenarios (Sonnet 16--19). These runs
 also shuffled the option order separately for each variant. Haiku changed 18\% of
 answers that should not change when the order differed from base and 5\% when it
@@ -158,8 +162,11 @@ information more often (15--17 of 30 omissions).
 (Figure~\ref{fig:sweep}), Opus answering with a code was right on all 192 prompts: its
 switch point sits exactly at the threshold in every scenario and pressure never moves
 it. In written advice it missed 8 of 190, mostly \emph{need more information} on
-near-ties (``about 1\% of the stakes''). Sonnet is exact on 3 of the 4 sweeps it ran;
-on the buyout sweep it switches at 0.79$\times$ the threshold. Haiku's switch point is off by a factor of about 1.45 on average: it ignores one
+near-ties (``about 1\% of the stakes''). Sonnet is exact on the 3 sweeps it completed; a
+fourth stopped after 5 of 24 prompts and is not evaluated. One sweep's labels
+(commute) had the two options assigned the wrong way round; this was found and
+corrected after the run by swapping the options' roles, with no prompt changed, and
+the Opus result above uses the corrected labels. Haiku's switch point is off by a factor of about 1.45 on average: it ignores one
 scenario's expense rule entirely, and in another switches well before the threshold,
 as if leaving out the stated 20\% costs. Under
 pressure it moves the other way: asked to endorse the high-side option, its written
@@ -178,8 +185,10 @@ $p=0.005$), shifts to the requested option in 18 of 29, and changes its answer o
 updates but reaches the labeled answer on only 8; $d'$ against pressure and reframe
 is 0.04, and it also changes its answer on 12 of 30 pure rewordings, so part of
 this is general instability. Nimble discriminates better (AUROC 0.71 vs.\ 0.46, by the same margin against
-pressure and against reframe) but still shifts in 11 of 27 and never asks for missing
-information, which its training never taught. Whether the 9B pull is deference or
+pressure and against reframe) but still shifts in 11 of 27. It never selected
+\emph{need more information}, on omission prompts or anywhere else, although its
+published training data include about 50 cases whose correct answer is to hold a
+decision or obtain missing evidence (as domain-specific options, not a generic ask). Whether the 9B pull is deference or
 lexical priming waits on a neutral-mention control.
 
 \textbf{Other observations.} Opus never moved toward the requested option in
