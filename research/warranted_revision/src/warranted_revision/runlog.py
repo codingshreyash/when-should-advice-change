@@ -1,0 +1,171 @@
+"""Running log of every run, with totals.
+
+Usage (from ``research/warranted_revision``)::
+
+    python -m warranted_revision.runlog            # rewrite results/warranted_revision/RUN_LOG.md
+
+``results/warranted_revision/runs.json`` is kept by hand: one entry per run, including dry
+runs and failed launches, with the facts only we know (GitHub run, purpose, outcome, launch
+minutes, hourly price, actual Brev charge once known). Everything measurable (calls, tokens,
+output validity, ledger parsing, token-limit stops, refusals) is read from each run's own
+files, so the log can't drift from the results.
+"""
+
+from __future__ import annotations
+
+import gzip
+import json
+import sys
+from pathlib import Path
+from typing import Any
+
+from .diagnostics import call_diagnostics
+from .runner import PKG_ROOT
+
+RESULTS = PKG_ROOT.parents[1] / "results" / "warranted_revision"
+
+
+def _jsonl(run: Path, name: str):
+    for path, opener in ((run / name, open), (run / f"{name}.gz", gzip.open)):
+        if path.exists():
+            with opener(path, "rt") as fh:
+                for line in fh:
+                    if line.strip():
+                        yield json.loads(line)
+            return
+
+
+def measured(run: Path) -> dict[str, Any]:
+    """Counts read from a run directory (empty dict if the run left no files)."""
+    if not (run / "manifest.json").exists():
+        return {}
+    man = json.loads((run / "manifest.json").read_text())
+    out: dict[str, Any] = {
+        "synthetic": man["synthetic"],
+        "calls": man.get("actual_calls"),
+        "cases": len(man["case_ids"]),
+        "conditions": man["conditions"],
+    }
+    prompt = completion = 0
+    for d in _jsonl(run, "decisions.jsonl"):
+        prompt += d["prompt_tokens"]
+        completion += d["completion_tokens"]
+    out["prompt_tokens"], out["completion_tokens"] = prompt, completion
+    pred = next(
+        (run / n for n in ("predictions.jsonl", "predictions.jsonl.gz") if (run / n).exists()), None
+    )
+    if pred is not None and not man["synthetic"]:
+        rows = call_diagnostics(pred)["rows"]
+        dec = [r for r in rows if r["call_group"] == "decision"]
+        led = [r for r in rows if "ledger_expected" in r]
+        n_dec = sum(r["calls"] for r in dec)
+        out.update(
+            {
+                "decision_calls": n_dec,
+                "strict_valid_decisions": sum(r["strict_valid"] for r in dec),
+                "recoverable_rejected": sum(r["invalid_with_one_clear_decision"] for r in dec),
+                "ledgers_expected": sum(r["ledger_expected"] for r in led),
+                "ledgers_parsed": sum(r["ledger_parsed"] for r in led),
+                "token_limit_stops": sum(r["hit_token_limit"] for r in rows),
+                "refusals": sum(r["refusal"] for r in rows),
+                "missing": sum(r["missing"] for r in rows),
+            }
+        )
+    return out
+
+
+def _pct(a: float, b: float) -> str:
+    return "–" if not b else f"{a / b:.0%}"
+
+
+def build(results: Path = RESULTS) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    entries = json.loads((results / "runs.json").read_text())
+    rows = []
+    for e in entries:
+        m = measured(results / e["run_id"])
+        est = (e["launch_minutes"] / 60 * e["hourly_usd"]) if e.get("hourly_usd") else 0.0
+        rows.append({**e, **m, "est_cost_usd": round(est, 2)})
+    real = [r for r in rows if r["kind"] == "gpu"]
+    known = [r["actual_cost_usd"] for r in rows if r["actual_cost_usd"] is not None]
+    totals = {
+        "runs": len(rows),
+        "gpu_launches": len(real),
+        "instances_created": sum(r["instance_created"] for r in real),
+        "gpu_runs_completed": sum(r["outcome"].startswith("completed") for r in real),
+        "launch_minutes": round(sum(r["launch_minutes"] for r in real), 1),
+        "est_cost_usd": round(sum(r["est_cost_usd"] for r in real), 2),
+        "actual_cost_usd_known": round(sum(known), 2),
+        "runs_missing_actual_cost": sum(r["actual_cost_usd"] is None for r in real),
+        "real_model_calls": sum(r.get("calls") or 0 for r in real),
+        "real_prompt_tokens": sum(r.get("prompt_tokens", 0) for r in real),
+        "real_completion_tokens": sum(r.get("completion_tokens", 0) for r in real),
+        "synthetic_calls": sum(r.get("calls") or 0 for r in rows if r["kind"] == "synthetic"),
+        "decision_calls": sum(r.get("decision_calls", 0) for r in real),
+        "strict_valid_decisions": sum(r.get("strict_valid_decisions", 0) for r in real),
+        "ledgers_expected": sum(r.get("ledgers_expected", 0) for r in real),
+        "ledgers_parsed": sum(r.get("ledgers_parsed", 0) for r in real),
+        "token_limit_stops": sum(r.get("token_limit_stops", 0) for r in real),
+        "refusals": sum(r.get("refusals", 0) for r in real),
+        "missing": sum(r.get("missing", 0) for r in real),
+    }
+    return rows, totals
+
+
+def render(rows: list[dict[str, Any]], t: dict[str, Any]) -> str:
+    L = [
+        "# Run log\n",
+        "Generated by `python -m warranted_revision.runlog` from `runs.json` (kept by hand) and "
+        "each run's own files. Costs are estimates (launch-step minutes x hourly price, a slight "
+        "upper bound) until Brev's actual charge is filled in.\n",
+        "## Totals\n",
+        f"- Runs logged: **{t['runs']}** ({t['gpu_launches']} GPU launches, "
+        f"{t['instances_created']} instances created, {t['gpu_runs_completed']} completed)",
+        f"- GPU time: **{t['launch_minutes']:.0f} min**; estimated spend **${t['est_cost_usd']:.2f}**"
+        + (
+            f"; actual charges known: ${t['actual_cost_usd_known']:.2f}"
+            f" ({t['runs_missing_actual_cost']} runs still missing)"
+        ),
+        f"- Real model calls: **{t['real_model_calls']:,}**; tokens: "
+        f"{t['real_prompt_tokens']:,} prompt + {t['real_completion_tokens']:,} completion",
+        f"- Strictly valid decisions: {t['strict_valid_decisions']:,}/{t['decision_calls']:,} "
+        f"({_pct(t['strict_valid_decisions'], t['decision_calls'])}); ledgers parsed: "
+        f"{t['ledgers_parsed']:,}/{t['ledgers_expected']:,} ({_pct(t['ledgers_parsed'], t['ledgers_expected'])})",
+        f"- Token-limit stops: {t['token_limit_stops']}; refusals: {t['refusals']}; missing outputs: "
+        f"{t['missing']}",
+        f"- Synthetic (fake-model) calls: {t['synthetic_calls']:,}",
+        "",
+        "## Runs\n",
+        "| run | date | kind | outcome | cases x conditions | calls | min | est. $ | actual $ "
+        "| valid decisions | ledgers parsed | token-limit stops |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|",
+    ]
+    for r in rows:
+        gh = (
+            f"[{r['run_id']}](https://github.com/codingshreyash/when-should-advice-change/actions/runs/"
+            f"{r['github_run']})"
+            if r.get("github_run")
+            else f"`{r['run_id']}`"
+        )
+        shape = f"{r['cases']} x {len(r['conditions'])}" if "cases" in r else "–"
+        actual = "–" if r["actual_cost_usd"] is None else f"{r['actual_cost_usd']:.2f}"
+        L.append(
+            f"| {gh} | {r['date']} | {r['kind']} | {r['outcome']} | {shape} | "
+            f"{r.get('calls') or 0:,} | {r['launch_minutes']:g} | {r['est_cost_usd']:.2f} | {actual} | "
+            f"{_pct(r.get('strict_valid_decisions', 0), r.get('decision_calls', 0))} | "
+            f"{_pct(r.get('ledgers_parsed', 0), r.get('ledgers_expected', 0))} | "
+            f"{r.get('token_limit_stops', '–')} |"
+        )
+    L.append("")
+    return "\n".join(L)
+
+
+def main(argv: list[str] | None = None) -> int:
+    rows, totals = build()
+    (RESULTS / "RUN_LOG.md").write_text(render(rows, totals))
+    (RESULTS / "run_totals.json").write_text(json.dumps(totals, indent=2) + "\n")
+    print(render(rows, totals))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

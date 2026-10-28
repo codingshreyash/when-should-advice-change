@@ -1,0 +1,8 @@
+{
+  "version": "scaffold_probe_v1",
+  "source_inputs": "data/challenge_v1/challenge_inputs.jsonl",
+  "source_inputs_sha256": "f2254b54dcf66b4c922bb97e8ae8f24fdc9ce9c32005e20fe9a92a6963dcd149",
+  "items_sha256": "a49129bd3ce9a6f90078f570cdbe2c087e205d747c8f6eecec5a80848e1a1b42",
+  "n_cases": 20,
+  "note": "Gold-free probe texts for both actionable options; challenge_v1 templates."
+}

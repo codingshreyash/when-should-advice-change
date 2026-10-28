@@ -1,0 +1,21 @@
+{
+  "runs": 8,
+  "gpu_launches": 6,
+  "instances_created": 5,
+  "gpu_runs_completed": 3,
+  "launch_minutes": 187.7,
+  "est_cost_usd": 3.32,
+  "actual_cost_usd_known": 0,
+  "runs_missing_actual_cost": 6,
+  "real_model_calls": 2304,
+  "real_prompt_tokens": 2958721,
+  "real_completion_tokens": 809847,
+  "synthetic_calls": 151200,
+  "decision_calls": 1674,
+  "strict_valid_decisions": 1459,
+  "ledgers_expected": 2214,
+  "ledgers_parsed": 1317,
+  "token_limit_stops": 127,
+  "refusals": 1,
+  "missing": 0
+}

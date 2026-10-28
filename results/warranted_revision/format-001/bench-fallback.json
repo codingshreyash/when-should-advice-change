@@ -1,0 +1,52 @@
+{
+  "label": "fallback",
+  "model": {
+    "kind": "hf",
+    "model_id": "Qwen/Qwen3.5-9B",
+    "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+    "model_class": "Qwen3_5ForConditionalGeneration",
+    "dtype": "bfloat16",
+    "load_in_4bit": false,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "allow_unpinned": false,
+    "max_batch": 9,
+    "torch": "2.8.0+cu128",
+    "transformers": "5.20.2",
+    "gpu": "NVIDIA L40S",
+    "python": "3.10.12",
+    "load_seconds": 113.3,
+    "synthetic": false,
+    "privileged": false
+  },
+  "n_requests": 9,
+  "max_new_tokens": 1024,
+  "seconds": 18.17,
+  "new_tokens": 2777,
+  "tokens_per_second": 152.87,
+  "seconds_per_call": 2.02,
+  "hit_token_limit": 0,
+  "kernel_imports": {
+    "fla.ops.gated_delta_rule": "Traceback (most recent call last):\n  File \"/home/shadeform/warranted_revision/src/warranted_revision/bench.py\", line 47, in kernel_imports\n    importlib.import_module(mod)\n  File \"/usr/lib/python3.10/importlib/__init__.py\", line 126, in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n  File \"<frozen importlib._bootstrap>\", line 1050, in _gcd_import\nModuleNotFoundError: No module named 'fla'\n",
+    "causal_conv1d": "Traceback (most recent call last):\n  File \"/home/shadeform/warranted_revision/src/warranted_revision/bench.py\", line 47, in kernel_imports\n    importlib.import_module(mod)\n  File \"/usr/lib/python3.10/importlib/__init__.py\", line 126, in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n  File \"<frozen importlib._bootstrap>\", line 1050, in _gcd_import\nModuleNotFoundError: No module named 'causal_conv1d'\n"
+  },
+  "fallback_warnings": [
+    "causal_conv1d_fn",
+    "causal_conv1d_update",
+    "chunk_gated_delta_rule",
+    "fused_recurrent_gated_delta_rule"
+  ],
+  "output_sha256": [
+    "5044fc116c6905fc",
+    "5044fc116c6905fc",
+    "8c1e074a43ded40e",
+    "7ddaf2120de7438c",
+    "7a1cbf59b10b1f72",
+    "c0db6a26487dc941",
+    "f6bd6cd539ed105c",
+    "00dc7abb9fc8c945",
+    "4818899edab69ee9"
+  ],
+  "config": "configs/gpu_smoke.json"
+}

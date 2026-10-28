@@ -1,0 +1,93 @@
+{
+  "_status": "Checked against `brev ... --help` from brev CLI v0.6.335 on 2026-10-25: login, create, delete, ls, refresh. Still unconfirmed until the first real run: that `ssh <name>` works after `brev refresh`, and the CLI installer URL used by the workflow.",
+  "_cli_version_checked": "v0.6.335",
+  "login": {
+    "argv": [
+      "brev",
+      "login",
+      "--token",
+      "{token}"
+    ],
+    "note": "VERIFIED 2026-10-25 against `brev login --help` (flag: --token string, 'token provided to auto login'). Token source in the console still to be confirmed."
+  },
+  "create_check": {
+    "argv": [
+      "brev",
+      "create",
+      "{name}",
+      "--dry-run"
+    ],
+    "note": "Lists the types create will accept under its default filters (e.g. min 500GB disk), as 'type (NNNGB disk), ...'. The controller refuses unless the chosen type is listed. With --type, --dry-run only echoes the type back, so it is not a check."
+  },
+  "price": {
+    "argv": [
+      "brev",
+      "search",
+      "gpu"
+    ],
+    "note": "VERIFIED 2026-10-26 (Actions run 40408720343): table with TYPE first and $/HR last, e.g. 'massedcompute_L40S ... $1.06'. Read-only."
+  },
+  "create": {
+    "argv": [
+      "brev",
+      "create",
+      "{name}",
+      "--type",
+      "{instance_type}",
+      "--timeout",
+      "900"
+    ],
+    "note": "VERIFIED: -t/--type takes instance types (comma list = fallback chain, which the guard forbids); -g is --gpu-name, a search filter, not a type. Waits for readiness unless --detached; --timeout is seconds per instance (default 300)."
+  },
+  "refresh": {
+    "argv": [
+      "brev",
+      "refresh"
+    ],
+    "note": "VERIFIED: 'Force a refresh to the SSH config'"
+  },
+  "list": {
+    "argv": [
+      "brev",
+      "ls"
+    ],
+    "note": "VERIFIED: when stdout is piped, prints instance names only, one per line"
+  },
+  "exec": {
+    "argv": [
+      "ssh",
+      "-o",
+      "StrictHostKeyChecking=accept-new",
+      "{name}",
+      "{remote_cmd}"
+    ],
+    "note": "SSH alias written by `brev refresh`; confirm `ssh <name>` on the first run"
+  },
+  "copy_to": {
+    "argv": [
+      "scp",
+      "-o",
+      "StrictHostKeyChecking=accept-new",
+      "{src}",
+      "{name}:{dst}"
+    ]
+  },
+  "copy_from": {
+    "argv": [
+      "scp",
+      "-r",
+      "-o",
+      "StrictHostKeyChecking=accept-new",
+      "{name}:{src}",
+      "{dst}"
+    ]
+  },
+  "delete": {
+    "argv": [
+      "brev",
+      "delete",
+      "{name}"
+    ],
+    "note": "VERIFIED: `brev delete <name>`; deletion can take a few minutes, check with `brev ls`. Delete, not stop: stopped instances still bill for storage."
+  }
+}

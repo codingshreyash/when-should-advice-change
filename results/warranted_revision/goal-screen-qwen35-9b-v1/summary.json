@@ -1,0 +1,60 @@
+{
+ "run_id": "goal-screen-qwen35-9b-v1",
+ "preflight": false,
+ "system": {
+  "kind": "hf",
+  "model_id": "Qwen/Qwen3.5-9B",
+  "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "model_class": "Qwen3_5ForConditionalGeneration",
+  "dtype": "bfloat16",
+  "load_in_4bit": false,
+  "chat_template_kwargs": {
+   "enable_thinking": false
+  },
+  "tokenizer_kwargs": {},
+  "allow_unpinned": false,
+  "max_batch": 9,
+  "torch": "2.8.0+cu128",
+  "transformers": "5.20.2",
+  "gpu": "NVIDIA L40S",
+  "python": "3.10.12",
+  "load_seconds": 3.1,
+  "synthetic": false,
+  "privileged": false
+ },
+ "expected_calls": 1008,
+ "actual_calls": 1008,
+ "stopped": null,
+ "spend_usd": null,
+ "input_tokens": 776551,
+ "output_tokens": 168971,
+ "stop_reasons": {
+  "stop": 1004,
+  "length": 4
+ },
+ "refusals": 0,
+ "errors": 0,
+ "error_types": {},
+ "response_line": {
+  "valid": 875,
+  "invalid": 7
+ },
+ "response_line_by_kind": {
+  "control": {
+   "valid": 179,
+   "invalid": 1
+  },
+  "decision": {
+   "valid": 251,
+   "invalid": 1
+  },
+  "first": {
+   "valid": 72
+  },
+  "repeat": {
+   "valid": 373,
+   "invalid": 5
+  }
+ },
+ "preflight_projection": null
+}

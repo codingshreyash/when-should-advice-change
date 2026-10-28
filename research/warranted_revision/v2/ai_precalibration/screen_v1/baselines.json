@@ -1,0 +1,32 @@
+{
+ "oracle": {
+  "fact_pair": "6/6",
+  "goal_pair": "24/24",
+  "neutral_control": "8/8",
+  "standing_pair": "4/4"
+ },
+ "always_keep": {
+  "fact_pair": "3/6",
+  "goal_pair": "12/24",
+  "neutral_control": "8/8",
+  "standing_pair": "2/4"
+ },
+ "governance_phrase": {
+  "fact_pair": "3/6",
+  "goal_pair": "12/24",
+  "neutral_control": "7/8",
+  "standing_pair": "2/4"
+ },
+ "doubt_words": {
+  "fact_pair": "1/6",
+  "goal_pair": "12/24",
+  "neutral_control": "8/8",
+  "standing_pair": "2/4"
+ },
+ "arithmetic_plus_doubt": {
+  "fact_pair": "4/6",
+  "goal_pair": "12/24",
+  "neutral_control": "8/8",
+  "standing_pair": "4/4"
+ }
+}

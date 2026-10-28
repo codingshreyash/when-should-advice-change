@@ -1,0 +1,41 @@
+{
+  "run_id": "REPLACE_AT_LAUNCH",
+  "label": "Format-only check after the shared ledger JSON template: two dev cases, ledger-producing conditions incl. the provenance ablation, one replicate. Measurement validation, not a test.",
+  "split": "dev",
+  "inputs": "data/v0/dev_inputs.jsonl",
+  "case_ids_file": "configs/format_check_ids.json",
+  "conditions": [
+    "structured",
+    "best_of_n",
+    "premise_search",
+    "premise_search_formatonly"
+  ],
+  "replicates": 1,
+  "systems": [
+    {
+      "kind": "hf",
+      "name": "Qwen/Qwen3.5-9B",
+      "params": {
+        "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+        "model_class": "Qwen3_5ForConditionalGeneration",
+        "dtype": "bfloat16",
+        "load_in_4bit": false,
+        "max_batch": 9,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    }
+  ],
+  "condition_config": {
+    "max_new_tokens_direct": 200,
+    "max_new_tokens_structured": 1024,
+    "sample_temperature": 0.7,
+    "sample_top_p": 0.95,
+    "best_of_n": 9,
+    "base_turn_readings": 5,
+    "beam_width": 2,
+    "decisions_per_node": 2
+  },
+  "max_calls": 504
+}

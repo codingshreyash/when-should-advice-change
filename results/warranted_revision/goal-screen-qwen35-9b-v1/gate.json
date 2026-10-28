@@ -1,0 +1,58 @@
+{
+ "run_id": "goal-screen-qwen35-9b-v1",
+ "preflight": true,
+ "system": {
+  "kind": "hf",
+  "model_id": "Qwen/Qwen3.5-9B",
+  "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "model_class": "Qwen3_5ForConditionalGeneration",
+  "dtype": "bfloat16",
+  "load_in_4bit": false,
+  "chat_template_kwargs": {
+   "enable_thinking": false
+  },
+  "tokenizer_kwargs": {},
+  "allow_unpinned": false,
+  "max_batch": 9,
+  "torch": "2.8.0+cu128",
+  "transformers": "5.20.2",
+  "gpu": "NVIDIA L40S",
+  "python": "3.10.12",
+  "load_seconds": 69.9,
+  "synthetic": false,
+  "privileged": false
+ },
+ "expected_calls": 30,
+ "actual_calls": 30,
+ "stopped": null,
+ "spend_usd": null,
+ "input_tokens": 21189,
+ "output_tokens": 5375,
+ "stop_reasons": {
+  "stop": 30
+ },
+ "refusals": 0,
+ "errors": 0,
+ "error_types": {},
+ "response_line": {
+  "valid": 24
+ },
+ "response_line_by_kind": {
+  "control": {
+   "valid": 6
+  },
+  "decision": {
+   "valid": 12
+  },
+  "first": {
+   "valid": 6
+  }
+ },
+ "preflight_projection": null,
+ "seconds_per_batch": 7.8,
+ "full_run_batches": 117,
+ "projected_full_run_min": 15.3,
+ "remaining_min": 208.0,
+ "gate_passed": true,
+ "gate_problems": []
+}

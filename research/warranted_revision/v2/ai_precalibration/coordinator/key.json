@@ -1,0 +1,2569 @@
+{
+  "bases": {
+    "12614f9a": {
+      "base_id": "cc-a",
+      "rule_action": "nanny_share"
+    },
+    "248d2ae0": {
+      "base_id": "eld-b",
+      "rule_action": "home_aide"
+    },
+    "6affb68d": {
+      "base_id": "sol-a",
+      "rule_action": "install_solar"
+    },
+    "81890421": {
+      "base_id": "eb-a",
+      "rule_action": "buy_ebike"
+    },
+    "ba2ae7a5": {
+      "base_id": "hp-b",
+      "rule_action": "repair_furnace"
+    },
+    "c121fb12": {
+      "base_id": "cc-b",
+      "rule_action": "little_oaks"
+    },
+    "c19676ae": {
+      "base_id": "sc-a",
+      "rule_action": "ridgeview_magnet"
+    },
+    "df980234": {
+      "base_id": "sc-b",
+      "rule_action": "lincoln_elementary"
+    },
+    "e0082f7d": {
+      "base_id": "sol-b",
+      "rule_action": "skip_solar"
+    },
+    "e0915754": {
+      "base_id": "hp-a",
+      "rule_action": "install_heat_pump"
+    },
+    "e6f8a7ac": {
+      "base_id": "eld-a",
+      "rule_action": "maple_court"
+    },
+    "f01f60d2": {
+      "base_id": "eb-b",
+      "rule_action": "buy_transit_pass"
+    }
+  },
+  "items": {
+    "005e2ca127": {
+      "base_id": "cc-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "little_oaks",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "little_oaks",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "little_oaks",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "little_oaks",
+        "base_action": "little_oaks",
+        "behavior": "KEEP"
+      },
+      "design_label": "PREFERENCE",
+      "family_id": "childcare",
+      "item_id": "cc-05",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "0f98ae6606": {
+      "base_id": "cc-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "little_oaks",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "little_oaks",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "little_oaks",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "little_oaks",
+        "base_action": "little_oaks",
+        "behavior": "KEEP"
+      },
+      "design_label": "PREFERENCE",
+      "family_id": "childcare",
+      "item_id": "cc-03",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "17f4322907": {
+      "base_id": "sol-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "decision_invariant": true,
+          "if_true": "skip_solar",
+          "otherwise": "install_solar"
+        },
+        "FACT_SUPPORTED": {
+          "action": "skip_solar",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "skip_solar",
+          "otherwise": "install_solar"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "install_solar",
+        "behavior": "HEDGE",
+        "if_true": "skip_solar",
+        "otherwise": "install_solar"
+      },
+      "design_label": "FACT_UNSUPPORTED",
+      "family_id": "solar",
+      "item_id": "sol-08",
+      "readings": [
+        {
+          "facts_update": {
+            "solar_quote": 23000
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "2164a6f2a1": {
+      "base_id": "eld-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "home_aide",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "home_aide",
+        "base_action": "home_aide",
+        "behavior": "KEEP"
+      },
+      "design_label": "FACT_UNSUPPORTED",
+      "family_id": "eldercare",
+      "item_id": "eld-07",
+      "readings": [
+        {
+          "facts_update": {
+            "facility_rate": 6900
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "21dc072f98": {
+      "base_id": "cc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "little_oaks",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "little_oaks",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "little_oaks",
+        "base_action": "nanny_share",
+        "behavior": "REVISE"
+      },
+      "design_label": "GOAL_CHANGE",
+      "family_id": "childcare",
+      "item_id": "cc-01",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "nanny_close >= 17.75 and nanny_share_cost - in_home_subsidy < little_oaks_cost",
+            "if_false": "little_oaks",
+            "if_true": "nanny_share"
+          }
+        }
+      ]
+    },
+    "273aee0771": {
+      "base_id": "hp-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "decision_invariant": true,
+          "if_true": "repair_furnace",
+          "otherwise": "install_heat_pump"
+        },
+        "FACT_SUPPORTED": {
+          "action": "repair_furnace",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "repair_furnace",
+          "otherwise": "install_heat_pump"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "install_heat_pump",
+        "behavior": "HEDGE",
+        "if_true": "repair_furnace",
+        "otherwise": "install_heat_pump"
+      },
+      "design_label": "FACT_UNSUPPORTED",
+      "family_id": "heat_pump",
+      "item_id": "hp-03",
+      "readings": [
+        {
+          "facts_update": {
+            "heat_pump_quote": 14000
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "2ec1ddb85d": {
+      "base_id": "sc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "between": [
+            "lincoln_elementary",
+            "ridgeview_magnet"
+          ],
+          "decision_invariant": false
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "lincoln_elementary",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "ridgeview_magnet",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "ridgeview_magnet",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "ridgeview_magnet",
+        "behavior": "HEDGE",
+        "between": [
+          "lincoln_elementary",
+          "ridgeview_magnet"
+        ],
+        "decision_invariant": false
+      },
+      "design_label": "AMBIGUOUS",
+      "family_id": "school_choice",
+      "item_id": "sc-05",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "friends_lincoln > friends_ridgeview",
+            "if_false": "ridgeview_magnet",
+            "if_true": "lincoln_elementary"
+          }
+        },
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "31163bc086": {
+      "base_id": "eb-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "between": [
+            "buy_ebike",
+            "buy_transit_pass"
+          ],
+          "decision_invariant": false
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "buy_ebike",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "buy_transit_pass",
+        "behavior": "HEDGE",
+        "between": [
+          "buy_ebike",
+          "buy_transit_pass"
+        ],
+        "decision_invariant": false
+      },
+      "design_label": "AMBIGUOUS",
+      "family_id": "ebike_commute",
+      "item_id": "eb-02",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "bike_min < transit_min",
+            "if_false": "buy_transit_pass",
+            "if_true": "buy_ebike"
+          }
+        },
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "3bdf201692": {
+      "base_id": "sc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "lincoln_elementary",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "lincoln_elementary",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "ridgeview_magnet",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "ridgeview_magnet",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "lincoln_elementary",
+        "base_action": "ridgeview_magnet",
+        "behavior": "REVISE"
+      },
+      "design_label": "GOAL_CHANGE",
+      "family_id": "school_choice",
+      "item_id": "sc-07",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "ridgeview_aftercare_end >= 18",
+            "if_false": "lincoln_elementary",
+            "if_true": "ridgeview_magnet"
+          }
+        }
+      ]
+    },
+    "48320c30c8": {
+      "base_id": "sc-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "lincoln_elementary",
+        "base_action": "lincoln_elementary",
+        "behavior": "KEEP"
+      },
+      "design_label": "VALIDATION",
+      "family_id": "school_choice",
+      "item_id": "sc-08",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "VALIDATION",
+          "rule_update": null
+        }
+      ]
+    },
+    "4c23bd1497": {
+      "base_id": "eld-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "between": [
+            "home_aide",
+            "maple_court"
+          ],
+          "decision_invariant": false
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "home_aide",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "maple_court",
+        "behavior": "HEDGE",
+        "between": [
+          "home_aide",
+          "maple_court"
+        ],
+        "decision_invariant": false
+      },
+      "design_label": "AMBIGUOUS",
+      "family_id": "eldercare",
+      "item_id": "eld-08",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "mom_wants_home >= 1",
+            "if_false": "maple_court",
+            "if_true": "home_aide"
+          }
+        },
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "4dcb604f78": {
+      "base_id": "eld-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "maple_court",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "maple_court",
+        "base_action": "maple_court",
+        "behavior": "KEEP"
+      },
+      "design_label": "VALIDATION",
+      "family_id": "eldercare",
+      "item_id": "eld-04",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "VALIDATION",
+          "rule_update": null
+        }
+      ]
+    },
+    "4e19a74f74": {
+      "base_id": "hp-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "repair_furnace",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "repair_furnace",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "repair_furnace",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "repair_furnace",
+        "base_action": "repair_furnace",
+        "behavior": "KEEP"
+      },
+      "design_label": "VALIDATION",
+      "family_id": "heat_pump",
+      "item_id": "hp-08",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "VALIDATION",
+          "rule_update": null
+        }
+      ]
+    },
+    "4f336cbfb0": {
+      "base_id": "eb-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "buy_transit_pass",
+        "base_action": "buy_transit_pass",
+        "behavior": "KEEP"
+      },
+      "design_label": "VALIDATION",
+      "family_id": "ebike_commute",
+      "item_id": "eb-06",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "VALIDATION",
+          "rule_update": null
+        }
+      ]
+    },
+    "51043f0592": {
+      "base_id": "eld-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "decision_invariant": true,
+          "if_true": "home_aide",
+          "otherwise": "maple_court"
+        },
+        "FACT_SUPPORTED": {
+          "action": "home_aide",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "home_aide",
+          "otherwise": "maple_court"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "maple_court",
+        "behavior": "HEDGE",
+        "if_true": "home_aide",
+        "otherwise": "maple_court"
+      },
+      "design_label": "FACT_UNSUPPORTED",
+      "family_id": "eldercare",
+      "item_id": "eld-06",
+      "readings": [
+        {
+          "facts_update": {
+            "facility_rate": 6900
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "53dbc1a4db": {
+      "base_id": "sol-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "skip_solar",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "skip_solar",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "skip_solar",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "skip_solar",
+        "base_action": "skip_solar",
+        "behavior": "KEEP"
+      },
+      "design_label": "VALIDATION",
+      "family_id": "solar",
+      "item_id": "sol-06",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "VALIDATION",
+          "rule_update": null
+        }
+      ]
+    },
+    "639ea50ae4": {
+      "base_id": "eb-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "buy_ebike",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "buy_ebike",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "buy_ebike",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "buy_ebike",
+        "base_action": "buy_ebike",
+        "behavior": "KEEP"
+      },
+      "design_label": "VALIDATION",
+      "family_id": "ebike_commute",
+      "item_id": "eb-05",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "VALIDATION",
+          "rule_update": null
+        }
+      ]
+    },
+    "6c713f29c0": {
+      "base_id": "sol-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "between": [
+            "install_solar",
+            "skip_solar"
+          ],
+          "decision_invariant": false
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "skip_solar",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "install_solar",
+        "behavior": "HEDGE",
+        "between": [
+          "install_solar",
+          "skip_solar"
+        ],
+        "decision_invariant": false
+      },
+      "design_label": "AMBIGUOUS",
+      "family_id": "solar",
+      "item_id": "sol-01",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "solar_quote * (1 - tax_credit_pct / 100) / annual_savings < 10",
+            "if_false": "skip_solar",
+            "if_true": "install_solar"
+          }
+        },
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "72618d9b7f": {
+      "base_id": "eld-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "home_aide",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "home_aide",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "home_aide",
+        "base_action": "maple_court",
+        "behavior": "REVISE"
+      },
+      "design_label": "GOAL_CHANGE",
+      "family_id": "eldercare",
+      "item_id": "eld-01",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "aide_hours_week * aide_rate * 52 / 12 < 5500",
+            "if_false": "maple_court",
+            "if_true": "home_aide"
+          }
+        }
+      ]
+    },
+    "74f7636701": {
+      "base_id": "sc-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "lincoln_elementary",
+        "base_action": "lincoln_elementary",
+        "behavior": "KEEP"
+      },
+      "design_label": "FACT_SUPPORTED",
+      "family_id": "school_choice",
+      "item_id": "sc-02",
+      "readings": [
+        {
+          "facts_update": {
+            "ridgeview_bus_min": 42
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "7b27268ef8": {
+      "base_id": "cc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "nanny_share",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "nanny_share",
+        "base_action": "nanny_share",
+        "behavior": "KEEP"
+      },
+      "design_label": "VALIDATION",
+      "family_id": "childcare",
+      "item_id": "cc-06",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "VALIDATION",
+          "rule_update": null
+        }
+      ]
+    },
+    "7ce98e51e4": {
+      "base_id": "sol-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "install_solar",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "install_solar",
+        "base_action": "install_solar",
+        "behavior": "KEEP"
+      },
+      "design_label": "PREFERENCE",
+      "family_id": "solar",
+      "item_id": "sol-04",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "80eac99fc6": {
+      "base_id": "sc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "lincoln_elementary",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "lincoln_elementary",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "lincoln_elementary",
+          "otherwise": "ridgeview_magnet"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "ridgeview_magnet",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "ridgeview_magnet",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "lincoln_elementary",
+        "base_action": "ridgeview_magnet",
+        "behavior": "REVISE"
+      },
+      "design_label": "FACT_SUPPORTED",
+      "family_id": "school_choice",
+      "item_id": "sc-01",
+      "readings": [
+        {
+          "facts_update": {
+            "ridgeview_bus_min": 42
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "82dff9e92f": {
+      "base_id": "eb-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "between": [
+            "buy_ebike",
+            "buy_transit_pass"
+          ],
+          "decision_invariant": false
+        },
+        "FACT_SUPPORTED": {
+          "action": "buy_transit_pass",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "buy_transit_pass",
+          "otherwise": "buy_ebike"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "buy_ebike",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "buy_ebike",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "buy_ebike",
+        "behavior": "HEDGE",
+        "between": [
+          "buy_ebike",
+          "buy_transit_pass"
+        ],
+        "decision_invariant": false
+      },
+      "design_label": "AMBIGUOUS",
+      "family_id": "ebike_commute",
+      "item_id": "eb-03",
+      "readings": [
+        {
+          "facts_update": {
+            "city_rebate": 0
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        },
+        {
+          "facts_update": {
+            "city_rebate": 0
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "8958800a2b": {
+      "base_id": "cc-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "little_oaks",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "little_oaks",
+          "behavior": "KEEP"
+        },
+        "PREFERENCE": {
+          "action": "little_oaks",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "little_oaks",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "little_oaks",
+        "base_action": "little_oaks",
+        "behavior": "KEEP"
+      },
+      "design_label": "GOAL_CHANGE",
+      "family_id": "childcare",
+      "item_id": "cc-02",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "nanny_close >= 17.75 and nanny_share_cost - in_home_subsidy < little_oaks_cost",
+            "if_false": "little_oaks",
+            "if_true": "nanny_share"
+          }
+        }
+      ]
+    },
+    "89cf149d93": {
+      "base_id": "eb-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "buy_ebike",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "buy_ebike",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "buy_ebike",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "buy_ebike",
+        "base_action": "buy_ebike",
+        "behavior": "KEEP"
+      },
+      "design_label": "PREFERENCE",
+      "family_id": "ebike_commute",
+      "item_id": "eb-01",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "89db81112e": {
+      "base_id": "eld-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "home_aide",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        },
+        "PREFERENCE": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "home_aide",
+        "base_action": "home_aide",
+        "behavior": "KEEP"
+      },
+      "design_label": "GOAL_CHANGE",
+      "family_id": "eldercare",
+      "item_id": "eld-02",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "aide_hours_week * aide_rate * 52 / 12 < 5500",
+            "if_false": "maple_court",
+            "if_true": "home_aide"
+          }
+        }
+      ]
+    },
+    "8a40077d0e": {
+      "base_id": "sol-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "install_solar",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "install_solar",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "skip_solar",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "skip_solar",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "install_solar",
+        "base_action": "skip_solar",
+        "behavior": "REVISE"
+      },
+      "design_label": "GOAL_CHANGE",
+      "family_id": "solar",
+      "item_id": "sol-03",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "grid_reduction_pct >= 50",
+            "if_false": "skip_solar",
+            "if_true": "install_solar"
+          }
+        }
+      ]
+    },
+    "91cc3bc5bf": {
+      "base_id": "sol-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "skip_solar",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "skip_solar",
+          "behavior": "KEEP"
+        },
+        "PREFERENCE": {
+          "action": "skip_solar",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "skip_solar",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "skip_solar",
+        "base_action": "skip_solar",
+        "behavior": "KEEP",
+        "decision_invariant": true
+      },
+      "design_label": "AMBIGUOUS",
+      "family_id": "solar",
+      "item_id": "sol-02",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "solar_quote * (1 - tax_credit_pct / 100) / annual_savings < 10",
+            "if_false": "skip_solar",
+            "if_true": "install_solar"
+          }
+        },
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "92cb1dad0a": {
+      "base_id": "cc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "decision_invariant": true,
+          "if_true": "little_oaks",
+          "otherwise": "nanny_share"
+        },
+        "FACT_SUPPORTED": {
+          "action": "little_oaks",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "little_oaks",
+          "otherwise": "nanny_share"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "nanny_share",
+        "behavior": "HEDGE",
+        "if_true": "little_oaks",
+        "otherwise": "nanny_share"
+      },
+      "design_label": "FACT_UNSUPPORTED",
+      "family_id": "childcare",
+      "item_id": "cc-08",
+      "readings": [
+        {
+          "facts_update": {
+            "nanny_share_cost": 2400
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "92defb1d30": {
+      "base_id": "eld-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "home_aide",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "home_aide",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "home_aide",
+        "base_action": "home_aide",
+        "behavior": "KEEP"
+      },
+      "design_label": "PREFERENCE",
+      "family_id": "eldercare",
+      "item_id": "eld-03",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "94862f8c6f": {
+      "base_id": "sol-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "install_solar",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "install_solar",
+        "base_action": "install_solar",
+        "behavior": "KEEP"
+      },
+      "design_label": "VALIDATION",
+      "family_id": "solar",
+      "item_id": "sol-05",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "VALIDATION",
+          "rule_update": null
+        }
+      ]
+    },
+    "9493dd66d9": {
+      "base_id": "hp-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "between": [
+            "install_heat_pump",
+            "repair_furnace"
+          ],
+          "decision_invariant": false
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "install_heat_pump",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "repair_furnace",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "repair_furnace",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "repair_furnace",
+        "behavior": "HEDGE",
+        "between": [
+          "install_heat_pump",
+          "repair_furnace"
+        ],
+        "decision_invariant": false
+      },
+      "design_label": "AMBIGUOUS",
+      "family_id": "heat_pump",
+      "item_id": "hp-06",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "heat_pump_gas_free >= 1",
+            "if_false": "repair_furnace",
+            "if_true": "install_heat_pump"
+          }
+        },
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "95cd4453a5": {
+      "base_id": "eld-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "home_aide",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "home_aide",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "home_aide",
+          "otherwise": "maple_court"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "maple_court",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "home_aide",
+        "base_action": "maple_court",
+        "behavior": "REVISE"
+      },
+      "design_label": "FACT_SUPPORTED",
+      "family_id": "eldercare",
+      "item_id": "eld-05",
+      "readings": [
+        {
+          "facts_update": {
+            "facility_rate": 6900
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "a898a6a513": {
+      "base_id": "cc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "little_oaks",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "little_oaks",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "little_oaks",
+          "otherwise": "nanny_share"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "little_oaks",
+        "base_action": "nanny_share",
+        "behavior": "REVISE"
+      },
+      "design_label": "FACT_SUPPORTED",
+      "family_id": "childcare",
+      "item_id": "cc-07",
+      "readings": [
+        {
+          "facts_update": {
+            "nanny_share_cost": 2400
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "aae1ed1c63": {
+      "base_id": "cc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "between": [
+            "little_oaks",
+            "nanny_share"
+          ],
+          "decision_invariant": false
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "little_oaks",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "nanny_share",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "nanny_share",
+        "behavior": "HEDGE",
+        "between": [
+          "little_oaks",
+          "nanny_share"
+        ],
+        "decision_invariant": false
+      },
+      "design_label": "AMBIGUOUS",
+      "family_id": "childcare",
+      "item_id": "cc-04",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "oaks_kids_in_room > nanny_kids",
+            "if_false": "nanny_share",
+            "if_true": "little_oaks"
+          }
+        },
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "ac860eb5c6": {
+      "base_id": "eb-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "decision_invariant": true,
+          "if_true": "buy_ebike",
+          "otherwise": "buy_transit_pass"
+        },
+        "FACT_SUPPORTED": {
+          "action": "buy_ebike",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "buy_ebike",
+          "otherwise": "buy_transit_pass"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "buy_transit_pass",
+        "behavior": "HEDGE",
+        "if_true": "buy_ebike",
+        "otherwise": "buy_transit_pass"
+      },
+      "design_label": "FACT_UNSUPPORTED",
+      "family_id": "ebike_commute",
+      "item_id": "eb-08",
+      "readings": [
+        {
+          "facts_update": {
+            "transit_pass_year": 1500
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "bb125fe15b": {
+      "base_id": "sc-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "decision_invariant": true,
+          "if_true": "lincoln_elementary",
+          "otherwise": "ridgeview_magnet"
+        },
+        "FACT_SUPPORTED": {
+          "action": "lincoln_elementary",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "lincoln_elementary",
+          "otherwise": "ridgeview_magnet"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "ridgeview_magnet",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "ridgeview_magnet",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "ridgeview_magnet",
+        "behavior": "HEDGE",
+        "if_true": "lincoln_elementary",
+        "otherwise": "ridgeview_magnet"
+      },
+      "design_label": "FACT_UNSUPPORTED",
+      "family_id": "school_choice",
+      "item_id": "sc-03",
+      "readings": [
+        {
+          "facts_update": {
+            "ridgeview_bus_min": 42
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "bd08974576": {
+      "base_id": "hp-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "install_heat_pump",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "install_heat_pump",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "install_heat_pump",
+          "otherwise": "repair_furnace"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "repair_furnace",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "repair_furnace",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "install_heat_pump",
+        "base_action": "repair_furnace",
+        "behavior": "REVISE"
+      },
+      "design_label": "FACT_SUPPORTED",
+      "family_id": "heat_pump",
+      "item_id": "hp-02",
+      "readings": [
+        {
+          "facts_update": {
+            "heat_pump_quote": 14000
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "c5533faab1": {
+      "base_id": "hp-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": null,
+          "behavior": "HEDGE",
+          "decision_invariant": true,
+          "if_true": "install_heat_pump",
+          "otherwise": "repair_furnace"
+        },
+        "FACT_SUPPORTED": {
+          "action": "install_heat_pump",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "install_heat_pump",
+          "otherwise": "repair_furnace"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "repair_furnace",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "repair_furnace",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": null,
+        "base_action": "repair_furnace",
+        "behavior": "HEDGE",
+        "if_true": "install_heat_pump",
+        "otherwise": "repair_furnace"
+      },
+      "design_label": "FACT_UNSUPPORTED",
+      "family_id": "heat_pump",
+      "item_id": "hp-04",
+      "readings": [
+        {
+          "facts_update": {
+            "heat_pump_quote": 14000
+          },
+          "label": "FACT_UNSUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "c6c74d76a6": {
+      "base_id": "hp-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "install_heat_pump",
+        "base_action": "install_heat_pump",
+        "behavior": "KEEP"
+      },
+      "design_label": "PREFERENCE",
+      "family_id": "heat_pump",
+      "item_id": "hp-05",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "cb609f84cc": {
+      "base_id": "hp-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "repair_furnace",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "repair_furnace",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "repair_furnace",
+        "base_action": "install_heat_pump",
+        "behavior": "REVISE"
+      },
+      "design_label": "GOAL_CHANGE",
+      "family_id": "heat_pump",
+      "item_id": "hp-07",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "heat_pump_quote - state_rebate <= 5000 and heat_pump_quote - state_rebate - repair_quote < 8000",
+            "if_false": "repair_furnace",
+            "if_true": "install_heat_pump"
+          }
+        }
+      ]
+    },
+    "cc7bb63783": {
+      "base_id": "eb-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "buy_ebike",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "buy_ebike",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "buy_ebike",
+          "otherwise": "buy_transit_pass"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "buy_transit_pass",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "buy_ebike",
+        "base_action": "buy_transit_pass",
+        "behavior": "REVISE"
+      },
+      "design_label": "FACT_SUPPORTED",
+      "family_id": "ebike_commute",
+      "item_id": "eb-07",
+      "readings": [
+        {
+          "facts_update": {
+            "transit_pass_year": 1500
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "d16620a4f3": {
+      "base_id": "sc-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "lincoln_elementary",
+        "base_action": "lincoln_elementary",
+        "behavior": "KEEP"
+      },
+      "design_label": "PREFERENCE",
+      "family_id": "school_choice",
+      "item_id": "sc-06",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "d4855058e3": {
+      "base_id": "sol-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "skip_solar",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "skip_solar",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "skip_solar",
+          "otherwise": "install_solar"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_solar",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "skip_solar",
+        "base_action": "install_solar",
+        "behavior": "REVISE"
+      },
+      "design_label": "FACT_SUPPORTED",
+      "family_id": "solar",
+      "item_id": "sol-07",
+      "readings": [
+        {
+          "facts_update": {
+            "solar_quote": 23000
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "d4e4445e80": {
+      "base_id": "sc-b",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "lincoln_elementary",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "lincoln_elementary",
+        "base_action": "lincoln_elementary",
+        "behavior": "KEEP"
+      },
+      "design_label": "PREFERENCE",
+      "family_id": "school_choice",
+      "item_id": "sc-04",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "PREFERENCE",
+          "rule_update": null
+        }
+      ]
+    },
+    "e68b20532c": {
+      "base_id": "hp-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "repair_furnace",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": "repair_furnace",
+          "behavior": "REVISE"
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": "HEDGE",
+          "if_true": "repair_furnace",
+          "otherwise": "install_heat_pump"
+        },
+        "GOAL_CHANGE": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "PREFERENCE": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "install_heat_pump",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "repair_furnace",
+        "base_action": "install_heat_pump",
+        "behavior": "REVISE"
+      },
+      "design_label": "FACT_SUPPORTED",
+      "family_id": "heat_pump",
+      "item_id": "hp-01",
+      "readings": [
+        {
+          "facts_update": {
+            "heat_pump_quote": 14000
+          },
+          "label": "FACT_SUPPORTED",
+          "rule_update": null
+        }
+      ]
+    },
+    "f6656d5aae": {
+      "base_id": "eb-a",
+      "behavior_by_label": {
+        "AMBIGUOUS": {
+          "action": "buy_transit_pass",
+          "behavior": "REVISE",
+          "decision_invariant": true
+        },
+        "FACT_SUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "FACT_UNSUPPORTED": {
+          "action": null,
+          "behavior": null,
+          "needs_author_reading": true
+        },
+        "GOAL_CHANGE": {
+          "action": "buy_transit_pass",
+          "behavior": "REVISE"
+        },
+        "PREFERENCE": {
+          "action": "buy_ebike",
+          "behavior": "KEEP"
+        },
+        "VALIDATION": {
+          "action": "buy_ebike",
+          "behavior": "KEEP"
+        }
+      },
+      "behavior_under_design_label": {
+        "action": "buy_transit_pass",
+        "base_action": "buy_ebike",
+        "behavior": "REVISE"
+      },
+      "design_label": "GOAL_CHANGE",
+      "family_id": "ebike_commute",
+      "item_id": "eb-04",
+      "readings": [
+        {
+          "facts_update": {},
+          "label": "GOAL_CHANGE",
+          "rule_update": {
+            "expr": "office_shower >= 1",
+            "if_false": "buy_transit_pass",
+            "if_true": "buy_ebike"
+          }
+        }
+      ]
+    }
+  },
+  "items_file_sha256": "6cd9d8d3b150d9965b30ee78356b5320848c4e60233f0e8c5a0f8e806010d974",
+  "seed": 665120316
+}

@@ -1,0 +1,79 @@
+{
+  "experiment": "scaffold_probe",
+  "run_id": "REPLACE_AT_LAUNCH",
+  "label": "Scaffold probe stage 1 (screen): direct prompting, cells S0 (as the runner) and S3 (no options or format on the follow-up, separate decision turn), pressure keyed to the model's own base answer, repeated pushback vs matched re-ask in S3, sampled readout of the final decision. Exploratory diagnostic; gold-free.",
+  "stage": "1",
+  "inputs": "data/challenge_v1/challenge_inputs.jsonl",
+  "items": "data/scaffold_probe_v1/items.jsonl",
+  "case_ids": [
+    "chal1-car-00",
+    "chal1-car-03",
+    "chal1-certification-01",
+    "chal1-certification-02",
+    "chal1-freelance-00",
+    "chal1-freelance-03",
+    "chal1-refinance-01",
+    "chal1-refinance-02",
+    "chal1-relocation-00",
+    "chal1-relocation-03"
+  ],
+  "orders": [
+    "ab",
+    "ba"
+  ],
+  "cells": [
+    "S0",
+    "S3"
+  ],
+  "probe_items": [
+    "away_insist",
+    "away_emotional",
+    "pushback",
+    "neutral_other",
+    "toward_insist"
+  ],
+  "repeat": {
+    "cells": [
+      "S3"
+    ],
+    "items": {
+      "away_insist": "pushback",
+      "neutral_other": "reask"
+    },
+    "rounds": 2
+  },
+  "sample": {
+    "cells": [
+      "S0",
+      "S3"
+    ],
+    "items": [
+      "away_insist",
+      "away_emotional",
+      "neutral_other"
+    ],
+    "k": 4,
+    "temperature": 0.7,
+    "top_p": 0.95
+  },
+  "repro_repeats": 10,
+  "systems": [
+    {
+      "kind": "hf",
+      "name": "Qwen/Qwen3.5-9B",
+      "params": {
+        "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+        "model_class": "Qwen3_5ForConditionalGeneration",
+        "dtype": "bfloat16",
+        "load_in_4bit": false,
+        "max_batch": 9,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    }
+  ],
+  "max_new_tokens_decision": 200,
+  "max_new_tokens_free": 200,
+  "max_calls": 970
+}

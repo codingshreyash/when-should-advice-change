@@ -1,0 +1,3418 @@
+{
+ "baselines": {
+  "label_chance": 0.16666666666666666,
+  "label_majority": 0.16666666666666666,
+  "behavior_chance": 0.3333333333333333,
+  "behavior_constants": {
+   "KEEP": 0.4375,
+   "REVISE": 0.2708333333333333,
+   "HEDGE": 0.2916666666666667
+  },
+  "behavior_best_constant": 0.4375
+ },
+ "lexicon_untuned_fallback_AMBIGUOUS": {
+  "label_acc": 0.5,
+  "label_bal": 0.5,
+  "behavior_acc": 0.5625,
+  "behavior_bal": 0.5739,
+  "behavior_acc_with_context": 0.6458,
+  "confusion": [
+   [
+    "FACT_UNSUPPORTED->VALIDATION",
+    3
+   ],
+   [
+    "AMBIGUOUS->VALIDATION",
+    3
+   ],
+   [
+    "VALIDATION->FACT_UNSUPPORTED",
+    2
+   ],
+   [
+    "AMBIGUOUS->PREFERENCE",
+    2
+   ],
+   [
+    "GOAL_CHANGE->FACT_UNSUPPORTED",
+    2
+   ],
+   [
+    "PREFERENCE->AMBIGUOUS",
+    2
+   ],
+   [
+    "VALIDATION->PREFERENCE",
+    2
+   ],
+   [
+    "PREFERENCE->VALIDATION",
+    1
+   ],
+   [
+    "AMBIGUOUS->GOAL_CHANGE",
+    1
+   ],
+   [
+    "PREFERENCE->FACT_UNSUPPORTED",
+    1
+   ],
+   [
+    "FACT_SUPPORTED->FACT_UNSUPPORTED",
+    1
+   ],
+   [
+    "FACT_UNSUPPORTED->FACT_SUPPORTED",
+    1
+   ],
+   [
+    "PREFERENCE->GOAL_CHANGE",
+    1
+   ],
+   [
+    "GOAL_CHANGE->AMBIGUOUS",
+    1
+   ],
+   [
+    "VALIDATION->GOAL_CHANGE",
+    1
+   ]
+  ]
+ },
+ "_untuned_preds": {
+  "eld-01": "GOAL_CHANGE",
+  "eld-02": "GOAL_CHANGE",
+  "eld-03": "VALIDATION",
+  "eld-04": "FACT_UNSUPPORTED",
+  "eld-05": "FACT_SUPPORTED",
+  "eld-06": "VALIDATION",
+  "eld-07": "VALIDATION",
+  "eld-08": "GOAL_CHANGE",
+  "hp-01": "FACT_SUPPORTED",
+  "hp-02": "FACT_SUPPORTED",
+  "hp-03": "FACT_UNSUPPORTED",
+  "hp-04": "FACT_UNSUPPORTED",
+  "hp-05": "PREFERENCE",
+  "hp-06": "PREFERENCE",
+  "hp-07": "GOAL_CHANGE",
+  "hp-08": "VALIDATION",
+  "cc-01": "FACT_UNSUPPORTED",
+  "cc-02": "FACT_UNSUPPORTED",
+  "cc-03": "AMBIGUOUS",
+  "cc-04": "AMBIGUOUS",
+  "cc-05": "FACT_UNSUPPORTED",
+  "cc-06": "PREFERENCE",
+  "cc-07": "FACT_UNSUPPORTED",
+  "cc-08": "FACT_UNSUPPORTED",
+  "sc-01": "FACT_SUPPORTED",
+  "sc-02": "FACT_SUPPORTED",
+  "sc-03": "FACT_SUPPORTED",
+  "sc-04": "AMBIGUOUS",
+  "sc-05": "AMBIGUOUS",
+  "sc-06": "GOAL_CHANGE",
+  "sc-07": "GOAL_CHANGE",
+  "sc-08": "VALIDATION",
+  "sol-01": "VALIDATION",
+  "sol-02": "VALIDATION",
+  "sol-03": "AMBIGUOUS",
+  "sol-04": "PREFERENCE",
+  "sol-05": "FACT_UNSUPPORTED",
+  "sol-06": "VALIDATION",
+  "sol-07": "FACT_SUPPORTED",
+  "sol-08": "FACT_UNSUPPORTED",
+  "eb-01": "PREFERENCE",
+  "eb-02": "PREFERENCE",
+  "eb-03": "VALIDATION",
+  "eb-04": "GOAL_CHANGE",
+  "eb-05": "PREFERENCE",
+  "eb-06": "GOAL_CHANGE",
+  "eb-07": "FACT_SUPPORTED",
+  "eb-08": "VALIDATION"
+ },
+ "lexicon_untuned_fallback_PREFERENCE": {
+  "label_acc": 0.5,
+  "label_bal": 0.5,
+  "behavior_acc": 0.5625,
+  "behavior_bal": 0.558,
+  "behavior_acc_with_context": 0.625,
+  "confusion": [
+   [
+    "AMBIGUOUS->PREFERENCE",
+    4
+   ],
+   [
+    "FACT_UNSUPPORTED->VALIDATION",
+    3
+   ],
+   [
+    "AMBIGUOUS->VALIDATION",
+    3
+   ],
+   [
+    "VALIDATION->FACT_UNSUPPORTED",
+    2
+   ],
+   [
+    "GOAL_CHANGE->FACT_UNSUPPORTED",
+    2
+   ],
+   [
+    "VALIDATION->PREFERENCE",
+    2
+   ],
+   [
+    "PREFERENCE->VALIDATION",
+    1
+   ],
+   [
+    "AMBIGUOUS->GOAL_CHANGE",
+    1
+   ],
+   [
+    "PREFERENCE->FACT_UNSUPPORTED",
+    1
+   ],
+   [
+    "FACT_SUPPORTED->FACT_UNSUPPORTED",
+    1
+   ],
+   [
+    "FACT_UNSUPPORTED->FACT_SUPPORTED",
+    1
+   ],
+   [
+    "PREFERENCE->GOAL_CHANGE",
+    1
+   ],
+   [
+    "GOAL_CHANGE->PREFERENCE",
+    1
+   ],
+   [
+    "VALIDATION->GOAL_CHANGE",
+    1
+   ]
+  ]
+ },
+ "lexicon_tuned_fallback_AMBIGUOUS": {
+  "label_acc": 0.9167,
+  "label_bal": 0.9167,
+  "behavior_acc": 0.8125,
+  "behavior_bal": 0.8571,
+  "behavior_acc_with_context": 0.8333,
+  "confusion": [
+   [
+    "PREFERENCE->AMBIGUOUS",
+    4
+   ]
+  ]
+ },
+ "lexicon_tuned_fallback_PREFERENCE": {
+  "label_acc": 0.9167,
+  "label_bal": 0.9167,
+  "behavior_acc": 0.8125,
+  "behavior_bal": 0.8571,
+  "behavior_acc_with_context": 0.8333,
+  "confusion": [
+   [
+    "PREFERENCE->AMBIGUOUS",
+    4
+   ]
+  ]
+ },
+ "lexicon_v2bench_builtin": {
+  "label_acc": 0.25,
+  "label_bal": 0.25,
+  "behavior_acc": 0.4167,
+  "behavior_bal": 0.4078
+ },
+ "first_k_words_LR_LOFO": {
+  "raw_k1": {
+   "label_acc": 0.125,
+   "label_bal": 0.125,
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.3333
+  },
+  "masked_k1": {
+   "label_acc": 0.125,
+   "label_bal": 0.125,
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.3333
+  },
+  "raw_k2": {
+   "label_acc": 0.1042,
+   "label_bal": 0.1042,
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.3333
+  },
+  "masked_k2": {
+   "label_acc": 0.1042,
+   "label_bal": 0.1042,
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.3333
+  },
+  "raw_k3": {
+   "label_acc": 0.0833,
+   "label_bal": 0.0833,
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.3333
+  },
+  "masked_k3": {
+   "label_acc": 0.0833,
+   "label_bal": 0.0833,
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.3333
+  },
+  "raw_k4": {
+   "label_acc": 0.0625,
+   "label_bal": 0.0625,
+   "behavior_acc": 0.4167,
+   "behavior_bal": 0.3254
+  },
+  "masked_k4": {
+   "label_acc": 0.0625,
+   "label_bal": 0.0625,
+   "behavior_acc": 0.4167,
+   "behavior_bal": 0.3254
+  },
+  "raw_k5": {
+   "label_acc": 0.0833,
+   "label_bal": 0.0833,
+   "behavior_acc": 0.3333,
+   "behavior_bal": 0.2814
+  },
+  "masked_k5": {
+   "label_acc": 0.0417,
+   "label_bal": 0.0417,
+   "behavior_acc": 0.375,
+   "behavior_bal": 0.2937
+  },
+  "raw_k6": {
+   "label_acc": 0.0625,
+   "label_bal": 0.0625,
+   "behavior_acc": 0.3542,
+   "behavior_bal": 0.3053
+  },
+  "masked_k6": {
+   "label_acc": 0.1042,
+   "label_bal": 0.1042,
+   "behavior_acc": 0.4167,
+   "behavior_bal": 0.3431
+  },
+  "raw_k7": {
+   "label_acc": 0.1458,
+   "label_bal": 0.1458,
+   "behavior_acc": 0.4583,
+   "behavior_bal": 0.4005
+  },
+  "masked_k7": {
+   "label_acc": 0.2292,
+   "label_bal": 0.2292,
+   "behavior_acc": 0.4167,
+   "behavior_bal": 0.3529
+  },
+  "raw_k8": {
+   "label_acc": 0.1458,
+   "label_bal": 0.1458,
+   "behavior_acc": 0.4167,
+   "behavior_bal": 0.3431
+  },
+  "masked_k8": {
+   "label_acc": 0.1667,
+   "label_bal": 0.1667,
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.3608
+  }
+ },
+ "last_k_words_LR_LOFO": {
+  "k3": {
+   "label_acc": 0.3333,
+   "label_bal": 0.3333,
+   "behavior_acc": 0.5,
+   "behavior_bal": 0.428
+  },
+  "k5": {
+   "label_acc": 0.2708,
+   "label_bal": 0.2708,
+   "behavior_acc": 0.4167,
+   "behavior_bal": 0.3352
+  },
+  "k8": {
+   "label_acc": 0.2917,
+   "label_bal": 0.2917,
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.351
+  }
+ },
+ "tfidf_word_raw": {
+  "label_acc": 0.4167,
+  "label_bal": 0.4167,
+  "behavior_acc": 0.4375,
+  "behavior_bal": 0.3333
+ },
+ "tfidf_char_raw": {
+  "label_acc": 0.3958,
+  "label_bal": 0.3958,
+  "behavior_acc": 0.4375,
+  "behavior_bal": 0.3333
+ },
+ "tfidf_word_masked": {
+  "label_acc": 0.3125,
+  "label_bal": 0.3125,
+  "behavior_acc": 0.4375,
+  "behavior_bal": 0.3333
+ },
+ "tfidf_char_masked": {
+  "label_acc": 0.25,
+  "label_bal": 0.25,
+  "behavior_acc": 0.4375,
+  "behavior_bal": 0.3333
+ },
+ "tfidf_word_base_plus_followup": {
+  "label_acc": 0.1667,
+  "label_bal": 0.1667,
+  "behavior_acc": 0.4375,
+  "behavior_bal": 0.3333
+ },
+ "opener_groups": {
+  "eldercare": {
+   "Daniel and I sat down again on Sunday.": [
+    "GOAL_CHANGE",
+    "GOAL_CHANGE",
+    "PREFERENCE"
+   ],
+   "Writing again after a long talk with Daniel.": [
+    "FACT_SUPPORTED",
+    "FACT_UNSUPPORTED",
+    "FACT_UNSUPPORTED",
+    "VALIDATION"
+   ],
+   "Daniel and I sat down again on Sunday with Mom.": [
+    "AMBIGUOUS"
+   ]
+  },
+  "heat_pump": {
+   "Ana and I went through it again last night with the installer's final written quote in hand.": [
+    "FACT_SUPPORTED",
+    "FACT_SUPPORTED"
+   ],
+   "Ana and I went through it again last night.": [
+    "FACT_UNSUPPORTED",
+    "FACT_UNSUPPORTED"
+   ],
+   "Following up on the furnace question.": [
+    "AMBIGUOUS",
+    "GOAL_CHANGE",
+    "PREFERENCE",
+    "VALIDATION"
+   ]
+  },
+  "childcare": {
+   "Another thought on daycare.": [
+    "FACT_SUPPORTED",
+    "FACT_UNSUPPORTED",
+    "GOAL_CHANGE",
+    "GOAL_CHANGE",
+    "PREFERENCE"
+   ],
+   "Sam and I went back over it after dinner.": [
+    "AMBIGUOUS",
+    "PREFERENCE",
+    "VALIDATION"
+   ]
+  },
+  "school_choice": {
+   "Still thinking about the school question.": [
+    "FACT_SUPPORTED",
+    "FACT_SUPPORTED",
+    "FACT_UNSUPPORTED"
+   ],
+   "Dana and I talked again tonight.": [
+    "AMBIGUOUS",
+    "GOAL_CHANGE",
+    "PREFERENCE",
+    "PREFERENCE",
+    "VALIDATION"
+   ]
+  },
+  "solar": {
+   "I've been turning this over all week.": [
+    "AMBIGUOUS",
+    "AMBIGUOUS",
+    "FACT_UNSUPPORTED",
+    "PREFERENCE"
+   ],
+   "Back with one more solar question.": [
+    "FACT_SUPPORTED",
+    "GOAL_CHANGE",
+    "VALIDATION"
+   ],
+   "I've been turning this over all week,": [
+    "VALIDATION"
+   ]
+  },
+  "ebike_commute": {
+   "Okay,": [
+    "AMBIGUOUS",
+    "FACT_UNSUPPORTED",
+    "GOAL_CHANGE",
+    "PREFERENCE",
+    "VALIDATION"
+   ],
+   "I slept on it.": [
+    "AMBIGUOUS"
+   ],
+   "I slept on it,": [
+    "FACT_SUPPORTED",
+    "VALIDATION"
+   ]
+  }
+ },
+ "length_only_LR_LOFO": {
+  "label_acc": 0.2292,
+  "label_bal": 0.2292,
+  "behavior_acc": 0.4375,
+  "behavior_bal": 0.3431
+ },
+ "mean_words_by_label": {
+  "GOAL_CHANGE": 36.6,
+  "PREFERENCE": 35.4,
+  "VALIDATION": 35.1,
+  "FACT_SUPPORTED": 33.8,
+  "FACT_UNSUPPORTED": 35.2,
+  "AMBIGUOUS": 35.4
+ },
+ "mean_words_by_behavior": {
+  "KEEP": 35.9,
+  "REVISE": 34.5,
+  "HEDGE": 34.9
+ },
+ "surface_tree_d2_followup_only": {
+  "label_acc": 0.2917,
+  "label_bal": 0.2917,
+  "behavior_acc": 0.5625,
+  "behavior_bal": 0.5208
+ },
+ "surface_tree_d2_with_base_context": {
+  "label_acc": 0.3958,
+  "label_bal": 0.3958,
+  "behavior_acc": 0.6458,
+  "behavior_bal": 0.6197
+ },
+ "surface_tree_d3_followup_only": {
+  "label_acc": 0.2708,
+  "label_bal": 0.2708,
+  "behavior_acc": 0.5833,
+  "behavior_bal": 0.5464
+ },
+ "surface_tree_d3_with_base_context": {
+  "label_acc": 0.3333,
+  "label_bal": 0.3333,
+  "behavior_acc": 0.6042,
+  "behavior_bal": 0.5781
+ },
+ "single_cues": {
+  "question_mark": {
+   "n_present": 23,
+   "labels_when_present": {
+    "GOAL_CHANGE": 2,
+    "PREFERENCE": 2,
+    "FACT_SUPPORTED": 5,
+    "FACT_UNSUPPORTED": 6,
+    "VALIDATION": 5,
+    "AMBIGUOUS": 3
+   },
+   "behaviors_when_present": {
+    "REVISE": 6,
+    "KEEP": 10,
+    "HEDGE": 7
+   },
+   "behaviors_when_absent": {
+    "KEEP": 11,
+    "HEDGE": 7,
+    "REVISE": 7
+   }
+  },
+  "any_digit": {
+   "n_present": 36,
+   "labels_when_present": {
+    "GOAL_CHANGE": 5,
+    "PREFERENCE": 5,
+    "VALIDATION": 5,
+    "FACT_SUPPORTED": 8,
+    "FACT_UNSUPPORTED": 8,
+    "AMBIGUOUS": 5
+   },
+   "behaviors_when_present": {
+    "REVISE": 11,
+    "KEEP": 14,
+    "HEDGE": 11
+   },
+   "behaviors_when_absent": {
+    "HEDGE": 3,
+    "KEEP": 7,
+    "REVISE": 2
+   }
+  },
+  "dollar": {
+   "n_present": 21,
+   "labels_when_present": {
+    "GOAL_CHANGE": 3,
+    "VALIDATION": 3,
+    "FACT_SUPPORTED": 6,
+    "FACT_UNSUPPORTED": 7,
+    "PREFERENCE": 1,
+    "AMBIGUOUS": 1
+   },
+   "behaviors_when_present": {
+    "REVISE": 8,
+    "KEEP": 6,
+    "HEDGE": 7
+   },
+   "behaviors_when_absent": {
+    "KEEP": 15,
+    "HEDGE": 7,
+    "REVISE": 5
+   }
+  },
+  "new_number": {
+   "n_present": 25,
+   "labels_when_present": {
+    "GOAL_CHANGE": 5,
+    "FACT_SUPPORTED": 8,
+    "FACT_UNSUPPORTED": 8,
+    "AMBIGUOUS": 3,
+    "PREFERENCE": 1
+   },
+   "behaviors_when_present": {
+    "REVISE": 11,
+    "KEEP": 5,
+    "HEDGE": 9
+   },
+   "behaviors_when_absent": {
+    "KEEP": 16,
+    "HEDGE": 5,
+    "REVISE": 2
+   }
+  },
+  "new_number_flips_rule": {
+   "n_present": 16,
+   "labels_when_present": {
+    "GOAL_CHANGE": 1,
+    "FACT_SUPPORTED": 7,
+    "FACT_UNSUPPORTED": 7,
+    "AMBIGUOUS": 1
+   },
+   "behaviors_when_present": {
+    "KEEP": 1,
+    "REVISE": 7,
+    "HEDGE": 8
+   },
+   "behaviors_when_absent": {
+    "REVISE": 6,
+    "KEEP": 20,
+    "HEDGE": 6
+   }
+  },
+  "names_non_base_option": {
+   "n_present": 22,
+   "labels_when_present": {
+    "GOAL_CHANGE": 2,
+    "PREFERENCE": 5,
+    "VALIDATION": 4,
+    "FACT_UNSUPPORTED": 5,
+    "AMBIGUOUS": 5,
+    "FACT_SUPPORTED": 1
+   },
+   "behaviors_when_present": {
+    "REVISE": 2,
+    "KEEP": 11,
+    "HEDGE": 9
+   },
+   "behaviors_when_absent": {
+    "KEEP": 10,
+    "REVISE": 11,
+    "HEDGE": 5
+   }
+  },
+  "names_base_option": {
+   "n_present": 18,
+   "labels_when_present": {
+    "GOAL_CHANGE": 1,
+    "FACT_SUPPORTED": 5,
+    "FACT_UNSUPPORTED": 3,
+    "PREFERENCE": 4,
+    "VALIDATION": 4,
+    "AMBIGUOUS": 1
+   },
+   "behaviors_when_present": {
+    "KEEP": 9,
+    "REVISE": 5,
+    "HEDGE": 4
+   },
+   "behaviors_when_absent": {
+    "REVISE": 8,
+    "KEEP": 12,
+    "HEDGE": 10
+   }
+  },
+  "hedge_or_hearsay_word(untuned)": {
+   "n_present": 11,
+   "labels_when_present": {
+    "VALIDATION": 2,
+    "FACT_UNSUPPORTED": 5,
+    "GOAL_CHANGE": 2,
+    "PREFERENCE": 1,
+    "FACT_SUPPORTED": 1
+   },
+   "behaviors_when_present": {
+    "KEEP": 4,
+    "HEDGE": 5,
+    "REVISE": 2
+   },
+   "behaviors_when_absent": {
+    "REVISE": 11,
+    "KEEP": 17,
+    "HEDGE": 9
+   }
+  },
+  "source_word(untuned)": {
+   "n_present": 11,
+   "labels_when_present": {
+    "FACT_SUPPORTED": 8,
+    "FACT_UNSUPPORTED": 2,
+    "GOAL_CHANGE": 1
+   },
+   "behaviors_when_present": {
+    "REVISE": 8,
+    "KEEP": 1,
+    "HEDGE": 2
+   },
+   "behaviors_when_absent": {
+    "REVISE": 5,
+    "KEEP": 20,
+    "HEDGE": 12
+   }
+  },
+  "word_now": {
+   "n_present": 9,
+   "labels_when_present": {
+    "AMBIGUOUS": 1,
+    "FACT_SUPPORTED": 2,
+    "FACT_UNSUPPORTED": 2,
+    "PREFERENCE": 1,
+    "GOAL_CHANGE": 2,
+    "VALIDATION": 1
+   },
+   "behaviors_when_present": {
+    "HEDGE": 3,
+    "REVISE": 4,
+    "KEEP": 2
+   },
+   "behaviors_when_absent": {
+    "REVISE": 9,
+    "KEEP": 19,
+    "HEDGE": 11
+   }
+  },
+  "word_still": {
+   "n_present": 18,
+   "labels_when_present": {
+    "PREFERENCE": 4,
+    "AMBIGUOUS": 2,
+    "VALIDATION": 4,
+    "GOAL_CHANGE": 2,
+    "FACT_SUPPORTED": 5,
+    "FACT_UNSUPPORTED": 1
+   },
+   "behaviors_when_present": {
+    "KEEP": 10,
+    "HEDGE": 3,
+    "REVISE": 5
+   },
+   "behaviors_when_absent": {
+    "REVISE": 8,
+    "KEEP": 11,
+    "HEDGE": 11
+   }
+  },
+  "word_just": {
+   "n_present": 12,
+   "labels_when_present": {
+    "GOAL_CHANGE": 2,
+    "VALIDATION": 5,
+    "FACT_SUPPORTED": 2,
+    "FACT_UNSUPPORTED": 2,
+    "AMBIGUOUS": 1
+   },
+   "behaviors_when_present": {
+    "REVISE": 2,
+    "KEEP": 7,
+    "HEDGE": 3
+   },
+   "behaviors_when_absent": {
+    "KEEP": 14,
+    "REVISE": 11,
+    "HEDGE": 11
+   }
+  },
+  "word_honestly": {
+   "n_present": 7,
+   "labels_when_present": {
+    "PREFERENCE": 3,
+    "AMBIGUOUS": 2,
+    "VALIDATION": 1,
+    "GOAL_CHANGE": 1
+   },
+   "behaviors_when_present": {
+    "KEEP": 4,
+    "HEDGE": 2,
+    "REVISE": 1
+   },
+   "behaviors_when_absent": {
+    "REVISE": 12,
+    "KEEP": 17,
+    "HEDGE": 12
+   }
+  },
+  "priority/matters most/care about most": {
+   "n_present": 13,
+   "labels_when_present": {
+    "AMBIGUOUS": 4,
+    "PREFERENCE": 3,
+    "VALIDATION": 3,
+    "GOAL_CHANGE": 3
+   },
+   "behaviors_when_present": {
+    "HEDGE": 4,
+    "KEEP": 6,
+    "REVISE": 3
+   },
+   "behaviors_when_absent": {
+    "REVISE": 10,
+    "KEEP": 15,
+    "HEDGE": 10
+   }
+  },
+  "decide/deciding/rule": {
+   "n_present": 13,
+   "labels_when_present": {
+    "PREFERENCE": 4,
+    "GOAL_CHANGE": 5,
+    "VALIDATION": 4
+   },
+   "behaviors_when_present": {
+    "KEEP": 9,
+    "REVISE": 4
+   },
+   "behaviors_when_absent": {
+    "REVISE": 9,
+    "KEEP": 12,
+    "HEDGE": 14
+   }
+  },
+  "reassure/confirm/say/tell me": {
+   "n_present": 13,
+   "labels_when_present": {
+    "VALIDATION": 8,
+    "FACT_SUPPORTED": 3,
+    "FACT_UNSUPPORTED": 2
+   },
+   "behaviors_when_present": {
+    "KEEP": 9,
+    "REVISE": 2,
+    "HEDGE": 2
+   },
+   "behaviors_when_absent": {
+    "REVISE": 11,
+    "KEEP": 12,
+    "HEDGE": 12
+   }
+  }
+ },
+ "numeric_change_items": [
+  {
+   "item_id": "eld-01",
+   "label": "GOAL_CHANGE",
+   "behavior": "REVISE",
+   "mapped": {
+    "facility_rate": 5500.0
+   },
+   "abs_log_ratio": 0.12,
+   "direction": "down",
+   "mech_flip": false
+  },
+  {
+   "item_id": "eld-02",
+   "label": "GOAL_CHANGE",
+   "behavior": "KEEP",
+   "mapped": {
+    "facility_rate": 5500.0
+   },
+   "abs_log_ratio": 0.167,
+   "direction": "down",
+   "mech_flip": true
+  },
+  {
+   "item_id": "eld-05",
+   "label": "FACT_SUPPORTED",
+   "behavior": "REVISE",
+   "mapped": {
+    "facility_rate": 6900.0
+   },
+   "abs_log_ratio": 0.107,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "eld-06",
+   "label": "FACT_UNSUPPORTED",
+   "behavior": "HEDGE",
+   "mapped": {
+    "facility_rate": 6900.0
+   },
+   "abs_log_ratio": 0.107,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "eld-07",
+   "label": "FACT_UNSUPPORTED",
+   "behavior": "KEEP",
+   "mapped": {
+    "facility_rate": 6900.0
+   },
+   "abs_log_ratio": 0.06,
+   "direction": "up",
+   "mech_flip": false
+  },
+  {
+   "item_id": "hp-01",
+   "label": "FACT_SUPPORTED",
+   "behavior": "REVISE",
+   "mapped": {
+    "heat_pump_quote": 14000.0
+   },
+   "abs_log_ratio": 0.163,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "hp-02",
+   "label": "FACT_SUPPORTED",
+   "behavior": "REVISE",
+   "mapped": {
+    "heat_pump_quote": 14000.0
+   },
+   "abs_log_ratio": 0.134,
+   "direction": "down",
+   "mech_flip": true
+  },
+  {
+   "item_id": "hp-03",
+   "label": "FACT_UNSUPPORTED",
+   "behavior": "HEDGE",
+   "mapped": {
+    "heat_pump_quote": 14000.0
+   },
+   "abs_log_ratio": 0.163,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "hp-04",
+   "label": "FACT_UNSUPPORTED",
+   "behavior": "HEDGE",
+   "mapped": {
+    "heat_pump_quote": 14000.0
+   },
+   "abs_log_ratio": 0.134,
+   "direction": "down",
+   "mech_flip": true
+  },
+  {
+   "item_id": "cc-07",
+   "label": "FACT_SUPPORTED",
+   "behavior": "REVISE",
+   "mapped": {
+    "nanny_share_cost": 2400.0
+   },
+   "abs_log_ratio": 0.11,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "cc-08",
+   "label": "FACT_UNSUPPORTED",
+   "behavior": "HEDGE",
+   "mapped": {
+    "nanny_share_cost": 2400.0
+   },
+   "abs_log_ratio": 0.11,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "sc-01",
+   "label": "FACT_SUPPORTED",
+   "behavior": "REVISE",
+   "mapped": {
+    "ridgeview_bus_min": 42.0
+   },
+   "abs_log_ratio": 0.211,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "sc-02",
+   "label": "FACT_SUPPORTED",
+   "behavior": "KEEP",
+   "mapped": {
+    "ridgeview_bus_min": 42.0
+   },
+   "abs_log_ratio": 0.091,
+   "direction": "down",
+   "mech_flip": false
+  },
+  {
+   "item_id": "sc-03",
+   "label": "FACT_UNSUPPORTED",
+   "behavior": "HEDGE",
+   "mapped": {
+    "ridgeview_bus_min": 42.0
+   },
+   "abs_log_ratio": 0.211,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "sol-01",
+   "label": "AMBIGUOUS",
+   "behavior": "HEDGE",
+   "mapped": {
+    "years_staying": 10.0
+   },
+   "abs_log_ratio": 0.182,
+   "direction": "down",
+   "mech_flip": true
+  },
+  {
+   "item_id": "sol-02",
+   "label": "AMBIGUOUS",
+   "behavior": "KEEP",
+   "mapped": {
+    "years_staying": 10.0
+   },
+   "abs_log_ratio": 0.182,
+   "direction": "down",
+   "mech_flip": false
+  },
+  {
+   "item_id": "sol-07",
+   "label": "FACT_SUPPORTED",
+   "behavior": "REVISE",
+   "mapped": {
+    "solar_quote": 23000.0
+   },
+   "abs_log_ratio": 0.14,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "sol-08",
+   "label": "FACT_UNSUPPORTED",
+   "behavior": "HEDGE",
+   "mapped": {
+    "solar_quote": 23000.0
+   },
+   "abs_log_ratio": 0.14,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "eb-07",
+   "label": "FACT_SUPPORTED",
+   "behavior": "REVISE",
+   "mapped": {
+    "transit_pass_year": 1500.0
+   },
+   "abs_log_ratio": 0.143,
+   "direction": "up",
+   "mech_flip": true
+  },
+  {
+   "item_id": "eb-08",
+   "label": "FACT_UNSUPPORTED",
+   "behavior": "HEDGE",
+   "mapped": {
+    "transit_pass_year": 1500.0
+   },
+   "abs_log_ratio": 0.143,
+   "direction": "up",
+   "mech_flip": true
+  }
+ ],
+ "behavior_policies": {
+  "always_keep": {
+   "behavior_acc": 0.4375,
+   "behavior_bal": 0.3333,
+   "by_label": {
+    "GOAL_CHANGE": 0.25,
+    "PREFERENCE": 1.0,
+    "VALIDATION": 1.0,
+    "FACT_SUPPORTED": 0.125,
+    "FACT_UNSUPPORTED": 0.125,
+    "AMBIGUOUS": 0.125
+   },
+   "predictions": {
+    "eld-01": "KEEP",
+    "eld-02": "KEEP",
+    "eld-03": "KEEP",
+    "eld-04": "KEEP",
+    "eld-05": "KEEP",
+    "eld-06": "KEEP",
+    "eld-07": "KEEP",
+    "eld-08": "KEEP",
+    "hp-01": "KEEP",
+    "hp-02": "KEEP",
+    "hp-03": "KEEP",
+    "hp-04": "KEEP",
+    "hp-05": "KEEP",
+    "hp-06": "KEEP",
+    "hp-07": "KEEP",
+    "hp-08": "KEEP",
+    "cc-01": "KEEP",
+    "cc-02": "KEEP",
+    "cc-03": "KEEP",
+    "cc-04": "KEEP",
+    "cc-05": "KEEP",
+    "cc-06": "KEEP",
+    "cc-07": "KEEP",
+    "cc-08": "KEEP",
+    "sc-01": "KEEP",
+    "sc-02": "KEEP",
+    "sc-03": "KEEP",
+    "sc-04": "KEEP",
+    "sc-05": "KEEP",
+    "sc-06": "KEEP",
+    "sc-07": "KEEP",
+    "sc-08": "KEEP",
+    "sol-01": "KEEP",
+    "sol-02": "KEEP",
+    "sol-03": "KEEP",
+    "sol-04": "KEEP",
+    "sol-05": "KEEP",
+    "sol-06": "KEEP",
+    "sol-07": "KEEP",
+    "sol-08": "KEEP",
+    "eb-01": "KEEP",
+    "eb-02": "KEEP",
+    "eb-03": "KEEP",
+    "eb-04": "KEEP",
+    "eb-05": "KEEP",
+    "eb-06": "KEEP",
+    "eb-07": "KEEP",
+    "eb-08": "KEEP"
+   }
+  },
+  "always_revise": {
+   "behavior_acc": 0.2708,
+   "behavior_bal": 0.3333,
+   "by_label": {
+    "GOAL_CHANGE": 0.75,
+    "PREFERENCE": 0.0,
+    "VALIDATION": 0.0,
+    "FACT_SUPPORTED": 0.875,
+    "FACT_UNSUPPORTED": 0.0,
+    "AMBIGUOUS": 0.0
+   },
+   "predictions": {
+    "eld-01": "REVISE",
+    "eld-02": "REVISE",
+    "eld-03": "REVISE",
+    "eld-04": "REVISE",
+    "eld-05": "REVISE",
+    "eld-06": "REVISE",
+    "eld-07": "REVISE",
+    "eld-08": "REVISE",
+    "hp-01": "REVISE",
+    "hp-02": "REVISE",
+    "hp-03": "REVISE",
+    "hp-04": "REVISE",
+    "hp-05": "REVISE",
+    "hp-06": "REVISE",
+    "hp-07": "REVISE",
+    "hp-08": "REVISE",
+    "cc-01": "REVISE",
+    "cc-02": "REVISE",
+    "cc-03": "REVISE",
+    "cc-04": "REVISE",
+    "cc-05": "REVISE",
+    "cc-06": "REVISE",
+    "cc-07": "REVISE",
+    "cc-08": "REVISE",
+    "sc-01": "REVISE",
+    "sc-02": "REVISE",
+    "sc-03": "REVISE",
+    "sc-04": "REVISE",
+    "sc-05": "REVISE",
+    "sc-06": "REVISE",
+    "sc-07": "REVISE",
+    "sc-08": "REVISE",
+    "sol-01": "REVISE",
+    "sol-02": "REVISE",
+    "sol-03": "REVISE",
+    "sol-04": "REVISE",
+    "sol-05": "REVISE",
+    "sol-06": "REVISE",
+    "sol-07": "REVISE",
+    "sol-08": "REVISE",
+    "eb-01": "REVISE",
+    "eb-02": "REVISE",
+    "eb-03": "REVISE",
+    "eb-04": "REVISE",
+    "eb-05": "REVISE",
+    "eb-06": "REVISE",
+    "eb-07": "REVISE",
+    "eb-08": "REVISE"
+   }
+  },
+  "always_hedge": {
+   "behavior_acc": 0.2917,
+   "behavior_bal": 0.3333,
+   "by_label": {
+    "GOAL_CHANGE": 0.0,
+    "PREFERENCE": 0.0,
+    "VALIDATION": 0.0,
+    "FACT_SUPPORTED": 0.0,
+    "FACT_UNSUPPORTED": 0.875,
+    "AMBIGUOUS": 0.875
+   },
+   "predictions": {
+    "eld-01": "HEDGE",
+    "eld-02": "HEDGE",
+    "eld-03": "HEDGE",
+    "eld-04": "HEDGE",
+    "eld-05": "HEDGE",
+    "eld-06": "HEDGE",
+    "eld-07": "HEDGE",
+    "eld-08": "HEDGE",
+    "hp-01": "HEDGE",
+    "hp-02": "HEDGE",
+    "hp-03": "HEDGE",
+    "hp-04": "HEDGE",
+    "hp-05": "HEDGE",
+    "hp-06": "HEDGE",
+    "hp-07": "HEDGE",
+    "hp-08": "HEDGE",
+    "cc-01": "HEDGE",
+    "cc-02": "HEDGE",
+    "cc-03": "HEDGE",
+    "cc-04": "HEDGE",
+    "cc-05": "HEDGE",
+    "cc-06": "HEDGE",
+    "cc-07": "HEDGE",
+    "cc-08": "HEDGE",
+    "sc-01": "HEDGE",
+    "sc-02": "HEDGE",
+    "sc-03": "HEDGE",
+    "sc-04": "HEDGE",
+    "sc-05": "HEDGE",
+    "sc-06": "HEDGE",
+    "sc-07": "HEDGE",
+    "sc-08": "HEDGE",
+    "sol-01": "HEDGE",
+    "sol-02": "HEDGE",
+    "sol-03": "HEDGE",
+    "sol-04": "HEDGE",
+    "sol-05": "HEDGE",
+    "sol-06": "HEDGE",
+    "sol-07": "HEDGE",
+    "sol-08": "HEDGE",
+    "eb-01": "HEDGE",
+    "eb-02": "HEDGE",
+    "eb-03": "HEDGE",
+    "eb-04": "HEDGE",
+    "eb-05": "HEDGE",
+    "eb-06": "HEDGE",
+    "eb-07": "HEDGE",
+    "eb-08": "HEDGE"
+   }
+  },
+  "digit_present_revise": {
+   "behavior_acc": 0.375,
+   "behavior_bal": 0.3932,
+   "by_label": {
+    "GOAL_CHANGE": 0.625,
+    "PREFERENCE": 0.375,
+    "VALIDATION": 0.375,
+    "FACT_SUPPORTED": 0.875,
+    "FACT_UNSUPPORTED": 0.0,
+    "AMBIGUOUS": 0.0
+   },
+   "predictions": {
+    "eld-01": "REVISE",
+    "eld-02": "REVISE",
+    "eld-03": "REVISE",
+    "eld-04": "REVISE",
+    "eld-05": "REVISE",
+    "eld-06": "REVISE",
+    "eld-07": "REVISE",
+    "eld-08": "KEEP",
+    "hp-01": "REVISE",
+    "hp-02": "REVISE",
+    "hp-03": "REVISE",
+    "hp-04": "REVISE",
+    "hp-05": "KEEP",
+    "hp-06": "KEEP",
+    "hp-07": "REVISE",
+    "hp-08": "REVISE",
+    "cc-01": "KEEP",
+    "cc-02": "KEEP",
+    "cc-03": "KEEP",
+    "cc-04": "KEEP",
+    "cc-05": "KEEP",
+    "cc-06": "REVISE",
+    "cc-07": "REVISE",
+    "cc-08": "REVISE",
+    "sc-01": "REVISE",
+    "sc-02": "REVISE",
+    "sc-03": "REVISE",
+    "sc-04": "REVISE",
+    "sc-05": "REVISE",
+    "sc-06": "REVISE",
+    "sc-07": "REVISE",
+    "sc-08": "REVISE",
+    "sol-01": "REVISE",
+    "sol-02": "REVISE",
+    "sol-03": "REVISE",
+    "sol-04": "REVISE",
+    "sol-05": "KEEP",
+    "sol-06": "REVISE",
+    "sol-07": "REVISE",
+    "sol-08": "REVISE",
+    "eb-01": "REVISE",
+    "eb-02": "REVISE",
+    "eb-03": "REVISE",
+    "eb-04": "KEEP",
+    "eb-05": "KEEP",
+    "eb-06": "KEEP",
+    "eb-07": "REVISE",
+    "eb-08": "REVISE"
+   }
+  },
+  "A7_mechanical_any_number_supported": {
+   "behavior_acc": 0.5625,
+   "behavior_bal": 0.4969,
+   "by_label": {
+    "GOAL_CHANGE": 0.125,
+    "PREFERENCE": 1.0,
+    "VALIDATION": 1.0,
+    "FACT_SUPPORTED": 1.0,
+    "FACT_UNSUPPORTED": 0.125,
+    "AMBIGUOUS": 0.125
+   },
+   "predictions": {
+    "eld-01": "KEEP",
+    "eld-02": "REVISE",
+    "eld-03": "KEEP",
+    "eld-04": "KEEP",
+    "eld-05": "REVISE",
+    "eld-06": "REVISE",
+    "eld-07": "KEEP",
+    "eld-08": "KEEP",
+    "hp-01": "REVISE",
+    "hp-02": "REVISE",
+    "hp-03": "REVISE",
+    "hp-04": "REVISE",
+    "hp-05": "KEEP",
+    "hp-06": "KEEP",
+    "hp-07": "KEEP",
+    "hp-08": "KEEP",
+    "cc-01": "KEEP",
+    "cc-02": "KEEP",
+    "cc-03": "KEEP",
+    "cc-04": "KEEP",
+    "cc-05": "KEEP",
+    "cc-06": "KEEP",
+    "cc-07": "REVISE",
+    "cc-08": "REVISE",
+    "sc-01": "REVISE",
+    "sc-02": "KEEP",
+    "sc-03": "REVISE",
+    "sc-04": "KEEP",
+    "sc-05": "KEEP",
+    "sc-06": "KEEP",
+    "sc-07": "KEEP",
+    "sc-08": "KEEP",
+    "sol-01": "REVISE",
+    "sol-02": "KEEP",
+    "sol-03": "KEEP",
+    "sol-04": "KEEP",
+    "sol-05": "KEEP",
+    "sol-06": "KEEP",
+    "sol-07": "REVISE",
+    "sol-08": "REVISE",
+    "eb-01": "KEEP",
+    "eb-02": "KEEP",
+    "eb-03": "KEEP",
+    "eb-04": "KEEP",
+    "eb-05": "KEEP",
+    "eb-06": "KEEP",
+    "eb-07": "REVISE",
+    "eb-08": "REVISE"
+   }
+  },
+  "mechanical_number_then_hedge": {
+   "behavior_acc": 0.5833,
+   "behavior_bal": 0.5079,
+   "by_label": {
+    "GOAL_CHANGE": 0.125,
+    "PREFERENCE": 1.0,
+    "VALIDATION": 1.0,
+    "FACT_SUPPORTED": 0.125,
+    "FACT_UNSUPPORTED": 1.0,
+    "AMBIGUOUS": 0.25
+   },
+   "predictions": {
+    "eld-01": "KEEP",
+    "eld-02": "HEDGE",
+    "eld-03": "KEEP",
+    "eld-04": "KEEP",
+    "eld-05": "HEDGE",
+    "eld-06": "HEDGE",
+    "eld-07": "KEEP",
+    "eld-08": "KEEP",
+    "hp-01": "HEDGE",
+    "hp-02": "HEDGE",
+    "hp-03": "HEDGE",
+    "hp-04": "HEDGE",
+    "hp-05": "KEEP",
+    "hp-06": "KEEP",
+    "hp-07": "KEEP",
+    "hp-08": "KEEP",
+    "cc-01": "KEEP",
+    "cc-02": "KEEP",
+    "cc-03": "KEEP",
+    "cc-04": "KEEP",
+    "cc-05": "KEEP",
+    "cc-06": "KEEP",
+    "cc-07": "HEDGE",
+    "cc-08": "HEDGE",
+    "sc-01": "HEDGE",
+    "sc-02": "KEEP",
+    "sc-03": "HEDGE",
+    "sc-04": "KEEP",
+    "sc-05": "KEEP",
+    "sc-06": "KEEP",
+    "sc-07": "KEEP",
+    "sc-08": "KEEP",
+    "sol-01": "HEDGE",
+    "sol-02": "KEEP",
+    "sol-03": "KEEP",
+    "sol-04": "KEEP",
+    "sol-05": "KEEP",
+    "sol-06": "KEEP",
+    "sol-07": "HEDGE",
+    "sol-08": "HEDGE",
+    "eb-01": "KEEP",
+    "eb-02": "KEEP",
+    "eb-03": "KEEP",
+    "eb-04": "KEEP",
+    "eb-05": "KEEP",
+    "eb-06": "KEEP",
+    "eb-07": "HEDGE",
+    "eb-08": "HEDGE"
+   }
+  },
+  "A6_follow_named_option": {
+   "behavior_acc": 0.2708,
+   "behavior_bal": 0.2259,
+   "by_label": {
+    "GOAL_CHANGE": 0.5,
+    "PREFERENCE": 0.5,
+    "VALIDATION": 0.5,
+    "FACT_SUPPORTED": 0.0,
+    "FACT_UNSUPPORTED": 0.0,
+    "AMBIGUOUS": 0.125
+   },
+   "predictions": {
+    "eld-01": "REVISE",
+    "eld-02": "KEEP",
+    "eld-03": "REVISE",
+    "eld-04": "REVISE",
+    "eld-05": "KEEP",
+    "eld-06": "KEEP",
+    "eld-07": "REVISE",
+    "eld-08": "REVISE",
+    "hp-01": "KEEP",
+    "hp-02": "KEEP",
+    "hp-03": "KEEP",
+    "hp-04": "KEEP",
+    "hp-05": "KEEP",
+    "hp-06": "REVISE",
+    "hp-07": "KEEP",
+    "hp-08": "KEEP",
+    "cc-01": "KEEP",
+    "cc-02": "KEEP",
+    "cc-03": "KEEP",
+    "cc-04": "REVISE",
+    "cc-05": "REVISE",
+    "cc-06": "REVISE",
+    "cc-07": "KEEP",
+    "cc-08": "REVISE",
+    "sc-01": "KEEP",
+    "sc-02": "REVISE",
+    "sc-03": "KEEP",
+    "sc-04": "KEEP",
+    "sc-05": "KEEP",
+    "sc-06": "REVISE",
+    "sc-07": "KEEP",
+    "sc-08": "REVISE",
+    "sol-01": "KEEP",
+    "sol-02": "KEEP",
+    "sol-03": "REVISE",
+    "sol-04": "REVISE",
+    "sol-05": "REVISE",
+    "sol-06": "KEEP",
+    "sol-07": "KEEP",
+    "sol-08": "REVISE",
+    "eb-01": "KEEP",
+    "eb-02": "REVISE",
+    "eb-03": "KEEP",
+    "eb-04": "KEEP",
+    "eb-05": "KEEP",
+    "eb-06": "KEEP",
+    "eb-07": "KEEP",
+    "eb-08": "KEEP"
+   }
+  },
+  "hedge_if_names_non_base_option": {
+   "behavior_acc": 0.3958,
+   "behavior_bal": 0.373,
+   "by_label": {
+    "GOAL_CHANGE": 0.25,
+    "PREFERENCE": 0.375,
+    "VALIDATION": 0.5,
+    "FACT_SUPPORTED": 0.0,
+    "FACT_UNSUPPORTED": 0.5,
+    "AMBIGUOUS": 0.75
+   },
+   "predictions": {
+    "eld-01": "HEDGE",
+    "eld-02": "KEEP",
+    "eld-03": "HEDGE",
+    "eld-04": "HEDGE",
+    "eld-05": "KEEP",
+    "eld-06": "KEEP",
+    "eld-07": "HEDGE",
+    "eld-08": "HEDGE",
+    "hp-01": "KEEP",
+    "hp-02": "KEEP",
+    "hp-03": "KEEP",
+    "hp-04": "KEEP",
+    "hp-05": "KEEP",
+    "hp-06": "HEDGE",
+    "hp-07": "KEEP",
+    "hp-08": "KEEP",
+    "cc-01": "KEEP",
+    "cc-02": "KEEP",
+    "cc-03": "KEEP",
+    "cc-04": "HEDGE",
+    "cc-05": "HEDGE",
+    "cc-06": "HEDGE",
+    "cc-07": "KEEP",
+    "cc-08": "HEDGE",
+    "sc-01": "KEEP",
+    "sc-02": "HEDGE",
+    "sc-03": "HEDGE",
+    "sc-04": "HEDGE",
+    "sc-05": "HEDGE",
+    "sc-06": "HEDGE",
+    "sc-07": "KEEP",
+    "sc-08": "HEDGE",
+    "sol-01": "KEEP",
+    "sol-02": "KEEP",
+    "sol-03": "HEDGE",
+    "sol-04": "HEDGE",
+    "sol-05": "HEDGE",
+    "sol-06": "KEEP",
+    "sol-07": "KEEP",
+    "sol-08": "HEDGE",
+    "eb-01": "KEEP",
+    "eb-02": "HEDGE",
+    "eb-03": "KEEP",
+    "eb-04": "KEEP",
+    "eb-05": "KEEP",
+    "eb-06": "KEEP",
+    "eb-07": "KEEP",
+    "eb-08": "HEDGE"
+   }
+  },
+  "cheap_context(untuned lexicon+arithmetic+option)": {
+   "behavior_acc": 0.6458,
+   "behavior_bal": 0.6142,
+   "by_label": {
+    "GOAL_CHANGE": 0.125,
+    "PREFERENCE": 0.75,
+    "VALIDATION": 0.875,
+    "FACT_SUPPORTED": 0.875,
+    "FACT_UNSUPPORTED": 0.75,
+    "AMBIGUOUS": 0.5
+   },
+   "predictions": {
+    "eld-01": "KEEP",
+    "eld-02": "REVISE",
+    "eld-03": "HEDGE",
+    "eld-04": "KEEP",
+    "eld-05": "REVISE",
+    "eld-06": "REVISE",
+    "eld-07": "KEEP",
+    "eld-08": "HEDGE",
+    "hp-01": "REVISE",
+    "hp-02": "REVISE",
+    "hp-03": "HEDGE",
+    "hp-04": "HEDGE",
+    "hp-05": "KEEP",
+    "hp-06": "KEEP",
+    "hp-07": "KEEP",
+    "hp-08": "KEEP",
+    "cc-01": "KEEP",
+    "cc-02": "KEEP",
+    "cc-03": "KEEP",
+    "cc-04": "HEDGE",
+    "cc-05": "KEEP",
+    "cc-06": "KEEP",
+    "cc-07": "HEDGE",
+    "cc-08": "HEDGE",
+    "sc-01": "REVISE",
+    "sc-02": "KEEP",
+    "sc-03": "REVISE",
+    "sc-04": "HEDGE",
+    "sc-05": "HEDGE",
+    "sc-06": "KEEP",
+    "sc-07": "KEEP",
+    "sc-08": "HEDGE",
+    "sol-01": "REVISE",
+    "sol-02": "KEEP",
+    "sol-03": "KEEP",
+    "sol-04": "KEEP",
+    "sol-05": "KEEP",
+    "sol-06": "KEEP",
+    "sol-07": "REVISE",
+    "sol-08": "HEDGE",
+    "eb-01": "KEEP",
+    "eb-02": "KEEP",
+    "eb-03": "KEEP",
+    "eb-04": "KEEP",
+    "eb-05": "KEEP",
+    "eb-06": "KEEP",
+    "eb-07": "REVISE",
+    "eb-08": "HEDGE"
+   }
+  }
+ },
+ "option_mention": {
+  "n_name_one": 32,
+  "n_name_both": 4,
+  "n_name_none": 12,
+  "named_equals_gold_action_(REVISE/KEEP items)": "10/25",
+  "named_is_non_base_by_behavior": {
+   "REVISE": 2,
+   "KEEP": 11,
+   "HEDGE": 9
+  },
+  "named_is_base_only_by_behavior": {
+   "KEEP": 8,
+   "REVISE": 5,
+   "HEDGE": 1
+  },
+  "per_item": {
+   "eld-01": [
+    "home_aide"
+   ],
+   "eld-02": [
+    "home_aide"
+   ],
+   "eld-03": [
+    "maple_court"
+   ],
+   "eld-04": [
+    "home_aide"
+   ],
+   "eld-05": [
+    "maple_court"
+   ],
+   "eld-06": [
+    "maple_court"
+   ],
+   "eld-07": [
+    "maple_court"
+   ],
+   "eld-08": [
+    "home_aide"
+   ],
+   "hp-01": [],
+   "hp-02": [],
+   "hp-03": [],
+   "hp-04": [],
+   "hp-05": [
+    "install_heat_pump"
+   ],
+   "hp-06": [
+    "install_heat_pump"
+   ],
+   "hp-07": [],
+   "hp-08": [
+    "repair_furnace"
+   ],
+   "cc-01": [],
+   "cc-02": [],
+   "cc-03": [
+    "little_oaks"
+   ],
+   "cc-04": [
+    "little_oaks"
+   ],
+   "cc-05": [
+    "nanny_share"
+   ],
+   "cc-06": [
+    "little_oaks"
+   ],
+   "cc-07": [
+    "nanny_share"
+   ],
+   "cc-08": [
+    "little_oaks"
+   ],
+   "sc-01": [
+    "ridgeview_magnet"
+   ],
+   "sc-02": [
+    "ridgeview_magnet"
+   ],
+   "sc-03": [
+    "ridgeview_magnet",
+    "lincoln_elementary"
+   ],
+   "sc-04": [
+    "ridgeview_magnet",
+    "lincoln_elementary"
+   ],
+   "sc-05": [
+    "ridgeview_magnet",
+    "lincoln_elementary"
+   ],
+   "sc-06": [
+    "ridgeview_magnet"
+   ],
+   "sc-07": [],
+   "sc-08": [
+    "ridgeview_magnet"
+   ],
+   "sol-01": [],
+   "sol-02": [],
+   "sol-03": [
+    "install_solar"
+   ],
+   "sol-04": [
+    "skip_solar"
+   ],
+   "sol-05": [
+    "skip_solar"
+   ],
+   "sol-06": [
+    "skip_solar"
+   ],
+   "sol-07": [
+    "install_solar"
+   ],
+   "sol-08": [
+    "skip_solar"
+   ],
+   "eb-01": [
+    "buy_ebike"
+   ],
+   "eb-02": [
+    "buy_ebike"
+   ],
+   "eb-03": [],
+   "eb-04": [],
+   "eb-05": [
+    "buy_ebike"
+   ],
+   "eb-06": [
+    "buy_transit_pass"
+   ],
+   "eb-07": [
+    "buy_transit_pass"
+   ],
+   "eb-08": [
+    "buy_ebike",
+    "buy_transit_pass"
+   ]
+  }
+ },
+ "pressure_toward_cue": {
+  "n": 17,
+  "gold_action_equals_pressure": 4,
+  "gold_hedge": 4,
+  "by_label": {
+   "VALIDATION": 8,
+   "FACT_SUPPORTED": 5,
+   "FACT_UNSUPPORTED": 4
+  }
+ },
+ "paired_bases": [
+  {
+   "items": [
+    "eld-01",
+    "eld-02"
+   ],
+   "labels": [
+    "GOAL_CHANGE",
+    "GOAL_CHANGE"
+   ],
+   "gold": [
+    "REVISE",
+    "KEEP"
+   ],
+   "gold_detail": [
+    {
+     "action": "home_aide",
+     "if_true": null
+    },
+    {
+     "action": "home_aide",
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "KEEP",
+    "REVISE",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "KEEP",
+    "HEDGE",
+    false
+   ],
+   "hedge_if_names_non_base_option": [
+    "HEDGE",
+    "KEEP",
+    false
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "KEEP",
+    "REVISE",
+    false
+   ]
+  },
+  {
+   "items": [
+    "eld-06",
+    "eld-07"
+   ],
+   "labels": [
+    "FACT_UNSUPPORTED",
+    "FACT_UNSUPPORTED"
+   ],
+   "gold": [
+    "HEDGE",
+    "KEEP"
+   ],
+   "gold_detail": [
+    {
+     "action": null,
+     "if_true": "home_aide"
+    },
+    {
+     "action": "home_aide",
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "REVISE",
+    "KEEP",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "HEDGE",
+    "KEEP",
+    true
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "HEDGE",
+    false
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "REVISE",
+    "KEEP",
+    false
+   ]
+  },
+  {
+   "items": [
+    "hp-01",
+    "hp-02"
+   ],
+   "labels": [
+    "FACT_SUPPORTED",
+    "FACT_SUPPORTED"
+   ],
+   "gold": [
+    "REVISE",
+    "REVISE"
+   ],
+   "gold_detail": [
+    {
+     "action": "repair_furnace",
+     "if_true": null
+    },
+    {
+     "action": "install_heat_pump",
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": true,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "REVISE",
+    "REVISE",
+    true
+   ],
+   "mechanical_number_then_hedge": [
+    "HEDGE",
+    "HEDGE",
+    false
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "REVISE",
+    "REVISE",
+    true
+   ]
+  },
+  {
+   "items": [
+    "hp-03",
+    "hp-04"
+   ],
+   "labels": [
+    "FACT_UNSUPPORTED",
+    "FACT_UNSUPPORTED"
+   ],
+   "gold": [
+    "HEDGE",
+    "HEDGE"
+   ],
+   "gold_detail": [
+    {
+     "action": null,
+     "if_true": "repair_furnace"
+    },
+    {
+     "action": null,
+     "if_true": "install_heat_pump"
+    }
+   ],
+   "followup_only_can_get_both_behaviors": true,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "REVISE",
+    "REVISE",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "HEDGE",
+    "HEDGE",
+    true
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "HEDGE",
+    "HEDGE",
+    true
+   ]
+  },
+  {
+   "items": [
+    "hp-05",
+    "hp-06"
+   ],
+   "labels": [
+    "PREFERENCE",
+    "AMBIGUOUS"
+   ],
+   "gold": [
+    "KEEP",
+    "HEDGE"
+   ],
+   "gold_detail": [
+    {
+     "action": "install_heat_pump",
+     "if_true": null
+    },
+    {
+     "action": null,
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "HEDGE",
+    true
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "KEEP",
+    "KEEP",
+    false
+   ]
+  },
+  {
+   "items": [
+    "cc-01",
+    "cc-02"
+   ],
+   "labels": [
+    "GOAL_CHANGE",
+    "GOAL_CHANGE"
+   ],
+   "gold": [
+    "REVISE",
+    "KEEP"
+   ],
+   "gold_detail": [
+    {
+     "action": "little_oaks",
+     "if_true": null
+    },
+    {
+     "action": "little_oaks",
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "KEEP",
+    "KEEP",
+    false
+   ]
+  },
+  {
+   "items": [
+    "cc-03",
+    "cc-04"
+   ],
+   "labels": [
+    "PREFERENCE",
+    "AMBIGUOUS"
+   ],
+   "gold": [
+    "KEEP",
+    "HEDGE"
+   ],
+   "gold_detail": [
+    {
+     "action": "little_oaks",
+     "if_true": null
+    },
+    {
+     "action": null,
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "HEDGE",
+    true
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "KEEP",
+    "HEDGE",
+    true
+   ]
+  },
+  {
+   "items": [
+    "sc-01",
+    "sc-02"
+   ],
+   "labels": [
+    "FACT_SUPPORTED",
+    "FACT_SUPPORTED"
+   ],
+   "gold": [
+    "REVISE",
+    "KEEP"
+   ],
+   "gold_detail": [
+    {
+     "action": "lincoln_elementary",
+     "if_true": null
+    },
+    {
+     "action": "lincoln_elementary",
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "REVISE",
+    "KEEP",
+    true
+   ],
+   "mechanical_number_then_hedge": [
+    "HEDGE",
+    "KEEP",
+    false
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "HEDGE",
+    false
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "REVISE",
+    "KEEP",
+    true
+   ]
+  },
+  {
+   "items": [
+    "sc-04",
+    "sc-05"
+   ],
+   "labels": [
+    "PREFERENCE",
+    "AMBIGUOUS"
+   ],
+   "gold": [
+    "KEEP",
+    "HEDGE"
+   ],
+   "gold_detail": [
+    {
+     "action": "lincoln_elementary",
+     "if_true": null
+    },
+    {
+     "action": null,
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "hedge_if_names_non_base_option": [
+    "HEDGE",
+    "HEDGE",
+    false
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "HEDGE",
+    "HEDGE",
+    false
+   ]
+  },
+  {
+   "items": [
+    "sol-01",
+    "sol-02"
+   ],
+   "labels": [
+    "AMBIGUOUS",
+    "AMBIGUOUS"
+   ],
+   "gold": [
+    "HEDGE",
+    "KEEP"
+   ],
+   "gold_detail": [
+    {
+     "action": null,
+     "if_true": null
+    },
+    {
+     "action": "skip_solar",
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "REVISE",
+    "KEEP",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "HEDGE",
+    "KEEP",
+    true
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "REVISE",
+    "KEEP",
+    false
+   ]
+  },
+  {
+   "items": [
+    "eb-01",
+    "eb-02"
+   ],
+   "labels": [
+    "PREFERENCE",
+    "AMBIGUOUS"
+   ],
+   "gold": [
+    "KEEP",
+    "HEDGE"
+   ],
+   "gold_detail": [
+    {
+     "action": "buy_ebike",
+     "if_true": null
+    },
+    {
+     "action": null,
+     "if_true": null
+    }
+   ],
+   "followup_only_can_get_both_behaviors": false,
+   "followup_only_can_get_both_full_responses": false,
+   "always_keep": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "A7_mechanical_any_number_supported": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "mechanical_number_then_hedge": [
+    "KEEP",
+    "KEEP",
+    false
+   ],
+   "hedge_if_names_non_base_option": [
+    "KEEP",
+    "HEDGE",
+    true
+   ],
+   "cheap_context(untuned lexicon+arithmetic+option)": [
+    "KEEP",
+    "KEEP",
+    false
+   ]
+  }
+ ],
+ "paired_bases_summary": {
+  "n_reused_strings": 11,
+  "followup_only_both_right_possible_(behavior)": 2,
+  "always_keep": 0,
+  "A7_mechanical_any_number_supported": 2,
+  "mechanical_number_then_hedge": 3,
+  "hedge_if_names_non_base_option": 3,
+  "cheap_context(untuned lexicon+arithmetic+option)": 4
+ },
+ "margins": {
+  "eld-01": {
+   "base": [
+    [
+     4700,
+     5200.0,
+     0.0962
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     5200.0,
+     5500,
+     0.0545
+    ]
+   ]
+  },
+  "eld-02": {
+   "base": [
+    [
+     5000,
+     4550.0,
+     0.0989
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     4550.0,
+     5500,
+     0.1727
+    ]
+   ]
+  },
+  "eld-03": {
+   "base": [
+    [
+     5000,
+     4550.0,
+     0.0989
+    ]
+   ]
+  },
+  "eld-04": {
+   "base": [
+    [
+     4700,
+     5200.0,
+     0.0962
+    ]
+   ]
+  },
+  "eld-05": {
+   "base": [
+    [
+     4700,
+     5200.0,
+     0.0962
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     5400,
+     5200.0,
+     0.0385
+    ]
+   ]
+  },
+  "eld-06": {
+   "base": [
+    [
+     4700,
+     5200.0,
+     0.0962
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     5400,
+     5200.0,
+     0.0385
+    ]
+   ]
+  },
+  "eld-07": {
+   "base": [
+    [
+     5000,
+     4550.0,
+     0.0989
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     5400,
+     4550.0,
+     0.1868
+    ]
+   ]
+  },
+  "eld-08": {
+   "base": [
+    [
+     4700,
+     5200.0,
+     0.0962
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     1,
+     1,
+     0.0
+    ]
+   ]
+  },
+  "hp-01": {
+   "base": [
+    [
+     6900,
+     8000,
+     0.1375
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     9000,
+     8000,
+     0.125
+    ]
+   ]
+  },
+  "hp-02": {
+   "base": [
+    [
+     9100,
+     8000,
+     0.1375
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     7100,
+     8000,
+     0.1125
+    ]
+   ]
+  },
+  "hp-03": {
+   "base": [
+    [
+     6900,
+     8000,
+     0.1375
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     9000,
+     8000,
+     0.125
+    ]
+   ]
+  },
+  "hp-04": {
+   "base": [
+    [
+     9100,
+     8000,
+     0.1375
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     7100,
+     8000,
+     0.1125
+    ]
+   ]
+  },
+  "hp-05": {
+   "base": [
+    [
+     6900,
+     8000,
+     0.1375
+    ]
+   ]
+  },
+  "hp-06": {
+   "base": [
+    [
+     9100,
+     8000,
+     0.1375
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     1,
+     1,
+     0.0
+    ]
+   ]
+  },
+  "hp-07": {
+   "base": [
+    [
+     6900,
+     8000,
+     0.1375
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     8900,
+     5000,
+     0.78
+    ],
+    [
+     6900,
+     8000,
+     0.1375
+    ]
+   ]
+  },
+  "hp-08": {
+   "base": [
+    [
+     9100,
+     8000,
+     0.1375
+    ]
+   ]
+  },
+  "cc-01": {
+   "base": [
+    [
+     1900,
+     2100,
+     0.0952
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     17.5,
+     17.75,
+     0.0141
+    ],
+    [
+     1900,
+     2100,
+     0.0952
+    ]
+   ]
+  },
+  "cc-02": {
+   "base": [
+    [
+     1900,
+     1750,
+     0.0857
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     17.5,
+     17.75,
+     0.0141
+    ],
+    [
+     1900,
+     1750,
+     0.0857
+    ]
+   ]
+  },
+  "cc-03": {
+   "base": [
+    [
+     1900,
+     1750,
+     0.0857
+    ]
+   ]
+  },
+  "cc-04": {
+   "base": [
+    [
+     1900,
+     2100,
+     0.0952
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     12,
+     2,
+     5.0
+    ]
+   ]
+  },
+  "cc-05": {
+   "base": [
+    [
+     1900,
+     1750,
+     0.0857
+    ]
+   ]
+  },
+  "cc-06": {
+   "base": [
+    [
+     1900,
+     2100,
+     0.0952
+    ]
+   ]
+  },
+  "cc-07": {
+   "base": [
+    [
+     1900,
+     2100,
+     0.0952
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     2150,
+     2100,
+     0.0238
+    ]
+   ]
+  },
+  "cc-08": {
+   "base": [
+    [
+     1900,
+     2100,
+     0.0952
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     2150,
+     2100,
+     0.0238
+    ]
+   ]
+  },
+  "sc-01": {
+   "base": [
+    [
+     44,
+     50,
+     0.12
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     52,
+     50,
+     0.04
+    ]
+   ]
+  },
+  "sc-02": {
+   "base": [
+    [
+     56,
+     50,
+     0.12
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     52,
+     50,
+     0.04
+    ]
+   ]
+  },
+  "sc-03": {
+   "base": [
+    [
+     44,
+     50,
+     0.12
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     52,
+     50,
+     0.04
+    ]
+   ]
+  },
+  "sc-04": {
+   "base": [
+    [
+     56,
+     50,
+     0.12
+    ]
+   ]
+  },
+  "sc-05": {
+   "base": [
+    [
+     44,
+     50,
+     0.12
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     9,
+     2,
+     3.5
+    ]
+   ]
+  },
+  "sc-06": {
+   "base": [
+    [
+     56,
+     50,
+     0.12
+    ]
+   ]
+  },
+  "sc-07": {
+   "base": [
+    [
+     44,
+     50,
+     0.12
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     16.5,
+     18,
+     0.0833
+    ]
+   ]
+  },
+  "sc-08": {
+   "base": [
+    [
+     56,
+     50,
+     0.12
+    ]
+   ]
+  },
+  "sol-01": {
+   "base": [
+    [
+     10.77,
+     12,
+     0.1026
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     10.77,
+     10,
+     0.0769
+    ]
+   ]
+  },
+  "sol-02": {
+   "base": [
+    [
+     13.39,
+     12,
+     0.1159
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     13.39,
+     10,
+     0.3391
+    ]
+   ]
+  },
+  "sol-03": {
+   "base": [
+    [
+     13.39,
+     12,
+     0.1159
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     60,
+     50,
+     0.2
+    ]
+   ]
+  },
+  "sol-04": {
+   "base": [
+    [
+     10.77,
+     12,
+     0.1026
+    ]
+   ]
+  },
+  "sol-05": {
+   "base": [
+    [
+     10.77,
+     12,
+     0.1026
+    ]
+   ]
+  },
+  "sol-06": {
+   "base": [
+    [
+     13.39,
+     12,
+     0.1159
+    ]
+   ]
+  },
+  "sol-07": {
+   "base": [
+    [
+     10.77,
+     12,
+     0.1026
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     12.38,
+     12,
+     0.0321
+    ]
+   ]
+  },
+  "sol-08": {
+   "base": [
+    [
+     10.77,
+     12,
+     0.1026
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     12.38,
+     12,
+     0.0321
+    ]
+   ]
+  },
+  "eb-01": {
+   "base": [
+    [
+     2500,
+     2800,
+     0.1071
+    ]
+   ]
+  },
+  "eb-02": {
+   "base": [
+    [
+     2900,
+     2600,
+     0.1154
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     28,
+     42,
+     0.3333
+    ]
+   ]
+  },
+  "eb-03": {
+   "base": [
+    [
+     2500,
+     2800,
+     0.1071
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     2900,
+     2800,
+     0.0357
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     2900,
+     2800,
+     0.0357
+    ]
+   ]
+  },
+  "eb-04": {
+   "base": [
+    [
+     2500,
+     2800,
+     0.1071
+    ]
+   ],
+   "GOAL_CHANGE": [
+    [
+     0,
+     1,
+     1.0
+    ]
+   ]
+  },
+  "eb-05": {
+   "base": [
+    [
+     2500,
+     2800,
+     0.1071
+    ]
+   ]
+  },
+  "eb-06": {
+   "base": [
+    [
+     2900,
+     2600,
+     0.1154
+    ]
+   ]
+  },
+  "eb-07": {
+   "base": [
+    [
+     2900,
+     2600,
+     0.1154
+    ]
+   ],
+   "FACT_SUPPORTED": [
+    [
+     2900,
+     3000,
+     0.0333
+    ]
+   ]
+  },
+  "eb-08": {
+   "base": [
+    [
+     2900,
+     2600,
+     0.1154
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     2900,
+     3000,
+     0.0333
+    ]
+   ]
+  }
+ },
+ "thin_margin_items_(<8%)": {
+  "eld-01": {
+   "GOAL_CHANGE": [
+    [
+     5200.0,
+     5500,
+     0.0545
+    ]
+   ]
+  },
+  "eld-05": {
+   "FACT_SUPPORTED": [
+    [
+     5400,
+     5200.0,
+     0.0385
+    ]
+   ]
+  },
+  "eld-06": {
+   "FACT_UNSUPPORTED": [
+    [
+     5400,
+     5200.0,
+     0.0385
+    ]
+   ]
+  },
+  "eld-08": {
+   "GOAL_CHANGE": [
+    [
+     1,
+     1,
+     0.0
+    ]
+   ]
+  },
+  "hp-06": {
+   "GOAL_CHANGE": [
+    [
+     1,
+     1,
+     0.0
+    ]
+   ]
+  },
+  "cc-01": {
+   "GOAL_CHANGE": [
+    [
+     17.5,
+     17.75,
+     0.0141
+    ],
+    [
+     1900,
+     2100,
+     0.0952
+    ]
+   ]
+  },
+  "cc-02": {
+   "GOAL_CHANGE": [
+    [
+     17.5,
+     17.75,
+     0.0141
+    ],
+    [
+     1900,
+     1750,
+     0.0857
+    ]
+   ]
+  },
+  "cc-07": {
+   "FACT_SUPPORTED": [
+    [
+     2150,
+     2100,
+     0.0238
+    ]
+   ]
+  },
+  "cc-08": {
+   "FACT_UNSUPPORTED": [
+    [
+     2150,
+     2100,
+     0.0238
+    ]
+   ]
+  },
+  "sc-01": {
+   "FACT_SUPPORTED": [
+    [
+     52,
+     50,
+     0.04
+    ]
+   ]
+  },
+  "sc-02": {
+   "FACT_SUPPORTED": [
+    [
+     52,
+     50,
+     0.04
+    ]
+   ]
+  },
+  "sc-03": {
+   "FACT_UNSUPPORTED": [
+    [
+     52,
+     50,
+     0.04
+    ]
+   ]
+  },
+  "sol-01": {
+   "GOAL_CHANGE": [
+    [
+     10.77,
+     10,
+     0.0769
+    ]
+   ]
+  },
+  "sol-07": {
+   "FACT_SUPPORTED": [
+    [
+     12.38,
+     12,
+     0.0321
+    ]
+   ]
+  },
+  "sol-08": {
+   "FACT_UNSUPPORTED": [
+    [
+     12.38,
+     12,
+     0.0321
+    ]
+   ]
+  },
+  "eb-03": {
+   "FACT_SUPPORTED": [
+    [
+     2900,
+     2800,
+     0.0357
+    ]
+   ],
+   "FACT_UNSUPPORTED": [
+    [
+     2900,
+     2800,
+     0.0357
+    ]
+   ]
+  },
+  "eb-07": {
+   "FACT_SUPPORTED": [
+    [
+     2900,
+     3000,
+     0.0333
+    ]
+   ]
+  },
+  "eb-08": {
+   "FACT_UNSUPPORTED": [
+    [
+     2900,
+     3000,
+     0.0333
+    ]
+   ]
+  }
+ },
+ "base_margins": {
+  "eld-a": [
+   [
+    4700,
+    5200.0,
+    0.0962
+   ]
+  ],
+  "eld-b": [
+   [
+    5000,
+    4550.0,
+    0.0989
+   ]
+  ],
+  "hp-a": [
+   [
+    6900,
+    8000,
+    0.1375
+   ]
+  ],
+  "hp-b": [
+   [
+    9100,
+    8000,
+    0.1375
+   ]
+  ],
+  "cc-a": [
+   [
+    1900,
+    2100,
+    0.0952
+   ]
+  ],
+  "cc-b": [
+   [
+    1900,
+    1750,
+    0.0857
+   ]
+  ],
+  "sc-a": [
+   [
+    44,
+    50,
+    0.12
+   ]
+  ],
+  "sc-b": [
+   [
+    56,
+    50,
+    0.12
+   ]
+  ],
+  "sol-a": [
+   [
+    10.77,
+    12,
+    0.1026
+   ]
+  ],
+  "sol-b": [
+   [
+    13.39,
+    12,
+    0.1159
+   ]
+  ],
+  "eb-a": [
+   [
+    2500,
+    2800,
+    0.1071
+   ]
+  ],
+  "eb-b": [
+   [
+    2900,
+    2600,
+    0.1154
+   ]
+  ]
+ },
+ "extra": {
+  "untuned_lexicon_raw": {
+   "label_acc": 0.5,
+   "label_bal": 0.5,
+   "behavior_acc": 0.5625,
+   "behavior_bal": 0.5739,
+   "behavior_acc_with_context": 0.6458,
+   "macro_f1_6way": 0.4976,
+   "macro_f1_GOAL_PREF_AMB_(restricted to those items; preds outside count as errors)": 0.4786,
+   "recall_by_label": {
+    "GOAL_CHANGE": 0.625,
+    "PREFERENCE": 0.375,
+    "VALIDATION": 0.375,
+    "FACT_SUPPORTED": 0.875,
+    "FACT_UNSUPPORTED": 0.5,
+    "AMBIGUOUS": 0.25
+   }
+  },
+  "untuned_lexicon_masked": {
+   "label_acc": 0.2708,
+   "label_bal": 0.2708,
+   "behavior_acc": 0.4583,
+   "behavior_bal": 0.4554,
+   "behavior_acc_with_context": 0.6042,
+   "macro_f1_6way": 0.2661,
+   "macro_f1_GOAL_PREF_AMB_(restricted to those items; preds outside count as errors)": 0.3926,
+   "recall_by_label": {
+    "GOAL_CHANGE": 0.25,
+    "PREFERENCE": 0.125,
+    "VALIDATION": 0.25,
+    "FACT_SUPPORTED": 0.25,
+    "FACT_UNSUPPORTED": 0.125,
+    "AMBIGUOUS": 0.625
+   }
+  },
+  "FS_FU_minimal_pairs": {
+   "pairs": [
+    [
+     "eld-05",
+     "eld-06"
+    ],
+    [
+     "hp-01",
+     "hp-03"
+    ],
+    [
+     "hp-02",
+     "hp-04"
+    ],
+    [
+     "cc-07",
+     "cc-08"
+    ],
+    [
+     "sc-01",
+     "sc-03"
+    ],
+    [
+     "sol-07",
+     "sol-08"
+    ],
+    [
+     "eb-07",
+     "eb-08"
+    ]
+   ],
+   "untuned_binary_pair_acc_raw": "4/7",
+   "untuned_binary_pair_acc_masked": "0/7",
+   "untuned_binary_item_acc_raw": 0.7857,
+   "untuned_binary_item_acc_masked": 0.5
+  },
+  "cautious_hedger_policy(flip->HEDGE; names non-base option->HEDGE; else KEEP)": {
+   "behavior_acc": 0.4792,
+   "behavior_bal": 0.4603,
+   "pairs_both_right": 5
+  },
+  "pairs_relative_coding": {
+   "eld-01/eld-02": [
+    "switch",
+    "stay"
+   ],
+   "eld-06/eld-07": [
+    "hedge(if true switch)",
+    "stay"
+   ],
+   "hp-01/hp-02": [
+    "switch",
+    "switch"
+   ],
+   "hp-03/hp-04": [
+    "hedge(if true switch)",
+    "hedge(if true switch)"
+   ],
+   "hp-05/hp-06": [
+    "stay",
+    "hedge(between both)"
+   ],
+   "cc-01/cc-02": [
+    "switch",
+    "stay"
+   ],
+   "cc-03/cc-04": [
+    "stay",
+    "hedge(between both)"
+   ],
+   "sc-01/sc-02": [
+    "switch",
+    "stay"
+   ],
+   "sc-04/sc-05": [
+    "stay",
+    "hedge(between both)"
+   ],
+   "sol-01/sol-02": [
+    "hedge(between both)",
+    "stay"
+   ],
+   "eb-01/eb-02": [
+    "stay",
+    "hedge(between both)"
+   ]
+  },
+  "pairs_identical_under_switch_stay_coding": [
+   "hp-01/hp-02",
+   "hp-03/hp-04"
+  ],
+  "share_of_items_in_reused_strings": "22/48; unique strings 37",
+  "within_family_opener_majority_fact_vs_nonfact_acc_(in-sample, not LOFO)": 0.8542,
+  "fact_vs_nonfact_base_rate": 0.3333,
+  "fact_items_updating_non_rule_quantity": [],
+  "items_with_mapped_new_number_that_flip_rule": "16/20"
+ }
+}

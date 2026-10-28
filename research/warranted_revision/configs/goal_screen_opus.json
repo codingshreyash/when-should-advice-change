@@ -1,0 +1,37 @@
+{
+ "experiment": "goal_screen",
+ "items": "v2/ai_precalibration/candidate_v3/items.json",
+ "manifest": "v2/ai_precalibration/screen_v1/run_manifest.json",
+ "conditions": [
+  "N",
+  "S",
+  "F"
+ ],
+ "repeats": 3,
+ "preflight_items": [
+  "eld-05",
+  "eld-02"
+ ],
+ "preflight_controls": [
+  "ic-eld-05",
+  "ic-eld-02"
+ ],
+ "max_calls": 1008,
+ "run_id": "goal-screen-opus55-v1",
+ "label": "Goal screen, Claude Opus 5.5, adaptive thinking (cannot be disabled), effort low",
+ "system": {
+  "kind": "anthropic",
+  "name": "claude-opus-5-5",
+  "params": {
+   "effort": "low"
+  }
+ },
+ "max_tokens_first": 1500,
+ "max_tokens_free": 1500,
+ "max_tokens_decision": 1500,
+ "budget": {
+  "max_usd": 30.0,
+  "usd_per_m_input": 4.0,
+  "usd_per_m_output": 20.0
+ }
+}

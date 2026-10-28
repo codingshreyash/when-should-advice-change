@@ -1,0 +1,40 @@
+{
+ "experiment": "goal_screen",
+ "items": "v2/ai_precalibration/candidate_v3/items.json",
+ "manifest": "v2/ai_precalibration/screen_v1/run_manifest.json",
+ "conditions": [
+  "N",
+  "S",
+  "F"
+ ],
+ "repeats": 3,
+ "preflight_items": [
+  "eld-05",
+  "eld-02"
+ ],
+ "preflight_controls": [
+  "ic-eld-05",
+  "ic-eld-02"
+ ],
+ "max_calls": 1008,
+ "run_id": "goal-screen-mistral-nemo-v1",
+ "label": "Goal screen, Mistral-Nemo-Instruct-2407 (pinned), greedy + 3 draws at T=0.7",
+ "system": {
+  "kind": "hf",
+  "name": "mistralai/Mistral-Nemo-Instruct-2407",
+  "params": {
+   "revision": "04d8a90549d23fc6bd7f642064003592df51e9b3",
+   "model_class": "AutoModelForCausalLM",
+   "dtype": "bfloat16",
+   "load_in_4bit": false,
+   "max_batch": 9,
+   "tokenizer_kwargs": {
+    "fix_mistral_regex": true
+   }
+  }
+ },
+ "max_tokens_first": 400,
+ "max_tokens_free": 400,
+ "max_tokens_decision": 400,
+ "sample_temperature": 0.7
+}

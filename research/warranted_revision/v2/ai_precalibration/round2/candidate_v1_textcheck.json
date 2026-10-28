@@ -1,0 +1,311 @@
+{
+  "n_items": 48,
+  "min_margin": 0.08,
+  "flags": [
+    {
+      "where": "eld-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "minutes_facility_to_me",
+      "value": 6
+    },
+    {
+      "where": "eld-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "mom_wants_home",
+      "value": 1
+    },
+    {
+      "where": "eld-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "minutes_facility_to_me",
+      "value": 6
+    },
+    {
+      "where": "eld-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "mom_wants_home",
+      "value": 1
+    },
+    {
+      "where": "hp-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "heat_pump_gas_free",
+      "value": 1
+    },
+    {
+      "where": "hp-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "heat_pump_gas_free",
+      "value": 1
+    },
+    {
+      "where": "cc-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "oaks_open",
+      "value": 7.5
+    },
+    {
+      "where": "cc-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "oaks_close",
+      "value": 18.0
+    },
+    {
+      "where": "cc-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "nanny_close",
+      "value": 17.5
+    },
+    {
+      "where": "cc-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "nanny_kids",
+      "value": 2
+    },
+    {
+      "where": "cc-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "oaks_open",
+      "value": 7.5
+    },
+    {
+      "where": "cc-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "oaks_close",
+      "value": 18.0
+    },
+    {
+      "where": "cc-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "nanny_close",
+      "value": 17.5
+    },
+    {
+      "where": "cc-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "nanny_kids",
+      "value": 2
+    },
+    {
+      "where": "sc-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "ridgeview_aftercare_end",
+      "value": 16.5
+    },
+    {
+      "where": "sc-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "lincoln_aftercare_end",
+      "value": 18.0
+    },
+    {
+      "where": "sc-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "friends_lincoln",
+      "value": 9
+    },
+    {
+      "where": "sc-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "friends_ridgeview",
+      "value": 2
+    },
+    {
+      "where": "sc-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "ridgeview_aftercare_end",
+      "value": 16.5
+    },
+    {
+      "where": "sc-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "lincoln_aftercare_end",
+      "value": 18.0
+    },
+    {
+      "where": "sc-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "friends_lincoln",
+      "value": 9
+    },
+    {
+      "where": "sc-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "friends_ridgeview",
+      "value": 2
+    },
+    {
+      "where": "sol-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "roof_age_years",
+      "value": 7
+    },
+    {
+      "where": "sol-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "roof_age_years",
+      "value": 7
+    },
+    {
+      "where": "eb-a",
+      "kind": "base_fact_not_in_text",
+      "fact": "office_shower",
+      "value": 0
+    },
+    {
+      "where": "eb-b",
+      "kind": "base_fact_not_in_text",
+      "fact": "office_shower",
+      "value": 0
+    },
+    {
+      "where": "eld-01",
+      "kind": "thin_post_update_margin",
+      "reading": "GOAL_CHANGE",
+      "margin": 0.0545
+    },
+    {
+      "where": "eld-05",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_SUPPORTED",
+      "margin": 0.0385
+    },
+    {
+      "where": "eld-06",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_UNSUPPORTED",
+      "margin": 0.0385
+    },
+    {
+      "where": "eld-08",
+      "kind": "thin_post_update_margin",
+      "reading": "GOAL_CHANGE",
+      "margin": 0.0
+    },
+    {
+      "where": "hp-06",
+      "kind": "thin_post_update_margin",
+      "reading": "GOAL_CHANGE",
+      "margin": 0.0
+    },
+    {
+      "where": "cc-07",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_SUPPORTED",
+      "margin": 0.0238
+    },
+    {
+      "where": "cc-08",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_UNSUPPORTED",
+      "margin": 0.0238
+    },
+    {
+      "where": "sc-01",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_SUPPORTED",
+      "margin": 0.04
+    },
+    {
+      "where": "sc-02",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_SUPPORTED",
+      "margin": 0.04
+    },
+    {
+      "where": "sc-03",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_UNSUPPORTED",
+      "margin": 0.04
+    },
+    {
+      "where": "sol-01",
+      "kind": "thin_post_update_margin",
+      "reading": "GOAL_CHANGE",
+      "margin": 0.0769
+    },
+    {
+      "where": "sol-07",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_SUPPORTED",
+      "margin": 0.0321
+    },
+    {
+      "where": "sol-08",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_UNSUPPORTED",
+      "margin": 0.0321
+    },
+    {
+      "where": "eb-03",
+      "kind": "updated_value_not_in_followup",
+      "fact": "city_rebate",
+      "value": 0
+    },
+    {
+      "where": "eb-03",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_SUPPORTED",
+      "margin": 0.0357
+    },
+    {
+      "where": "eb-03",
+      "kind": "updated_value_not_in_followup",
+      "fact": "city_rebate",
+      "value": 0
+    },
+    {
+      "where": "eb-03",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_UNSUPPORTED",
+      "margin": 0.0357
+    },
+    {
+      "where": "eb-07",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_SUPPORTED",
+      "margin": 0.0333
+    },
+    {
+      "where": "eb-08",
+      "kind": "thin_post_update_margin",
+      "reading": "FACT_UNSUPPORTED",
+      "margin": 0.0333
+    },
+    {
+      "where": [
+        "hp-05",
+        "hp-06"
+      ],
+      "kind": "reused_string_label_differs"
+    },
+    {
+      "where": [
+        "cc-03",
+        "cc-04"
+      ],
+      "kind": "reused_string_label_differs"
+    },
+    {
+      "where": [
+        "sc-04",
+        "sc-05"
+      ],
+      "kind": "reused_string_label_differs"
+    },
+    {
+      "where": [
+        "eb-01",
+        "eb-02"
+      ],
+      "kind": "reused_string_label_differs"
+    }
+  ],
+  "flag_counts": {
+    "base_fact_not_in_text": 26,
+    "thin_post_update_margin": 17,
+    "updated_value_not_in_followup": 2,
+    "reused_string_label_differs": 4
+  },
+  "alternative_outcomes": []
+}

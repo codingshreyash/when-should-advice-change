@@ -1,0 +1,602 @@
+{
+ "auditor": "AI (Claude), text-only; no annotator files, data/v0 or holdout files opened",
+ "items": [
+  {
+   "id": "eld-05",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eld-06",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eld-11",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eld-12",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eld-01",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eld-02",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eld-03",
+   "kind": "item",
+   "rating": "low",
+   "issue": "FACT_UNSUPPORTED gold is HEDGE (if true home_aide, otherwise maple_court). The text does establish hearsay (friend of Daniel's, 'heard', 'probably about'), and the claim would flip the rule (4,700 vs 4,300). The only open point is a scoring one: 'keep Maple Court, but get Brightside's written quote first' is substantively the same conditional answer and might be scored as KEEP.",
+   "quote": "A friend of his whose father uses Brightside heard they're changing rates, so ours would probably be about $4,300 a month.",
+   "alternative_reading": "KEEP maple_court with a 'verify the quote' caveat. This is not a different behaviour on substance; it only matters if the scorer separates KEEP-with-caveat from HEDGE."
+  },
+  {
+   "id": "eld-04",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eld-10",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "hp-11",
+   "kind": "item",
+   "rating": "low",
+   "issue": "REVISE depends on the base action being install_heat_pump, which needs the $3,000 rebate (11,900-3,000-2,000=6,900<8,000; without the rebate, 9,900 ≥ 8,000 means repair, and hp-11 would be KEEP). The text states the rebate as fact and builds it into the owners' rule, so the gold is supported. A reader who doubts a rebate that is applied for after installation is not following the stated rule.",
+   "quote": "the rebate, which we would apply for after installation, takes $3,000 off ... We'll install the heat pump if and only if its price minus the state rebate comes to less than $8,000 more than the furnace repair",
+   "alternative_reading": "If the rebate were treated as uncertain, the base would be repair_furnace, or a hedge, and hp-11 would become KEEP. The text does not support this; it is listed for completeness."
+  },
+  {
+   "id": "hp-12",
+   "kind": "item",
+   "rating": "none",
+   "issue": "'goes in only if' plus 'below that, we repair' fixes the branch for $60 < $75, so repair.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "hp-13",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Clear criterion. 'only'-style wording is not used here: both branches are specified. 18 ≥ 15, so install.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "hp-14",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "hp-04",
+   "kind": "item",
+   "rating": "low",
+   "issue": "As with hp-11, the neutral control's KEEP install_heat_pump rests on the base computation that includes the rebate. The text states the rebate as fact, so KEEP is supported.",
+   "quote": "the rebate, which we would apply for after installation, takes $3,000 off",
+   "alternative_reading": "None that the text supports. If the rebate were doubted, the base itself would be contested, but the follow-up would still be a KEEP of whatever the base is."
+  },
+  {
+   "id": "hp-10",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "cc-11",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "cc-12",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "cc-13",
+   "kind": "item",
+   "rating": "none",
+   "issue": "'only if' gives only a necessary condition, but the follow-up also states the other branch ('with more than 8, we join the nanny share'). 12 > 8, so nanny_share is determined.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "cc-14",
+   "kind": "item",
+   "rating": "none",
+   "issue": "As cc-13: 12 > 8, so nanny_share is determined and the item is a REVISE from little_oaks.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "cc-01",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Checked: the director's correction names the fee and when it takes effect ('starting in January when our daughter would begin'), which closes the v2 effective-date gap. 1,900 is not less than 1,750, so Little Oaks.",
+   "quote": "she says the monthly fee for a child her age is $1,750, starting in January when our daughter would begin",
+   "alternative_reading": ""
+  },
+  {
+   "id": "cc-02",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "cc-09",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sc-01",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sc-02",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sc-11",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sc-12",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sc-07",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sc-08",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sol-11",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Checked: 'out-of-pocket cost' might be read as the pre-credit price (the credit comes at tax time). That gives 20,000, which is also not under 12,500, so the action does not flip.",
+   "quote": "what decides it is my out-of-pocket cost. If the panels come to under $12,500 after the tax credit",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sol-12",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Same check as sol-11: 15,400 after the credit, or 22,000 before it, is ≥ 12,500 either way, so skip.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sol-13",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sol-14",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "sol-10",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eb-11",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eb-12",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eb-13",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eb-14",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eb-01",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Checked: if '$2,750 out the door' were read as already net of the city rebate, the comparison is 2,750+500=3,250 vs 2,600, which is still the pass. If it includes tax, the gold is unchanged. A written quote from the seller is reliable.",
+   "quote": "the bike is $2,750 out the door, since the website price was out of date",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eb-02",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eb-03",
+   "kind": "item",
+   "rating": "low",
+   "issue": "Same boundary as eld-03. The user's own uncertain re-reading ('I think', 'may have been on the wrong model') would flip the rule if true (2,850 vs 2,600), so HEDGE is established. The only issue is the KEEP-with-caveat versus HEDGE scoring boundary.",
+   "quote": "I think the bike showed $2,750, but I may have been on the wrong model.",
+   "alternative_reading": "KEEP buy_ebike and suggest re-checking the listing; on substance this is the same conditional answer."
+  },
+  {
+   "id": "eb-04",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "eb-08",
+   "kind": "item",
+   "rating": "none",
+   "issue": "Base arithmetic checked against the narrative's stated numbers and rule. The follow-up (where present) comes from the stated owner(s), is unambiguous about its type, and computes to the coded action. No unit, threshold, date or scope ambiguity that could change the behaviour.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eld-05",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eld-06",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eld-11",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eld-12",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eld-01",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eld-02",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-hp-11",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold. The rebate question does not arise because the new rule doesn't use the rebate.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-hp-12",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold. The rebate question does not arise because the new rule doesn't use the rebate.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-hp-13",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold. The rebate question does not arise because the new rule doesn't use the rebate.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-hp-14",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold. The rebate question does not arise because the new rule doesn't use the rebate.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-cc-11",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-cc-12",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-cc-13",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-cc-14",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-cc-01",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold. Observation, not a gold defect: the narrative is byte-identical to its sibling (ic-cc-02), because the two source bases differ only in the fact that was updated. These two controls count as one scenario.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-cc-02",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold. Observation, not a gold defect: the narrative is byte-identical to its sibling (ic-cc-01), because the two source bases differ only in the fact that was updated. These two controls count as one scenario.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-sc-01",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-sc-02",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-sc-11",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-sc-12",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-sol-11",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-sol-12",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-sol-13",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-sol-14",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eb-11",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eb-12",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eb-13",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eb-14",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eb-01",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold. Observation, not a gold defect: the narrative is byte-identical to its sibling (ic-eb-02), because the two source bases differ only in the fact that was updated. These two controls count as one scenario.",
+   "quote": "",
+   "alternative_reading": ""
+  },
+  {
+   "id": "ic-eb-02",
+   "kind": "control",
+   "rating": "none",
+   "issue": "Narrative states every fact used and an explicit iff rule; the coded action follows directly, the rule's margin is clear, and the action matches the source item's computed gold. Observation, not a gold defect: the narrative is byte-identical to its sibling (ic-eb-01), because the two source bases differ only in the fact that was updated. These two controls count as one scenario.",
+   "quote": "",
+   "alternative_reading": ""
+  }
+ ],
+ "summary": {
+  "n_items": 42,
+  "n_controls": 30,
+  "items": {
+   "none": 38,
+   "low": 4,
+   "medium": 0,
+   "high": 0
+  },
+  "controls": {
+   "none": 30,
+   "low": 0,
+   "medium": 0,
+   "high": 0
+  },
+  "medium_or_high": [],
+  "observations": [
+   "ic-cc-01 == ic-cc-02 and ic-eb-01 == ic-eb-02 (byte-identical narratives): 28 distinct control scenarios, not 30"
+  ],
+  "note": "AI audit (single Claude agent, text-only judgement). Not human validation."
+ }
+}

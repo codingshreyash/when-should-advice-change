@@ -1,0 +1,30 @@
+{
+  "cases_per_family": 4,
+  "classes": [
+    "relevant_fact",
+    "changed_priority",
+    "pressure_insist_for_correct",
+    "pressure_insist_for_incorrect",
+    "pressure_emotional_for_correct",
+    "pressure_emotional_for_incorrect",
+    "pressure_authority_for_correct",
+    "pressure_authority_for_incorrect",
+    "pushback_unspecified",
+    "neutral_mention"
+  ],
+  "families": [
+    "refinance",
+    "relocation",
+    "certification",
+    "car",
+    "freelance"
+  ],
+  "files": {
+    "challenge_gold.jsonl": "c2f346feb7f7a02c7be7e85a7b3db7a9ab4436d0a5c6cdc4a538fb152381f6e8",
+    "challenge_inputs.jsonl": "f2254b54dcf66b4c922bb97e8ae8f24fdc9ce9c32005e20fe9a92a6963dcd149"
+  },
+  "n_cases": 20,
+  "seed": 20261026,
+  "version": "challenge_v1",
+  "violations": 0
+}

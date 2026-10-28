@@ -1,0 +1,97 @@
+{
+  "run_id": "format-001",
+  "created_utc": "2026-10-25T20:37:46+00:00",
+  "synthetic": false,
+  "label": "Format-only check after the shared ledger JSON template: two dev cases, ledger-producing conditions incl. the provenance ablation, one replicate. Measurement validation, not a test.",
+  "git_sha": "e7de5dfb1cf84375b92ed7e02a8dc978bf123900",
+  "git_dirty": true,
+  "protocol_sha256": "868bf9144037d405c2b71f56746b4e7f038383bd768cf42767a6f794d7154d6c",
+  "data_files": {
+    "data/v0/dev_inputs.jsonl": "009201f7bc4019a11271999c10430911836f57c3be9e37b3059161cfbc78bcfc",
+    "configs/format_check_ids.json": "550a4cb10c26b16b3dad9fc3a0aba5d7d60da6d7cbbe18af41da1f1d21e67238"
+  },
+  "split": "dev",
+  "case_ids": [
+    "dev-refinance-00",
+    "dev-relocation-01"
+  ],
+  "conditions": [
+    "structured",
+    "best_of_n",
+    "premise_search",
+    "premise_search_noprov"
+  ],
+  "replicates": 1,
+  "systems": {
+    "hf:Qwen/Qwen3.5-9B@c20223623576": {
+      "kind": "hf",
+      "model_id": "Qwen/Qwen3.5-9B",
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "model_class": "Qwen3_5ForConditionalGeneration",
+      "dtype": "bfloat16",
+      "load_in_4bit": false,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "allow_unpinned": false,
+      "max_batch": 9,
+      "torch": "2.8.0+cu128",
+      "transformers": "5.20.2",
+      "gpu": "NVIDIA L40S",
+      "python": "3.10.12",
+      "load_seconds": 5.2,
+      "synthetic": false,
+      "privileged": false
+    }
+  },
+  "decoding": {
+    "max_new_tokens_direct": 200,
+    "max_new_tokens_structured": 1024,
+    "sample_temperature": 0.7,
+    "sample_top_p": 0.95,
+    "best_of_n": 9,
+    "base_turn_readings": 5,
+    "beam_width": 2,
+    "decisions_per_node": 2
+  },
+  "budget": {
+    "max_calls": 504,
+    "calls_per_turn": {
+      "structured": {
+        "base": 1,
+        "followup": 1
+      },
+      "best_of_n": {
+        "base": 9,
+        "followup": 9
+      },
+      "premise_search": {
+        "base": 9,
+        "followup": 9
+      },
+      "premise_search_noprov": {
+        "base": 9,
+        "followup": 9
+      }
+    }
+  },
+  "seeds": {
+    "option_order_seed": 1684,
+    "sampling_seed": 20261025
+  },
+  "hardware": {
+    "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12"
+  },
+  "expected_calls": 504,
+  "actual_calls": 504,
+  "shard": "1/1",
+  "planned_case_ids": [
+    "dev-refinance-00",
+    "dev-relocation-01"
+  ],
+  "shard_runs": null,
+  "notes": [
+    "config: {\"run_id\":\"format-001\",\"label\":\"Format-only check after the shared ledger JSON template: two dev cases, ledger-producing conditions incl. the provenance ablation, one replicate. Measurement validation, not a test.\",\"split\":\"dev\",\"inputs\":\"data/v0/dev_inputs.jsonl\",\"case_ids_file\":\"configs/format_check_ids.json\",\"allow_holdout\":false,\"conditions\":[\"structured\",\"best_of_n\",\"premise_search\",\"premise_search_noprov\"],\"replicates\":1,\"systems\":[{\"kind\":\"hf\",\"name\":\"Qwen/Qwen3.5-9B\",\"params\":{\"revision\":\"c202236235762e1c871ad0ccb60c8ee5ba337b9a\",\"model_class\":\"Qwen3_5ForConditionalGeneration\",\"dtype\":\"bfloat16\",\"load_in_4bit\":false,\"max_batch\":9,\"chat_template_kwargs\":{\"enable_thinking\":false}}}],\"condition_config\":{\"max_new_tokens_direct\":200,\"max_new_tokens_structured\":1024,\"sample_temperature\":0.7,\"sample_top_p\":0.95,\"best_of_n\":9,\"base_turn_readings\":5,\"beam_width\":2,\"decisions_per_node\":2},\"option_order_seed\":1684,\"sampling_seed\":20261025,\"max_calls\":504,\"shard\":\"1/1\",\"out_root\":\"/home/shadeform/results/warranted_revision\",\"gold_for_controls\":null}"
+  ]
+}
