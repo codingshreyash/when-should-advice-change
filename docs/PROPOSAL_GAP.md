@@ -11,6 +11,8 @@ below are reconstructed from the earliest committed statements of the project's 
 
 Please check them against the proposal itself.
 
+**Where the cited records are.** Paths under `research/warranted_revision/` and `results/warranted_revision/` refer to branch `research/warranted-revision-v1` of this repository, which holds the full research record and is not merged into `main`.
+
 **What is closed and what is not.** The premise-search and goal-autonomy work
 (`research/warranted_revision/`) is closed by its negative methods report. That report does
 not close the questions below.

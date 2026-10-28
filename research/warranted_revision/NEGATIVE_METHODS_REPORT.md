@@ -9,6 +9,8 @@ numbers come from the committed records cited in each section; nothing here is n
 and Qwen comparisons, and the confirmatory protocol in `PROTOCOL.md`). Several of that
 project's questions remain open; see `docs/PROPOSAL_GAP.md` at the repository root.
 
+**Where the cited records are.** Paths under `research/warranted_revision/` and `results/warranted_revision/` refer to branch `research/warranted-revision-v1` of this repository, which holds the full research record and is not merged into `main`.
+
 **What is and isn't complete.**
 - Only one model, Qwen3.5-9B, completed the final screen. Mistral-NeMo stopped at its
   preflight gate.
