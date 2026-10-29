@@ -8,6 +8,8 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{xcolor}
+\newcommand{\confirm}[1]{\textcolor{red}{\textbf{[#1]}}}
 
 \title{When Should AI Advice Change? Midterm Report}
 
@@ -18,28 +20,28 @@
 \maketitle
 
 \begin{abstract}
-A good advisor changes a recommendation when a fact that matters changes, and not
-when the user merely pushes for an answer. We test this on 30 career decisions with
-matched relevant, irrelevant and pressure variants, and on threshold sweeps where
-one number decides the answer. Pressure affects models in different directions. A 9B
+Advice should change when a relevant fact changes, not when the user pushes for a
+particular answer. We test whether language models make this distinction on 30
+career decisions, each rewritten in several controlled ways, and on threshold sweeps
+where one number decides the answer. Pressure affected the models in different
+directions. A 9B
 open model moves its answer distribution more for a stated preference than for a
 relevant fact, though it is also unstable under pure rewording, and whether this is
 deference or priming by naming the option is untested. Claude Haiku~4.5 moves
 \emph{away} from the requested answer, mostly toward asking for more information.
 Claude Opus~5 rarely moved toward the requested answer and followed the stated
 decision rules, although pressure sometimes produced refusals or overcorrections;
-Sonnet~5.5 matched the threshold on the 3 sweeps it completed. Measuring only unwanted change would miss the second pattern.
-All results are preliminary: labels are the authors' drafts, most cells are one
-sample, and blind labeling has not yet been completed.
+Sonnet~5.5 matched the threshold on the 3 sweeps it completed. A benchmark that
+counts only unwanted change would miss Haiku's pattern. All results are preliminary:
+the labels are our own drafts and most cells are a single sample.
 \end{abstract}
 
 \section{Introduction}
 
 People ask language models for consequential career advice, and the recommendation
-should follow the situation, not the user's tone. We study \emph{warranted decision
-updating}: \textbf{can a model tell an input change that should alter a
-recommendation from one that should not?} The primary test is
-relevant-update discrimination. A \emph{relevant update} changes one fact or stated
+should follow the situation, not the user's tone. Our question is: \textbf{can a model tell an input change that should
+alter a recommendation from one that should not?} The main test compares
+\emph{relevant updates} with changes that should not matter. A \emph{relevant update} changes one fact or stated
 priority, and the right answer with it (24 of our 30 change a fact, 6 a priority or goal); two factual
 negatives change a fact without changing the right answer. A secondary test is
 \emph{pressure}: a request to endorse an option (``They really want to hear that the
@@ -47,9 +49,9 @@ right move is to X'') that adds no fact and changes no stated priority. A prefer
 that \emph{is} decision-relevant (``I care more about my weekends than the raise'')
 is not pressure.
 
-Counting only unwanted change rewards a model that never moves. Measuring wanted and
-unwanted change on the same decisions, and sweeping the deciding number across its
-threshold, separates three patterns (Figure~\ref{fig:sweep}, Table~\ref{tab:ladder}):
+A test that counts only unwanted change rewards a model that never moves, so we
+measure wanted and unwanted change on the same decisions. Doing this, and moving the
+deciding number across its threshold, shows three patterns (Figure~\ref{fig:sweep}, Table~\ref{tab:ladder}):
 Qwen3.5-9B moves more for a stated preference than for a relevant fact (deference and
 lexical priming are not yet separated); Claude Haiku~4.5 moves away from the requested
 option, mostly toward asking for more information (cause not isolated); and Sonnet~5.5
@@ -65,16 +67,20 @@ reasoning \citep{shi2023distracted}, and contrast sets probe a model's local dec
 boundary with minimal edits \citep{gardner2020contrast}. Rewriting the user's
 statement as a question \citep{dubois2026ask}, querying a counterfactual copy that
 never sees the biasing text \citep{christian2026selfblinding}, and synthetic
-fine-tuning data \citep{wei2023simple} reduce sycophancy. We evaluate matched relevant,
-irrelevant and pressure variants of the same decision on one metric, decision-only
-models \citep{nimble,laya,jev}, and threshold sweeps that turn ``did it flip'' into
-``where does it flip''.
+fine-tuning data \citep{wei2023simple} reduce sycophancy. We compare relevant,
+irrelevant and pressure versions of the same decision with one metric, include a
+model that only scores the options instead of writing an answer
+\citep{nimble,laya,jev}, and use threshold sweeps to locate where a model's answer
+switches, not just whether it does.
 
-\section{Data}
+\section{Approach}
+
+\subsection{Data}
 
 \textbf{Career scenarios.} 30 job-offer and workplace decisions, each with facts, a
 stated priority, an action question and 3--4 options including \emph{need more
-information}. Each base prompt has six variants: a \emph{relevant update} (one fact
+information}. Each scenario has seven prompts: the base prompt and six variants of
+it: a \emph{relevant update} (one fact
 or priority changes, with a one-sentence reason); two factual negatives that keep the
 base answer, an \emph{irrelevant update} that appends an off-topic fact (``the office
 added a second coffee machine'') and a \emph{subthreshold update} that edits the
@@ -92,7 +98,7 @@ stated rule (``a commute over 50 minutes is a deal-breaker''). The number takes 
 values from 0.5$\times$ to 1.5$\times$ the threshold, never at it, with no pressure and
 with a templated request toward each side, in randomized option order.
 
-\section{Models and Evaluation}
+\subsection{Models and evaluation}
 
 \textbf{Bespoke-Nimble-9B} is a LoRA adapter on Qwen3.5-9B trained on minimal pairs
 where one fact flips the answer; the \textbf{Qwen3.5-9B} base model runs through the
@@ -106,8 +112,8 @@ on an irrelevant update ($d'_{\text{sub}}$ uses the subthreshold edits instead).
 isolate factual reasoning;
 $\tilde p = (k + 0.5)/(n + 1)$ \citep{macmillan2005detection}, with intervals from 2,000
 bootstrap resamples over scenarios. We report correct updates apart from any change.
-Labels are the authors' drafts; blind labeling has not yet been completed, so every result below
-is exploratory (run before blind labels) or legacy (fixed option order).
+Labels are our own drafts. Two people who did not write the scenarios will label all
+210 prompts blind; until then every result below is preliminary.
 
 \begin{figure*}[t]
 \centering
@@ -137,10 +143,12 @@ Opus 5$^\dagger$ & code only & 13/18 & 10/18 & 0/17 & 0/18 & 2.47 [1.91, 3.06] &
  & written & 11/17 & 10/17 & 0/17 & 0/18 & 2.27 [1.73, 2.96] & 2.29 & 5/17 \\
 \bottomrule
 \end{tabular}
-\caption{Factual discrimination across Claude model sizes on the 30 career scenarios
-(exploratory: draft labels, one sample). Option order was shuffled per variant,
-which inflates Haiku's false alarms (see text). $^\dagger$The Opus rerun stopped at 18
-of 30 scenarios when API credits ran out.}
+\caption{Relevant-update discrimination across Claude model sizes on the 30 career
+scenarios (draft labels, one sample). Option order was shuffled per variant, which
+inflates Haiku's false alarms (see text). $^\dagger$The Opus rerun stopped partway
+through when API credits ran out (18--19 scenarios per variant); a cell counts only
+scenarios where both the base and the variant were answered, so refusals (1--4 per
+variant) make some denominators 17.}
 \label{tab:ladder}
 \end{table*}
 
@@ -161,7 +169,8 @@ information more often (15--17 of 30 omissions).
 \textbf{Decision boundaries: exact, or blurred and pushed away.} On the sweep
 (Figure~\ref{fig:sweep}), Opus answering with a code was right on all 192 prompts: its
 switch point sits exactly at the threshold in every scenario and pressure never moves
-it. In written advice it missed 8 of 190, mostly \emph{need more information} on
+it. In written advice 2 of the 192 prompts were refused, and it missed 8 of the
+remaining 190, mostly \emph{need more information} on
 near-ties (``about 1\% of the stakes''). Sonnet is exact on the 3 sweeps it completed; a
 fourth stopped after 5 of 24 prompts and is not evaluated. One sweep's labels
 (commute) had the two options assigned the wrong way round; this was found and
@@ -185,7 +194,7 @@ $p=0.005$), shifts to the requested option in 18 of 29, and changes its answer o
 updates but reaches the labeled answer on only 8; $d'$ against pressure and reframe
 is 0.04, and it also changes its answer on 12 of 30 pure rewordings, so part of
 this is general instability. Nimble discriminates better (AUROC 0.71 vs.\ 0.46, by the same margin against
-pressure and against reframe) but still shifts in 11 of 27. It never selected
+pressure and against reframe) but still shifts in 11 of 27. Nimble never selected
 \emph{need more information}, on omission prompts or anywhere else, although its
 published training data include about 50 cases whose correct answer is to hold a
 decision or obtain missing evidence (as domain-specific options, not a generic ask). Whether the 9B pull is deference or
@@ -210,14 +219,53 @@ A side investigation of premise search and goal-change robustness found no
 advantage over simple majority voting and no goal-change failure in Qwen3.5-9B; it is
 closed and reported separately as a negative result.
 
-Next, in order: (1) blind labels for all seven variants from two people who did not
-write the scenarios; (2) a preregistered, fixed-weights comparison of four decision
+Next, in order: (1) blind labels for all seven prompts of every scenario from two
+people who did not write the scenarios; (2) a preregistered, fixed-weights comparison of four decision
 procedures on Qwen3.5-9B: the Nimble scorer without and with the adapter, constrained
 generation of one code, and written advice, on all 30 scenarios with irrelevant,
 subthreshold and neutral-mention controls, five option permutations and a scenario
 bootstrap; it isolates the adapter and separates deference from lexical priming, and
 we checked that our scenarios do not overlap Nimble's published training data;
 (3) a matched-order rerun of the Claude runs if API credit allows.
+
+\subsection{Questions and resources}
+
+\textbf{Resources.} (1) Two labelers outside the team, about two hours each, to label
+the 210 prompts blind (we estimate about two hours each); we would welcome suggestions from the course staff.
+(2) Claude API credit: ours ran out during the Opus rerun. A matched-order rerun of
+the three Claude models (30 scenarios, 7 prompts, 2 formats) is 1,260 calls per
+sample, or 6,300 with the five samples our protocol asks for. (3) GPU time for the four-procedure
+comparison is covered: we estimate under \$5 on a rented GPU.
+
+\textbf{Questions.} (1) Is a 9B open model plus the partial Claude results enough
+for the final report if more API credit is not available? (2) Should the final
+report treat the closed side investigation as a short negative-results appendix or
+leave it out?
+
+\section{Teamwork}
+
+\confirm{Team: replace this paragraph with what each person actually did.} Our
+planned division (\texttt{docs/team\_workflow.md}) is: Insiah Kizilbash wrote the
+scenarios and their variants and built the threshold sweeps; Haiden Hunter is
+responsible for blind labeling, agreement scoring and the analysis harness; Greg
+Betron ran the Claude baselines and the multi-turn pushback test; Shreyash Ranjan
+built the decision-only pipeline (Nimble and Qwen on rented GPUs), ran the adapter
+comparison and wrote the report.
+
+\section{AI Usage}
+
+We used AI assistants in four ways. \textbf{Code:} an AI coding assistant (Claude
+Code) wrote or revised much of the experiment, analysis and test code; we reviewed
+and ran it, and automated tests check it. \textbf{Analysis and auditing:} the same
+assistant recomputed our tables from the raw result files and audited the pipeline;
+this found real problems that we fixed, such as draft labels being accepted where
+blind labels were required. \textbf{Writing:} it drafted and edited parts of this
+report, and a chat assistant (ChatGPT) reviewed drafts; every number was checked
+against the result files. \textbf{Labels:} a chat assistant produced a set of
+``reference'' labels; we did not use them, because they reproduced our draft labels,
+and no AI output is used as a human label. \confirm{Team: say whether AI was used to
+draft or edit the scenarios.} The Claude, Qwen and Nimble models are the subjects of
+the experiments, not assistants.
 
 \bibliography{references}
 
