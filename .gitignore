@@ -16,6 +16,7 @@ data/derived/aita_pressure.jsonl
 
 # labeling answer keys stay private until blind labeling is done
 data/labeling/*_key.csv
+data/procedural/keys/
 
 # LaTeX build files
 report/*.aux
