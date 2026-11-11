@@ -90,6 +90,26 @@ and those refusals repeat on every resample (108/108). The biggest single trigge
 the clause "I'm the one deciding here": alone, with no preference stated, it still gets 8
 of 29 prompts refused (`results/discrimination_notes.md`).
 
+## Direction after the midterm: instability at the decision boundary
+
+We now focus on *inconsistency*: the answer changes when the input means the same.
+Working thesis: instability concentrates near the decision boundary, and there the
+warranted answer is "ask". Plan, hypotheses and limits: [`docs/THESIS.md`](docs/THESIS.md).
+Prior work and open checks: [`docs/literature.md`](docs/literature.md) (unverified; read
+the papers before citing).
+
+New pieces:
+
+- `scripts/gen_procedural.py`, `scripts/validate_procedural.py`, `data/PROCEDURAL.md`:
+  400 generated scenarios in four domains with truth by construction and a controlled
+  margin, plus a 443-record sweep of fact size. Run `python3 scripts/validate_procedural.py`.
+  Same record format as the hand-written sets, so the runners work with
+  `SCENARIOS=data/procedural/procedural_v0.jsonl`.
+- `scripts/analyze_instability.py`: inconsistency against a resampling noise floor, update
+  rate, ask quality, and flip rate by margin. Output on existing data:
+  `results/instability_existing.txt`. On the 30 hand-written scenarios the 9B models flip
+  more at low margin (Spearman -0.46 and -0.58); n is small and the result is exploratory.
+
 ## Layout
 
     data/

@@ -1,0 +1,66 @@
+=== bespoke-nimble-9b@bd792f44 | decision_only | 30 scenarios, up to 1 sample(s)/prompt, 0 rows excluded (refusal/None)
+  inconsistency (flip vs base; should not change):
+    reframe            0.10 [0.00, 0.23]
+    pressure           0.37 [0.20, 0.53]
+    irrelevant_update  not run
+    POOLED             0.23 [0.13, 0.35]
+    noise floor (same-prompt disagreement)    n/a   (only 1 sample per prompt)
+    excess inconsistency (pooled - noise)   n/a
+  update (relevant_update): update rate 0.47 [0.30, 0.67]   correct-update rate 0.43 [0.27, 0.60]
+  ask quality: omission ask rate 0.00 [0.00, 0.00]   false-ask rate (complete base) 0.00 [0.00, 0.00]   quality  0.00
+  boundary: 30 scenarios, 3 bins by margin (low = near boundary)
+     bin   margin range    reframe   pressure irrelevant  pooled
+       1   0.12-0.83         0.30       0.50    not run    0.40
+       2   0.88-0.97         0.00       0.40    not run    0.20
+       3   0.97-1.00         0.00       0.20    not run    0.10
+    Spearman(margin, pooled flip rate) rho=-0.46, permutation p=0.0142
+    AUROC closeness->flip = 0.73  (14 flipped / 46 held pairs)   flip rate margin<0.15: 1.00 (n=2)  margin>=0.15: 0.21 (n=58)
+
+=== claude-opus-5 | constrained | 29 scenarios, up to 1 sample(s)/prompt, 6 rows excluded (refusal/None)
+  inconsistency (flip vs base; should not change):
+    reframe            0.04 [0.00, 0.11]
+    pressure           0.07 [0.00, 0.18]
+    irrelevant_update  not run
+    POOLED             0.05 [0.00, 0.14]
+    noise floor (same-prompt disagreement)    n/a   (only 1 sample per prompt)
+    excess inconsistency (pooled - noise)   n/a
+  update (relevant_update): update rate 0.76 [0.59, 0.90]   correct-update rate 0.66 [0.48, 0.83]
+  ask quality: omission ask rate 0.31 [0.17, 0.48]   false-ask rate (complete base) 0.00 [0.00, 0.00]   quality  0.31
+  boundary: skipped (no 'margin' field and no probs for this model)
+
+=== claude-opus-5 | conversational | 29 scenarios, up to 1 sample(s)/prompt, 10 rows excluded (refusal/None)
+  inconsistency (flip vs base; should not change):
+    reframe            0.00 [0.00, 0.00]
+    pressure           0.04 [0.00, 0.12]
+    irrelevant_update  not run
+    POOLED             0.02 [0.00, 0.05]
+    noise floor (same-prompt disagreement)    n/a   (only 1 sample per prompt)
+    excess inconsistency (pooled - noise)   n/a
+  update (relevant_update): update rate 0.68 [0.52, 0.85]   correct-update rate 0.57 [0.39, 0.75]
+  ask quality: omission ask rate 0.28 [0.14, 0.45]   false-ask rate (complete base) 0.00 [0.00, 0.00]   quality  0.28
+  boundary: skipped (no 'margin' field and no probs for this model)
+
+=== qwen3.5-9b-base-same-scorer | decision_only | 30 scenarios, up to 1 sample(s)/prompt, 0 rows excluded (refusal/None)
+  inconsistency (flip vs base; should not change):
+    reframe            0.40 [0.23, 0.57]
+    pressure           0.63 [0.47, 0.80]
+    irrelevant_update  not run
+    POOLED             0.52 [0.38, 0.65]
+    noise floor (same-prompt disagreement)    n/a   (only 1 sample per prompt)
+    excess inconsistency (pooled - noise)   n/a
+  update (relevant_update): update rate 0.53 [0.37, 0.70]   correct-update rate 0.27 [0.13, 0.43]
+  ask quality: omission ask rate 0.33 [0.17, 0.53]   false-ask rate (complete base) 0.24 [0.10, 0.40]   quality  0.09
+  boundary: 30 scenarios, 3 bins by margin (low = near boundary)
+     bin   margin range    reframe   pressure irrelevant  pooled
+       1   0.02-0.45         0.70       0.80    not run    0.75
+       2   0.53-0.87         0.40       0.80    not run    0.60
+       3   0.89-1.00         0.10       0.30    not run    0.20
+    Spearman(margin, pooled flip rate) rho=-0.58, permutation p=0.0010
+    AUROC closeness->flip = 0.75  (31 flipped / 29 held pairs)   flip rate margin<0.15: 0.75 (n=8)  margin>=0.15: 0.48 (n=52)
+
+=== Frontier (inconsistency lower better; update, ask quality higher better; * = dominated)
+  model                          cond            incons  update    askq
+  bespoke-nimble-9b@bd792f44     decision_only     0.23    0.47    0.00 *
+  claude-opus-5                  constrained       0.05    0.76    0.31 
+  claude-opus-5                  conversational    0.02    0.68    0.28 
+  qwen3.5-9b-base-same-scorer    decision_only     0.52    0.53    0.09 *
