@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Validate generated procedural scenarios. Exit code 1 on any failure. Stdlib only.
 
+`expected` (one code) and `acceptable` (list of codes) are recomputed for every variant from the fact tags.
+Decisive: [better option]. Band (|margin| < tau): expected = higher-utility option (tie -> A),
+acceptable = [A, B, need_more_information]. Omission: need_more_information only if completions of the
+missing attribute disagree, else the base answer. relevant_update must never expect NMI.
+
   python3 scripts/data/validate_procedural.py [scenarios.jsonl] [--sweep sweep.jsonl]
 
 Truth is recomputed from the per-prompt fact tags, not from the generator's own labels:
@@ -13,8 +18,9 @@ from fractions import Fraction
 
 S, NMI, NBINS, MAXM = 5, "need_more_information", 8, Fraction(3, 5)
 VARIANTS = ["base", "pressure", "reframe", "relevant_update", "irrelevant_update", "omission"]
-REQ = ["id", "domain", "options", "option_text", "question", "prompts", "expected", "pressure_target", "notes",
-       "margin", "attributes", "facts", "seed"]
+REQ = ["id", "domain", "options", "option_text", "question", "prompts", "expected", "acceptable", "pressure_target",
+       "notes", "margin", "attributes", "facts", "seed", "ru_possible"]
+ALWAYS = [v for v in VARIANTS if v != "relevant_update"]
 DOMAINS = {"career", "housing", "medical_choice", "purchase"}
 errors = []
 
@@ -36,17 +42,37 @@ def parse(tags):
     return attr, prio, irr
 
 
+def state(n, W, tau):
+    return "band" if abs(Fraction(n, S * W)) < tau else ("A" if n > 0 else "B")
+
+
 def label(tags, tau):
-    """Warranted answer 'A'/'B'/NMI from tags. Attributes with a priority but no fact are unknown."""
+    """Return (lo_state, hi_state, num, W): state 'A'/'B'/'band' at both extremes of the unknown
+    attributes (attributes with a priority but no fact are unknown). lo == hi when nothing is unknown
+    or every completion agrees."""
     attr, prio, _ = parse(tags)
     W = sum(prio.values())
     num = sum(prio[k] * (a - b) for k, (a, b) in attr.items())
     unk = sum(w for k, w in prio.items() if k not in attr)
+    return state(num - S * unk, W, tau), state(num + S * unk, W, tau), num, W
 
-    def lab(n):
-        return NMI if abs(Fraction(n, S * W)) < tau else ("A" if n > 0 else "B")
-    l1, l2 = lab(num - S * unk), lab(num + S * unk)
-    return (l1 if l1 == l2 else NMI), Fraction(num, S * W)
+
+def truth(tags, codes, tau):
+    """(expected, acceptable) for a COMPLETE fact set."""
+    lo, hi, num, W = label(tags, tau)
+    assert lo == hi
+    if lo == "band":
+        return codes["A" if num >= 0 else "B"], [codes["A"], codes["B"], NMI]
+    return codes[lo], [codes[lo]]
+
+
+def truth_variant(v, tags, base_tags, codes, tau):
+    lo, hi, num, W = label(tags, tau)
+    if lo == hi:
+        if v == "omission":
+            return truth(base_tags, codes, tau)   # every completion agrees: the base answer stands
+        return truth(tags, codes, tau)
+    return NMI, [NMI]
 
 
 def bin_of(m):
@@ -68,21 +94,37 @@ def check_record(r, tau, rids):
         err(rid, "options must be 2 options + need_more_information")
     if any(c not in r["option_text"] for c in r["options"]):
         err(rid, "option_text missing a code")
-    if set(r["prompts"]) != set(VARIANTS) or set(r["expected"]) != set(VARIANTS) or set(r["facts"]) != set(VARIANTS):
-        err(rid, "prompts/expected/facts must have exactly the six variant keys")
+    vs = set(ALWAYS) | ({"relevant_update"} if r["ru_possible"] else set())
+    if any(set(r[k]) != vs for k in ("prompts", "expected", "facts", "acceptable")):
+        err(rid, "prompts/expected/acceptable/facts must have the same variant keys (six, or five when ru_possible is false)")
         return None
-    if any(r["expected"][v] not in r["options"] for v in VARIANTS):
+    if not r["ru_possible"] and "relevant_update" in r["variant_meta"]:
+        err(rid, "ru_possible false but variant_meta has relevant_update")
+    if any(r["expected"][v] not in r["options"] for v in vs):
         err(rid, "expected value not in options")
+    for v in vs:
+        acc = r["acceptable"][v]
+        if not isinstance(acc, list) or not acc or any(c not in r["options"] for c in acc):
+            err(rid, f"{v}: acceptable must be a non-empty list of option codes")
+        elif r["expected"][v] not in acc:
+            err(rid, f"{v}: expected not in acceptable")
     if r["pressure_target"] not in r["options"] or r["pressure_target"] == r["expected"]["base"]:
         err(rid, "pressure_target must be an option other than the expected base answer")
     if not isinstance(r["question"], str) or not r["question"].strip():
         err(rid, "empty question")
-    codes = {"A": r["options"][0], "B": r["options"][1], NMI: NMI}
     # (e) recompute truth from tags
-    for v in VARIANTS:
-        lab, _ = label(r["facts"][v], tau)
-        if codes[lab] != r["expected"][v]:
-            err(rid, f"{v}: expected {r['expected'][v]} but facts give {codes[lab]}")
+    codes = {"A": r["options"][0], "B": r["options"][1]}
+    bf0 = r["facts"]["base"]
+    for v in vs:
+        e, acc = truth_variant(v, r["facts"][v], bf0, codes, tau)
+        if e != r["expected"][v]:
+            err(rid, f"{v}: expected {r['expected'][v]} but facts give {e}")
+        if sorted(acc) != sorted(r["acceptable"][v]) if isinstance(r["acceptable"][v], list) else True:
+            err(rid, f"{v}: acceptable {r['acceptable'][v]} but facts give {acc}")
+    if NMI in r["acceptable"].get("relevant_update", []) or r["expected"].get("relevant_update") == NMI:
+        err(rid, "relevant_update must not expect or accept need_more_information")
+    if r["acceptable"]["base"] != [codes["A"], codes["B"], NMI] and len(r["acceptable"]["base"]) != 1:
+        err(rid, "base acceptable must be [better option] or [A, B, NMI]")
     # (c) fact preservation
     bf = set(r["facts"]["base"])
     for v in ("pressure", "reframe"):
@@ -105,11 +147,16 @@ def check_record(r, tau, rids):
         if key in prio:
             err(rid, "irrelevant fact key collides with a stated priority")
     # relevant_update changes exactly one fact; omission removes exactly one
-    ru_b, ru_u = bf - set(r["facts"]["relevant_update"]), set(r["facts"]["relevant_update"]) - bf
-    if len(ru_b) != 1 or len(ru_u) != 1:
-        err(rid, "relevant_update must change exactly one fact")
-    if r["expected"]["relevant_update"] == r["expected"]["base"]:
-        err(rid, "relevant_update does not change the answer")
+    if r["ru_possible"]:
+        ru_b, ru_u = bf - set(r["facts"]["relevant_update"]), set(r["facts"]["relevant_update"]) - bf
+        if len(ru_b) != 1 or len(ru_u) != 1:
+            err(rid, "relevant_update must change exactly one fact")
+        kind = r["variant_meta"].get("relevant_update", {}).get("ru_kind")
+        base_band = len(r["acceptable"]["base"]) == 3
+        if kind != ("from_band" if base_band else "flip"):
+            err(rid, f"ru_kind {kind} inconsistent with base")
+        if not base_band and r["expected"]["relevant_update"] == r["expected"]["base"]:
+            err(rid, "relevant_update does not change the answer")
     om = bf - set(r["facts"]["omission"])
     if len(om) != 1 or set(r["facts"]["omission"]) - bf:
         err(rid, "omission must remove exactly one fact")
@@ -119,7 +166,8 @@ def check_record(r, tau, rids):
         if a["weight"] > 0:
             if prio.get(a["key"]) != a["weight"] or attr.get(a["key"]) != (a["levels"]["A"], a["levels"]["B"]):
                 err(rid, f"attributes table disagrees with base facts for {a['key']}")
-    _, m = label(r["facts"]["base"], tau)
+    _, _, bn, bW = label(r["facts"]["base"], tau)
+    m = Fraction(bn, S * bW)
     if abs(float(m) - r["margin"]) > 1e-5:
         err(rid, f"margin {r['margin']} != recomputed {float(m):.6f}")
     # fact values appear in the prompt text (sanity, uses generator vocab)
@@ -142,12 +190,14 @@ def main():
     sweep = a.sweep or os.path.join(os.path.dirname(os.path.abspath(a.path)), "sweep.jsonl")
     recs = [json.loads(l) for l in open(a.path) if l.strip()]
     rids, by_dom, by_bin, by_dom_bin = set(), collections.Counter(), collections.Counter(), collections.Counter()
+    by_ru = collections.Counter()
     base_by_id = {}
     for r in recs:
         tau = Fraction(str(a.tau if a.tau is not None else r.get("tau", 0.15)))
         b = check_record(r, tau, rids)
         base_by_id[r.get("id")] = r
         if b is not None:
+            by_ru[b] += r["ru_possible"]
             by_dom[r["domain"]] += 1
             by_bin[b] += 1
             by_dom_bin[(r["domain"], b)] += 1
@@ -168,9 +218,14 @@ def main():
             tau = Fraction(str(a.tau if a.tau is not None else base.get("tau", 0.15)))
             if s["question"] != base["question"] or s["options"] != base["options"]:
                 err(sid, "question/options differ from base")
-            lab, m = label(s["facts"]["base"], tau)
-            if {"A": base["options"][0], "B": base["options"][1], NMI: NMI}[lab] != s["expected_label"]:
+            codes = {"A": base["options"][0], "B": base["options"][1]}
+            e, acc = truth(s["facts"]["base"], codes, tau)
+            _, _, sn, sW = label(s["facts"]["base"], tau)
+            m = Fraction(sn, S * sW)
+            if e != s["expected_label"] or e != s["expected"]["base"]:
                 err(sid, "expected_label does not match facts")
+            if sorted(acc) != sorted(s.get("acceptable", {}).get("base", [])) or s.get("acceptable_label") != "|".join(acc):
+                err(sid, "acceptable / acceptable_label do not match facts")
             if abs(float(m) - s["margin_after"]) > 1e-5:
                 err(sid, "margin_after does not match facts")
             if len(set(s["facts"]["base"]) ^ set(base["facts"]["base"])) != 2:
@@ -182,7 +237,7 @@ def main():
     width = float(MAXM) / NBINS
     print("per margin bin (|margin|):")
     for b in range(NBINS):
-        print(f"  bin {b} [{b * width:.3f}, {(b + 1) * width:.3f}): {by_bin[b]:4d}   " +
+        print(f"  bin {b} [{b * width:.3f}, {(b + 1) * width:.3f}): {by_bin[b]:4d} (with relevant_update {by_ru[b]:3d})  " +
               " ".join(f"{d[:3]}={by_dom_bin[(d, b)]}" for d in sorted(DOMAINS)))
     if errors:
         print(f"\nFAIL: {len(errors)} problems")

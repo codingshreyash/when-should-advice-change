@@ -33,6 +33,17 @@ Frontier: one row per (model, condition): inconsistency (lower better), update r
 better), ask quality (higher better); '*' marks rows dominated by another (all at least as good,
 one strictly better). Rows may cover different variants/scenarios, so read it as descriptive.
 
+Acceptable sets: when a scenario record has an `acceptable` field (dict variant -> acceptable option
+codes, e.g. the procedural scenarios, where a close call accepts either option or need_more_information),
+three things are added or changed for it; scenarios without the field (legacy hand-written files) are
+scored exactly as before and print no extra lines.
+  unacceptable change  per variant sample: choice not in acceptable[variant] (a per-sample rate, no base
+                       pairing). Reported per stable variant and pooled alongside the plain flip rate,
+                       which still counts any change of choice, including moves inside the acceptable set.
+  correct-update       choice in acceptable["relevant_update"] instead of == expected.
+  false-ask            NMI on base when NMI is not in acceptable["base"] (a base-band answer of NMI is
+                       not a false ask).
+
 Refusals (stop_reason == 'refusal') and choice None rows are excluded and counted.
 Brackets: 95% bootstrap over scenarios (2000 resamples, seed 1684).
 
@@ -77,19 +88,29 @@ def pair_rate(rows):
 
 def scenario_stats(d, S, i):
     """All per-scenario quantities (None/absent when a variant wasn't run)."""
-    o = {"flip": {}}
+    o = {"flip": {}, "unacc": {}}
+    acc = S[i].get("acceptable")
     for v in STABLE + ("relevant_update",):
         o["flip"][v] = flip_rate(d, i, v)
+    for v in STABLE:
+        rows = d.get((i, v))
+        o["unacc"][v] = mean([r["choice"] not in acc[v] for r in rows]) if acc and v in acc and rows else None
+    us = [o["unacc"][v] for v in STABLE if o["unacc"][v] is not None]
+    o["unacc_pooled"] = mean(us) if us else None
     fs = [o["flip"][v] for v in STABLE if o["flip"][v] is not None]
     o["pooled"] = mean(fs) if fs else None
     ps = [p for v in ("base",) + STABLE for p in [pair_rate(d.get((i, v), []))] if p is not None]
     o["noise"] = mean(ps) if ps else None
     ru = d.get((i, "relevant_update"))
-    o["correct"] = mean([r["choice"] == S[i]["expected"].get("relevant_update") for r in ru]) if ru else None
+    if ru and acc and "relevant_update" in acc:
+        o["correct"] = mean([r["choice"] in acc["relevant_update"] for r in ru])
+    else:
+        o["correct"] = mean([r["choice"] == S[i]["expected"].get("relevant_update") for r in ru]) if ru else None
     om = d.get((i, "omission"))
     o["ask"] = mean([r["choice"] == NMI for r in om]) if om else None
     b = d.get((i, "base"))
-    o["false_ask"] = mean([r["choice"] == NMI for r in b]) if b and S[i]["expected"].get("base") != NMI else None
+    nmi_ok = NMI in acc["base"] if acc and "base" in acc else S[i]["expected"].get("base") == NMI
+    o["false_ask"] = mean([r["choice"] == NMI for r in b]) if b and not nmi_ok else None
     return o
 
 def agg(per, ids):
@@ -97,6 +118,8 @@ def agg(per, ids):
     g = lambda f: [x for x in (f(per[i]) for i in ids) if x is not None]
     out = {v: mean(g(lambda p, v=v: p["flip"][v])) for v in STABLE + ("relevant_update",)}
     out["pooled"] = mean(g(lambda p: p["pooled"]))
+    for v in STABLE: out["unacc_" + v] = mean(g(lambda p, v=v: p["unacc"][v]))
+    out["unacc_pooled"] = mean(g(lambda p: p["unacc_pooled"]))
     nz = g(lambda p: p["noise"])
     out["noise"] = mean(nz) if nz else NAN
     out["excess"] = out["pooled"] - out["noise"] if not isnan(out["noise"]) else NAN
@@ -197,11 +220,17 @@ def main():
         nsamp = max(len(r) for r in d.values())
         per = {i: scenario_stats(d, S, i) for i in ids}
         o = agg(per, ids)
-        ci = bootstrap(per, ids, ("pooled", "excess", "update", "correct", "ask", "false_ask") + STABLE)
+        has_acc = any("acceptable" in S[i] for i in ids)
+        ci = bootstrap(per, ids, ("pooled", "excess", "update", "correct", "ask", "false_ask") + STABLE
+                       + (("unacc_pooled",) + tuple("unacc_" + v for v in STABLE) if has_acc else ()))
         print(f"=== {key[0]} | {key[1]} | {len(ids)} scenarios, up to {nsamp} sample(s)/prompt, {excluded[key]} rows excluded (refusal/None)")
         print("  inconsistency (flip vs base; should not change):")
         for v in STABLE: print(f"    {v:18} {cell(o, ci, v)}")
         print(f"    {'POOLED':18} {cell(o, ci, 'pooled')}")
+        if has_acc:
+            print("    unacceptable change (choice not in acceptable[variant]; scenarios with `acceptable` only):")
+            for v in STABLE: print(f"      {v:18} {cell(o, ci, 'unacc_' + v)}")
+            print(f"      {'POOLED':18} {cell(o, ci, 'unacc_pooled')}")
         print(f"    noise floor (same-prompt disagreement)  {fmt(o['noise'])}" + ("" if not isnan(o['noise']) else "   (only 1 sample per prompt)"))
         print(f"    excess inconsistency (pooled - noise)   {cell(o, ci, 'excess') if not isnan(o['excess']) else 'n/a'}")
         print(f"  update (relevant_update): update rate {cell(o, ci, 'update')}   correct-update rate {cell(o, ci, 'correct')}")
