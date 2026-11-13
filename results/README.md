@@ -98,6 +98,7 @@ Saved stdout of the analysis scripts.
 | `discrimination_career30.txt` | relevant update vs. pressure/reframe: hit, false alarms, d′, AUROC, TV, movement ratio, pressure flips by base margin | the four `career/` files | an **older version** of `discrimination.py`; the current script prints different columns (`d_soc`, `auc_s`, no ratio) with the same values where they overlap | 2026-10-03 | legacy |
 | `pressure_controls_claude.txt` | per-control change and to-target rates | `pressure_controls/claude-opus-5__pressure_controls.jsonl` | `steering.py` | 2026-10-03 | exploratory |
 | `pushback_claude.txt` | per-branch change rates, escalation, turn-2 d′ | `pushback/claude-opus-5__pressure_controls.jsonl` | `pushback.py` | 2026-10-03 | exploratory |
+| `instability_existing.txt` | inconsistency vs. a noise floor (n/a: one sample), update rate, ask quality, flip rate by base margin, descriptive frontier | the four legacy `career/` files (`career_pilot`, `career_v2`; Nimble/Qwen at @bd792f44, Claude) | `instability.py` | 2026-11-11 | exploratory |
 | `artifact_probe.txt` | surface-cue probe, parts A–D | the scenario files, plus the two Nimble `career/` files for part D | `artifact_probe.py results/career/nimble-and-qwen__career_pilot.jsonl results/career/nimble-and-qwen__career_v2.jsonl` | 2026-10-14; regenerated 2026-10-21 with both factual negatives | exploratory |
 | `threshold_sweep_opus.txt` | accuracy, NMI rate, switch point, pressure shift per sweep | `threshold_sweep/claude-opus-5__threshold_sweep.jsonl` | `threshold.py` | 2026-10-21 | exploratory |
 
