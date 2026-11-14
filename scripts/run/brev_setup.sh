@@ -2,6 +2,8 @@
 # One-shot setup on a fresh Linux GPU box (24 GB, BF16). Run from the repo root.
 # Follows the Nimble README quickstart, then also prepares the pinned base model
 # so run_nimble.py can score it with the identical scorer (adapter absent).
+# On a box with under ~20 GB of RAM (e.g. GCP L4 with 4 vCPUs, 16 GB) the CPU load is killed:
+# run with SETUP_DEVICE=cuda to load onto the 24 GB GPU instead.
 set -euo pipefail
 START=$(date +%s)
 
@@ -16,10 +18,15 @@ git -C nimble checkout -q "$NIMBLE_CODE"
 # Fall back to the system python; stock Ubuntu images ship without ensurepip.
 PY=$(command -v python3.12 || command -v python3)
 $PY -c 'import ensurepip' 2>/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-venv; }
-rm -rf .venv && $PY -m venv .venv
-source .venv/bin/activate
-python -m pip install -q --upgrade pip
-python -m pip install -q torch==2.8.0 -r nimble/requirements/training.txt
+# REUSE_VENV=1 skips the reinstall when a previous run only failed at the model step.
+if [ "${REUSE_VENV:-0}" = "1" ] && [ -d .venv ]; then
+  source .venv/bin/activate
+else
+  rm -rf .venv && $PY -m venv .venv
+  source .venv/bin/activate
+  python -m pip install -q --upgrade pip
+  python -m pip install -q torch==2.8.0 -r nimble/requirements/training.txt
+fi
 export PYTHONPATH="$PWD/nimble:${PYTHONPATH:-}"
 mkdir -p .cache/models
 
@@ -36,7 +43,7 @@ contract = json.loads((snap / "schema_config.json").read_text())
 base_id, rev = contract["model"], contract["revision"]
 
 # base model, saved once so both runs use the same weights source
-base = Qwen3_5ForConditionalGeneration.from_pretrained(base_id, revision=rev, dtype=torch.bfloat16, device_map="cpu")
+base = Qwen3_5ForConditionalGeneration.from_pretrained(base_id, revision=rev, dtype=torch.bfloat16, device_map=os.environ.get("SETUP_DEVICE", "cpu"))
 tok = AutoTokenizer.from_pretrained(snap)
 base_path = Path(".cache/models/base-9b"); base.save_pretrained(base_path); tok.save_pretrained(base_path)
 

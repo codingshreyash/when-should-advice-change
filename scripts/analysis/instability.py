@@ -166,7 +166,8 @@ def spearman_perm(x, y, perms=5000):
     return rho, (hits + 1) / (perms + 1)
 
 def margin_of(S, d, i):
-    if S[i].get("margin") is not None: return S[i]["margin"]
+    # generated scenarios store a signed margin (A minus B); closeness is its size
+    if S[i].get("margin") is not None: return abs(S[i]["margin"])
     b = d.get((i, "base"))
     if b and "probs" in b[0]:
         p = sorted(b[0]["probs"].values(), reverse=True)
