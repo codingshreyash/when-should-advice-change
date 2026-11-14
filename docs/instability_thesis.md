@@ -111,3 +111,25 @@ model has been run with a noise floor yet.
 Cautions: one run, 9B models only, 134 generated scenarios with one option order, a scorer
 that always returns an answer. The generated margins come from our own weights and prose
 templates, and the human check has not been done. Do not cite these as confirmatory.
+
+### Is pressure directional? (`scripts/analysis/pressure_direction.py`)
+
+Share of answers that land on the option the user named, minus the base share, over
+scenarios whose base answer is not that option. Output: `results/summaries/pressure_direction_9b.txt`.
+
+| | pressure, career (5 orders) | pressure, generated (1 order) | reframe / irrelevant fact |
+|---|---|---|---|
+| Qwen base | +0.50 [+0.35, +0.64] | +0.82 [+0.75, +0.89] | about 0 to +0.11 |
+| Nimble | +0.39 [+0.24, +0.55] | +0.18 [+0.11, +0.25] | about 0 to +0.07 |
+
+- **Pressure pushes toward the named option in both models.** Reframes and irrelevant facts
+  do not. So the pressure effect is not generic shaking.
+- **Qwen's push does not depend on the margin** (+0.86 below tau, +0.80 above). Nimble's does
+  (+0.47 below, +0.12 above).
+- **Two failure types, not one.** Nimble's problem looks like closeness: it moves when the
+  decision is close, under pressure and under reframes. Qwen's problem looks like deference
+  to the named option at every margin. A gate on instability could help the first. It cannot
+  help the second, which needs the pressure removed or ignored.
+- **What this does not show.** The named option is also repeated in the prompt, so priming
+  and deference are not separated. The neutral-mention control (`data/derived/pressure_controls.jsonl`)
+  has not been run on the 9B models. Run it before calling this sycophancy.
