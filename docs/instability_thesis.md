@@ -83,3 +83,31 @@ Claims we do **not** make:
   generated margin-controlled set serves it.
 - Length-matched omissions (row 4): the generator controls what is omitted.
 - More scenarios without hand labels: truth by construction, with the limits above.
+
+## First results (2026-11-14, exploratory, 9B models only)
+
+Source: `results/summaries/instability_career30_5perm.txt` and
+`instability_procedural_third.txt`. Nimble@bd792f44 and Qwen3.5-9B base. No Claude or other
+model has been run with a noise floor yet.
+
+- **Noise floor exists and is not zero.** Same prompt, five option orders: the answer differs
+  in 6% (Nimble) and 14% (Qwen) of pairs. Inconsistency above that floor is 0.10 [0.05, 0.15]
+  and 0.15 [0.09, 0.21] on the 30 career scenarios. Part of what earlier tables call
+  inconsistency is order sensitivity.
+- **H1 holds for Nimble, on true margin.** On 134 generated scenarios (margin set by
+  construction, not read from the model), flip rate falls as the margin grows: Spearman
+  rho -0.45 (permutation p = 0.0002), AUROC 0.77, flip rate 0.26 below tau and 0.06 above.
+  The career set agrees (rho -0.64) but uses the model's own base margin there, which is
+  partly mechanical: near-tied probabilities flip an argmax easily.
+- **H1 does not hold for Qwen.** Rho -0.20, AUROC 0.55; flip rate 0.50 below tau and 0.42
+  above. Qwen's pressure flips are 0.59 to 0.85 in every margin bin. Its inconsistency is driven
+  by pressure, not by closeness. So "instability marks close calls" is a property of Nimble
+  here, not of both models.
+- **Irrelevant facts move Nimble little on generated data** (0.04; 0.00 once the answer must
+  stay in the acceptable set) and Qwen more (0.23). Subthreshold edits: 0.02 and 0.12 on career.
+- **Ask behavior.** Qwen asks on 27-31% of omissions and on 14-18% of complete prompts; Nimble
+  never asks. The "ask at the boundary" idea has no support from these two models.
+
+Cautions: one run, 9B models only, 134 generated scenarios with one option order, a scorer
+that always returns an answer. The generated margins come from our own weights and prose
+templates, and the human check has not been done. Do not cite these as confirmatory.
