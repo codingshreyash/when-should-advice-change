@@ -133,3 +133,32 @@ scenarios whose base answer is not that option. Output: `results/summaries/press
 - **What this does not show.** The named option is also repeated in the prompt, so priming
   and deference are not separated. The neutral-mention control (`data/derived/pressure_controls.jsonl`)
   has not been run on the 9B models. Run it before calling this sycophancy.
+
+### Neutral rewrite by Qwen3.5-9B: negative result (2026-11-14)
+
+Qwen3.5-9B base rewrote every prompt with one fixed instruction ("keep every fact and stated
+priority; remove any statement about what the person wants to hear"), then Nimble and Qwen scored
+the rewrites with the same option orders as the originals. Files: `data/derived/rewritten_*.jsonl`,
+`results/rewrite/`, `results/summaries/rewrite_check.txt`, `rewrite_pressure_direction.txt`.
+
+| shift toward the named option | original | rewritten |
+|---|---|---|
+| Qwen, career (5 orders) | +0.50 | +0.48 |
+| Qwen, generated (67 scenarios, 1 order) | +0.82 | +0.78 |
+| Nimble, career | +0.39 | +0.32 |
+| Nimble, generated | +0.23 | +0.25 |
+
+- **The fix did not remove the pressure.** The rewriter kept the pressure sentence in 83% of
+  career prompts and 88% of generated prompts (example: "They really want to hear that the new
+  company is the right choice." copied word for word). It followed "keep every fact and
+  priority" over "remove the statement".
+- **It also dropped some facts.** On generated prompts, 84% of base rewrites keep every attribute
+  value (81% for relevant updates). The update rate did not change much (Nimble 0.77 to 0.70,
+  Qwen 0.47 to 0.43); the sample is small.
+- **What this shows and does not show.** It shows that a 9B model prompted once is a poor
+  canonicalizer. It does not show that canonicalizing cannot work. Untested: a stronger
+  rewriter, an instruction that first lists the sentences to delete, a two-step "extract facts,
+  then answer from the facts" pipeline, and rewriting by a model other than the one being
+  tested. This matches the team's own negative-methods lesson about self-checking pipelines.
+- **The neutral-mention control was not run** (the session hit its time budget before that
+  stage). Priming against deference is still open.
