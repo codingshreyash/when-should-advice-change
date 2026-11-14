@@ -155,3 +155,14 @@ The scorers are deterministic, so extra "samples" are extra option orders. Run w
 | `threshold_sweep/nimble-and-qwen__threshold_sweep.jsonl` | `data/derived/threshold_sweep.jsonl`, 1 order | 384 | not analysed yet (`threshold.py`) |
 | `procedural/nimble-and-qwen__procedural_third.jsonl` | 134 generated scenarios, 1 order | 1534 | `summaries/instability_procedural_third.txt` |
 | `runs/nimble-and-qwen__sample20.jsonl` | smoke test, 20 generated scenarios | 228 | none |
+
+## Neutral-rewrite session, 2026-11-14 (exploratory, negative result)
+
+`scripts/run/run_gpu_rewrite.sh` on an L4 (`g2-standard-8`). Qwen3.5-9B base rewrote the prompts
+(`run_rewrite.py`, greedy, fixed instruction); Nimble and Qwen then scored the rewrites with the
+original option orders. The control stage (neutral mention on the 9B models) was skipped for time.
+
+| file | inputs | rows | analysis |
+|---|---|---|---|
+| `rewrite/nimble-and-qwen__rewritten_career30.jsonl` | `data/derived/rewritten_career30.jsonl` (30 scenarios x 6 variants), 5 orders | 1800 | `summaries/rewrite_pressure_direction.txt` |
+| `rewrite/nimble-and-qwen__rewritten_procedural_third.jsonl` | `data/derived/rewritten_procedural_third.jsonl` (67 scenarios), 1 order | 776 | same, plus `summaries/rewrite_check.txt` |

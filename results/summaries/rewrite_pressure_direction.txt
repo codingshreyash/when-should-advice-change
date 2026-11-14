@@ -1,0 +1,45 @@
+### career30 ORIGINAL (same scenarios, 5 option orders)
+=== bespoke-nimble-9b@bd792f44
+  eligible scenarios (base answer is not the named option): 27
+  pressure             shift toward named option +0.393 [+0.237, +0.548]  n=27
+  reframe              shift toward named option +0.089 [-0.015, +0.207]  n=27
+  irrelevant_update    shift toward named option -0.015 [-0.044, +0.000]  n=27
+=== qwen3.5-9b-base-same-scorer
+  eligible scenarios (base answer is not the named option): 29
+  pressure             shift toward named option +0.497 [+0.352, +0.641]  n=29
+  reframe              shift toward named option +0.041 [-0.014, +0.110]  n=29
+  irrelevant_update    shift toward named option +0.007 [-0.041, +0.062]  n=29
+### career30 REWRITTEN
+=== bespoke-nimble-9b@bd792f44
+  eligible scenarios (base answer is not the named option): 26
+  pressure             shift toward named option +0.315 [+0.177, +0.469]  n=26
+  reframe              shift toward named option +0.062 [-0.023, +0.169]  n=26
+  irrelevant_update    shift toward named option +0.008 [-0.038, +0.069]  n=26
+=== qwen3.5-9b-base-same-scorer
+  eligible scenarios (base answer is not the named option): 29
+  pressure             shift toward named option +0.483 [+0.324, +0.641]  n=29
+  reframe              shift toward named option +0.062 [-0.021, +0.166]  n=29
+  irrelevant_update    shift toward named option -0.021 [-0.062, +0.028]  n=29
+
+### procedural_third ORIGINAL (same 67 scenarios, 1 order)
+=== bespoke-nimble-9b@bd792f44
+  eligible scenarios (base answer is not the named option): 62
+  pressure             shift toward named option +0.226 [+0.129, +0.339]  n=62
+  reframe              shift toward named option +0.065 [+0.016, +0.129]  n=62
+  irrelevant_update    shift toward named option +0.000 [+0.000, +0.000]  n=62
+=== qwen3.5-9b-base-same-scorer
+  eligible scenarios (base answer is not the named option): 55
+  pressure             shift toward named option +0.818 [+0.709, +0.909]  n=55
+  reframe              shift toward named option +0.091 [+0.018, +0.182]  n=55
+  irrelevant_update    shift toward named option +0.000 [+0.000, +0.000]  n=55
+### procedural_third REWRITTEN
+=== bespoke-nimble-9b@bd792f44
+  eligible scenarios (base answer is not the named option): 61
+  pressure             shift toward named option +0.246 [+0.148, +0.361]  n=61
+  reframe              shift toward named option +0.016 [+0.000, +0.049]  n=61
+  irrelevant_update    shift toward named option +0.016 [+0.000, +0.049]  n=61
+=== qwen3.5-9b-base-same-scorer
+  eligible scenarios (base answer is not the named option): 50
+  pressure             shift toward named option +0.780 [+0.660, +0.880]  n=50
+  reframe              shift toward named option +0.080 [+0.020, +0.160]  n=50
+  irrelevant_update    shift toward named option +0.040 [+0.000, +0.100]  n=50
