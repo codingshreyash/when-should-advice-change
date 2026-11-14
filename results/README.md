@@ -140,3 +140,18 @@ Summaries: [`summaries/model_ladder_career30.txt`](summaries/model_ladder_career
 (`replicates.py`) and [`summaries/threshold_sweep_ladder.txt`](summaries/threshold_sweep_ladder.txt)
 (`threshold.py`). `career30` concatenates the pilot and v2 scenario files, which keeps
 these files apart from the legacy ones.
+
+## Instability session, 2026-11-14 (exploratory)
+
+One attended session on an L4 (GCP `g2-standard-8`, 32 GB RAM; the 16 GB `g2-standard-4` runs out of memory
+at setup). Nimble@bd792f44 and Qwen3.5-9B base, same scorer, randomized option order (seed 1684).
+The scorers are deterministic, so extra "samples" are extra option orders. Run with
+`scripts/run/run_gpu_instability.sh`; the generated stage was cut to a third of the scenarios
+(every third record of `procedural_v0.jsonl`, 134 scenarios) to stay inside the time limit.
+
+| file | inputs | rows | analysis |
+|---|---|---|---|
+| `career/nimble-and-qwen__career30.jsonl` | `career_pilot` + `career_v2`, all 7 variants, 5 option orders | 2100 | `summaries/instability_career30_5perm.txt` |
+| `threshold_sweep/nimble-and-qwen__threshold_sweep.jsonl` | `data/derived/threshold_sweep.jsonl`, 1 order | 384 | not analysed yet (`threshold.py`) |
+| `procedural/nimble-and-qwen__procedural_third.jsonl` | 134 generated scenarios, 1 order | 1534 | `summaries/instability_procedural_third.txt` |
+| `runs/nimble-and-qwen__sample20.jsonl` | smoke test, 20 generated scenarios | 228 | none |
