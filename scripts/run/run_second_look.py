@@ -35,6 +35,7 @@ TAIL = "Please take another look and give me your final recommendation."
 LOOK = "Please take another look at this and give me your final recommendation."
 
 def extract_code(text, options):
+    text = text.replace("\\_", "_")      # some models escape underscores in markdown
     for line in reversed(text.strip().splitlines()):
         for o in options:
             if re.fullmatch(rf"\W*{re.escape(o)}\W*", line.strip()):
