@@ -235,3 +235,62 @@ Hypotheses (may fail):
 Known limits: the seeded turn 1 is a template, not the model's own words, so a model may react to the
 change of voice; the seeded wrong answer names the other real option (never need_more_information); one
 scenario set and one phrasing per wording; no human check of the scenarios.
+
+## Results of experiments 2 and 3 (2026-11-15, exploratory; analysis as pre-specified)
+
+Six models, 100 decisive scenarios, 2 seeds x 5 wordings, 1,000 calls each. Rows: `results/seeded_reask/`;
+tables: `results/summaries/seeded_reask.txt`, `seeded_breakeven.txt`. Recovery = share right after a re-ask
+when the seeded first answer was wrong; loss = share wrong after a re-ask when it was right. Balanced net =
+0.5 x (recovery - loss), the accuracy change for a 50/50 mix.
+
+| model | neutral rec / loss | look_again rec / loss | are_you_sure rec / loss | review rec / loss |
+|---|---|---|---|---|
+| Claude Haiku 5.5 | 0.99 / 0.01 | 0.99 / 0.02 | 0.99 / 0.01 | 0.98 / 0.02 |
+| Gemma 4 31B | 0.99 / 0.00 | 0.98 / 0.00 | 1.00 / 0.01 | 0.99 / 0.01 |
+| GPT-5.4 Mini | 0.73 / 0.00 | 0.90 / 0.00 | 0.74 / 0.00 | 0.94 / 0.02 |
+| Llama 3.1 8B | 0.25 / 0.20 | 0.59 / 0.20 | 0.44 / 0.24 | 0.36 / 0.16 |
+| Mistral 7B | 0.02 / 0.01 | 0.44 / 0.20 | 0.35 / 0.09 | 0.19 / 0.06 |
+| Gemma 2 9B | 0.55 / 0.04 | 0.80 / **0.69** | 0.75 / **0.73** | 0.97 / **0.68** |
+
+**Break-even accuracy** = recovery / (recovery + loss). A re-ask helps on average only when the model's
+first answer is right less often than this. Haiku, Gemma 4 and GPT-5.4 Mini: 0.98-1.00 (never hurt). Gemma 2
+9B under any re-examine wording: 0.51 (are_you_sure), 0.54 (look_again), 0.59 (review), 0.68 (double_check);
+under the neutral wording 0.93. Llama 3.1 8B: 0.55-0.75. Mistral 7B: 0.68-0.91 (neutral is uninformative:
+it repeats the seeded answer 98% of the time).
+
+**Against the pre-specified hypotheses**
+
+- **H1 (capable models recover more than they lose): supported.** Recovery 0.73-1.00 against loss at most 0.02;
+  balanced net up to +0.49 (the maximum is +0.50).
+- **H2 (weak models lose more than they recover): not supported in this 50/50 design.** Recovery exceeded
+  loss in every model and wording. The harm shows up when first answers are mostly right (experiment 1:
+  Gemma 2 9B at 95% right lost 62 points). Break-even accuracy captures this: Gemma 2 9B helps only below
+  about 54% first-answer accuracy.
+- **H3 (a wording that implies a mistake raises the revise rate above neutral): supported** for Gemma 2 9B
+  (+0.26 to +0.69), Mistral (+0.18 to +0.54 on wrong seeds), Llama 3.1 8B (+0.12 to +0.28) and GPT-5.4 Mini
+  (look_again +0.17 [+0.08, +0.26], review +0.22 [+0.13, +0.31] on wrong seeds). Not testable for Haiku and
+  Gemma 4 (already at ceiling).
+- **H4 (Gemma 2 9B's collapse shrinks under the neutral wording): supported.** Loss 0.04 under neutral
+  against 0.43 to 0.73 under every re-examine wording, including "double-check". The collapse is triggered by
+  the request to re-examine, not by a second turn.
+- **H5 (recovery is higher at near margins): not supported.** For GPT-5.4 Mini recovery is lower near the
+  boundary (neutral 0.59 vs 0.80; review 0.85 vs 0.98); other models are mixed.
+
+**What this shows**
+
+For capable models a second look is safe and repairs a planted error. For mid-size models the benefit
+depends on how often the first answer is wrong and on the wording: Gemma 2 9B flips almost anything it is
+asked to re-examine (revise 0.7 to 0.9 under both seeds), so it repairs and breaks in similar proportion.
+
+**Cautions that matter**
+
+- **The wrong answers are planted, not the model's own.** A strong model's near-perfect recovery is close to
+  its fresh accuracy on these scenarios (0.95-0.99), so it may simply ignore the seeded answer and solve
+  again. This does **not** show that a second look fixes a model's own reasoning mistakes, the case that
+  Huang et al. and Kamoi et al. say it does not. Mistral's neutral row, which repeats the seeded answer
+  98% of the time, shows the opposite pole: strong anchoring to a prior turn.
+- The seeded turn is a template and not the model's own voice. The wrong seed names the other real option,
+  which is clearly worse in decisive scenarios.
+- Unparsed answers are excluded and uneven: Llama 3.1 8B lost 28 are_you_sure and 6 double_check pairs,
+  Mistral 7 neutral/wrong. This may bias those two models.
+- Templated scenarios, one phrasing per wording, one run, no human check. Intervals are over 100 scenarios.
