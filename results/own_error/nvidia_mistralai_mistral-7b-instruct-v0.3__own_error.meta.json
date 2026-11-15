@@ -1,0 +1,20 @@
+{
+ "model": "nvidia/mistralai/mistral-7b-instruct-v0.3",
+ "wordings": {
+  "neutral": "Please give me your final recommendation.",
+  "look_again": "Please take another look at this and give me your final recommendation.",
+  "review": "Please review your answer for any mistakes and give me your final recommendation."
+ },
+ "control_n": 100,
+ "control_seed": 1684,
+ "final_instruction": "On the last line write exactly one of these codes as your final recommendation:",
+ "max_tokens": 2000,
+ "temperature": null,
+ "limit": null,
+ "pool": {
+  "v0": 296,
+  "L1": 144,
+  "L2": 144,
+  "L3": 144
+ }
+}
