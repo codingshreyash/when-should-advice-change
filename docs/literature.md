@@ -86,3 +86,51 @@ Medium confidence. The searches were not exhaustive.
    kinds of change.
 3. No agreed definition of "warranted change" for advice.
 4. Few stability studies use a resampling noise floor.
+
+## Update 2026-11-15: related work for the "second look" and decomposition results
+
+Collected by three research agents. **Read depth is stated per item; most are abstracts or
+snippets.** Spot-check numbers before citing; the fetch tool summarises pages and can compress them.
+
+**Read methods and results (most of the page):**
+- *Anatomy of LLM Sycophancy: What a Flip Rate Hides* (Huang, arXiv 2610.06522). Stateless replay with a
+  matched no-pressure control subtracted, about 760k replays, 11 frontier models, moral vignettes plus
+  arithmetic with known truth. Effects are several times larger near the model's own decision boundary.
+  **Closest competitor to our boundary result and to part of the second-look design.**
+- Big-Big-SycoBench (arXiv 2610.15634): 20 resamples per item set a noise floor; valid vs invalid
+  arguments; 10 models. Labels are LLM-made and human-checked; not advice.
+- BeliefTrack, "When Should Models Change Their Minds?" (EMNLP 2026, arXiv 2605.30219): oracle belief
+  states by construction in closed-world tasks; Qwen2.5-7B and Qwen3.5-9B; not advice.
+- SWAY (Bhalla and Gligoric, arXiv 2604.02423): counterfactual log-ratio of positive vs negative nudges;
+  AITA, LFQA, DebateQA; temperature 0, no resample control, no ground truth.
+- Shapira et al., sycophancy as in-context updating (arXiv 2610.28325): MMLU-Pro with a wrong endorsed
+  option; models also defer to non-user sources.
+
+**Abstract only:** Resist and Update (arXiv 2607.12985; Bayesian witnesses with known posteriors),
+SycoBench-600, BeliefShift (arXiv 2603.23848), BASIL (arXiv 2508.16846), Beacon (arXiv 2510.16727).
+**Snippet only:** FRAGILE (Hwang et al., ICML 2026; framing changes on moral, medical, legal decisions;
+not a sycophancy paper; the midterm cited it, so check the wording), Huang et al. 2023 (self-correction,
+arXiv 2310.01798), FlipFlop (arXiv 2311.08596: "Are you sure?" about -17% accuracy on average),
+Firm or Fickle (arXiv 2503.22353), Kamoi et al. survey (arXiv 2406.01297), Sharma et al. (arXiv 2310.13548).
+Abstract only: He et al., multi-turn answer instability (arXiv 2511.10688); Li, accuracy-correction
+paradox (arXiv 2601.00828). User and real-world data: WildChat-1M (opened; ODC-By), a 2026 taxonomy
+(arXiv 2605.21778, opened) reporting Claude's sycophancy at 18% under pushback vs 9% without.
+
+**Already known, so do not claim as new:** follow-ups and "Are you sure?" can lower accuracy;
+intrinsic self-correction does not reliably help; pressure induces sycophancy; flips concentrate near the
+model's decision boundary (Anatomy); separating warranted from unwarranted updates with a noise control
+(Big-Big-SycoBench, BeliefTrack, SycoBench-600, BASIL); truth by construction (BeliefTrack, Resist and
+Update).
+
+**Claims that still stand (no read paper supports them):**
+1. In advice decisions with truth by construction and a controlled margin, flips concentrate near the
+   boundary, and part of the apparent pressure effect is option-order noise and priming by naming the
+   option. Frame it as advice-specific and as a decomposition, citing Anatomy.
+2. A **neutral** plain re-ask, against a resample control, does not reliably improve answers and sharply
+   hurts some mid-size models (Gemma 2 9B). Modest novelty: prior work mostly used challenge wording.
+3. Close calls scored as "either option acceptable" change how flip rates read.
+
+**Open next experiments suggested by the agents:** a wording sweep of the re-ask ("Are you sure?",
+"double check", "review your answer", "take another look", a neutral restate); a size sweep inside one
+model family; and **seeding turn 1 with a wrong answer** to measure recovery against loss, which removes
+the ceiling problem.
