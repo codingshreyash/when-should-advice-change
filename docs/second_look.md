@@ -339,3 +339,57 @@ Known limits. Strong models may have few own errors (the warning "few own errors
 make capable models fail much; the pool is chosen for size, not for realism. Templated scenarios, one
 wording per condition, one run, no human check. The resample baseline uses the API's default sampling;
 a model run at temperature 0 would make resample recovery near zero by construction (we do not control this).
+
+## Results of experiment 4: the model's own mistakes (2026-11-15, exploratory; analysis as pre-specified)
+
+Six models, 728 decisive pool items each (8,836 rows in total, no error rows). Rows: `results/own_error/`;
+tables: `results/summaries/own_error_reask.txt`. Own accuracy: Gemma 4 31B 0.993, Claude Haiku 5.5 0.971,
+GPT-5.4 Mini 0.962, Gemma 2 9B 0.865, Llama 3.1 8B 0.747, Mistral 7B 0.714. Own-wrong items E: 5, 21, 28, 98,
+160, 205. Recovery is the share right after a re-ask among own-wrong items; resample is an independent fresh
+try on the same items (default API sampling). Value-add = recovery(wording) - recovery(resample), paired.
+
+| model (E) | resample recovery | neutral | look_again | review | value-add look_again [95% CI] |
+|---|---|---|---|---|---|
+| Claude Haiku 5.5 (21) | 0.14 | 0.00 | 0.10 | 0.00 | -0.05 [-0.19, +0.10] |
+| GPT-5.4 Mini (28) | 0.32 | 0.04 | 0.29 | 0.36 | -0.04 [-0.29, +0.18] |
+| Gemma 2 9B (98) | 0.05 | 0.09 | 0.34 | 0.72 | **+0.29 [+0.18, +0.39]** |
+| Llama 3.1 8B (160) | 0.52 | 0.24 | 0.39 | 0.25 | **-0.13 [-0.24, -0.03]** |
+| Mistral 7B (205) | 0.48 | 0.19 | 0.36 | 0.20 | **-0.11 [-0.20, -0.02]** |
+| Gemma 4 31B (5) | 0.40 | 0.00 | 0.40 | 0.20 | 0.00 (E too small) |
+
+Loss (own-right sample of 100): look_again 0.00 Haiku, 0.05 GPT, **0.72 Gemma 2 9B**, 0.16 Llama, 0.27 Mistral;
+review 0.77 for Gemma 2 9B. Break-even accuracy from own errors, look_again: Gemma 2 9B **0.32**, Mistral 0.57,
+Llama 0.70, GPT 0.85, Haiku 1.00; Gemma 2 9B's own accuracy is 0.87, so a re-ask is a net loss for it.
+
+**Against the pre-specified hypotheses**
+
+- **H1 (own recovery is far below the planted-error recovery of 0.98-0.99): supported.** Haiku 0.00-0.10,
+  GPT 0.04-0.36, against 0.73-0.99 when the error was planted. Capable models keep their own mistakes.
+- **H2 (value-add is at most +0.10 for every model): not supported as worded, because of Gemma 2 9B.** Its
+  recovery gain (+0.29 look_again, +0.67 review) comes with an equal or larger loss (+0.71, +0.76), so it
+  fixes and breaks in proportion and nets out negative. For the other five models value-add is at most +0.04
+  and for Llama and Mistral it is significantly **negative**.
+- **H3 (review revises more than neutral for every model): partly.** Yes for Haiku, GPT, Gemma 2 9B and Gemma 4;
+  no difference for Llama and Mistral.
+- **H4 (Gemma 2 9B own loss of 0.4 or more under look_again and review): supported** (0.72 and 0.77).
+- **H5 (break-even accuracy from own errors lower than from planted errors for capable models): not
+  supported.** Their loss is about zero, so break-even stays near 1.00.
+
+**What this shows.** Asking a model to look again within the conversation did not fix its own mistakes better
+than simply asking again from scratch. For Llama and Mistral it fixed *less*: a fresh resample recovers about
+half of their own errors (their errors are largely unstable), but a re-ask in the same conversation recovers
+0.2 to 0.4, because the model is anchored on its own earlier answer. Capable models rarely err, and when
+they do they mostly keep the mistake (Haiku 0.00-0.10). The one exception to "no gain" is Gemma 2 9B, and its
+gain is paid for by losing most of its right answers.
+
+**Practical reading.** If you want a second chance from a model, start a fresh conversation rather than writing
+"look again". Do not ask a mid-size model to double-check an answer that is probably right.
+
+**Cautions**
+- Resample recovery depends on the API's default sampling. For Llama and Mistral it is high because their
+  errors are unstable; with greedy decoding it would be near zero.
+- Few own errors for the capable models (E = 5, 21, 28): wide intervals; Gemma 4 31B is uninformative.
+- Unparsed answers are excluded and uneven. Llama 3.1 8B lost 95 of 728 turn-1 answers (13%) and 36 neutral
+  re-asks; those items are missing from both the wrong and the right sets, which may bias its numbers.
+- Templated scenarios, the hard sets do not make capable models fail much, three wordings, one run, no human
+  check of the scenarios.
