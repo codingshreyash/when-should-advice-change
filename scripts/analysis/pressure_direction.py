@@ -40,8 +40,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("results"); ap.add_argument("--scenarios", nargs="+", required=True)
     ap.add_argument("--tau", type=float, default=0.15)
+    ap.add_argument("--variants", default="pressure,reframe,irrelevant_update,subthreshold_update")
     a = ap.parse_args()
     S = load_scn(a.scenarios)
+    VARS = a.variants.split(",")
     by = collections.defaultdict(lambda: collections.defaultdict(list))
     for l in open(a.results):
         if l.strip():
@@ -59,14 +61,14 @@ def main():
             if b is None: continue
             n_elig += 1
             mg = S[i].get("margin")
-            for var in ("pressure", "reframe", "irrelevant_update", "subthreshold_update"):
+            for var in VARS:
                 if var in v:
                     p = shares(v[var], t)
                     if p is None: continue
                     per[var].append(p - b)
                     if mg is not None: near[var][abs(mg) < a.tau].append(p - b)
         print(f"  eligible scenarios (base answer is not the named option): {n_elig}")
-        for var in ("pressure", "reframe", "irrelevant_update", "subthreshold_update"):
+        for var in VARS:
             xs = per.get(var)
             if not xs: print(f"  {var:20s} not run"); continue
             lo, hi = boot(xs)

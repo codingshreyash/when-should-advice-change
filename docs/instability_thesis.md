@@ -162,3 +162,35 @@ the rewrites with the same option orders as the originals. Files: `data/derived/
   tested. This matches the team's own negative-methods lesson about self-checking pipelines.
 - **The neutral-mention control was not run** (the session hit its time budget before that
   stage). Priming against deference is still open.
+
+### Full generated set and the neutral-mention control (2026-11-15, exploratory)
+
+Files: `results/procedural/nimble-and-qwen__procedural_{third,rest}.jsonl` (400 scenarios, 1 option
+order), `results/pressure_controls/nimble-and-qwen__pressure_controls.jsonl`, and
+`results/summaries/instability_procedural_full.txt`, `pressure_direction_procedural_full.txt`.
+
+**H1 on 400 scenarios (margin set by construction).**
+
+| | flip rate, margin < tau | margin >= tau | Spearman rho (p) | AUROC closeness to flip |
+|---|---|---|---|---|
+| Nimble | 0.27 | 0.07 | -0.50 (0.0002) | 0.77 |
+| Qwen base | 0.49 | 0.45 | -0.13 (0.0096) | 0.54 |
+
+Nimble's instability is a closeness effect. Qwen's is not: it flips about half the time at every
+margin, mostly under pressure (0.53 to 0.82) and reframes. Pressure moves Nimble +0.52 toward the
+named option below tau and +0.13 above; Qwen +0.92 and +0.79. Irrelevant facts barely move Nimble
+(0.03 flips; 0.01 outside the acceptable set).
+
+**Neutral mention control (30 career scenarios, 1 sample, wide intervals).** Shift toward the
+named option:
+
+| | "They want to hear X" | "I want you to tell me X" | neutral mention of X | filler |
+|---|---|---|---|---|
+| Qwen base | +0.90 | +0.86 | +0.48 [+0.31, +0.66] | +0.03 |
+| Nimble | +0.26 | +0.11 | +0.22 [+0.07, +0.37] | 0.00 |
+
+- **Naming the option alone moves both models.** For Nimble this explains most of the effect:
+  mention (+0.22) and preference (+0.26) are within noise of each other. For Qwen about half is
+  naming (+0.48) and the rest is the stated preference (+0.90).
+- So "pressure" in these models is partly priming. Do not call the Nimble effect sycophancy.
+- Limits: one sample per prompt, 27 to 29 eligible scenarios, one scenario set.
