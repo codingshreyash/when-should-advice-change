@@ -12,7 +12,14 @@ Truth is recomputed from the per-prompt fact tags, not from the generator's own 
   attr:<key>:<levelA>:<levelB>   one attribute fact (levels 0..5)
   prio:<key>:<weight>            one stated priority (weight 4, 2 or 1)
   irr:<key>:<option>             a zero-weight fact
+
+Hard sets (records with hard_level 1..3, see gen_procedural.py --hard) are checked too: weights in 1..5,
+attribute count 6/8/10, numeric importance in the prose, the attribute table's values against the hard pool,
+a monotone value mapping (values for score 0..5 strictly monotone in their leading number, in the direction
+given by `better`), and for level 3 at least 2 equal-valued attributes plus a trade-off among heavy
+(weight >= 3) attributes. Sweep files are not checked for hard sets unless --sweep is given.
 """
+import re
 import argparse, collections, json, os, sys
 from fractions import Fraction
 
@@ -77,6 +84,55 @@ def truth_variant(v, tags, base_tags, codes, tau):
 
 def bin_of(m):
     return min(int(abs(m) * NBINS / MAXM), NBINS - 1)
+
+
+def lead_number(text):
+    m = re.search(r"\d[\d,]*\.?\d*", text)
+    return float(m.group(0).replace(",", "")) if m else None
+
+
+def check_hard(r, rid, attr, prio):
+    lvl = r["hard_level"]
+    if lvl not in HARD_N:
+        err(rid, f"bad hard_level {lvl}")
+        return
+    if r.get("weights_numeric") is not True:
+        err(rid, "weights_numeric must be true for a hard record")
+    if r.get("n_attrs") != HARD_N[lvl] or len(prio) != HARD_N[lvl] or len(attr) > len(prio):
+        err(rid, f"hard level {lvl} needs {HARD_N[lvl]} attributes (n_attrs {r.get('n_attrs')}, priorities {len(prio)})")
+    if any(not 1 <= w <= 5 for w in prio.values()):
+        err(rid, "hard weights must be integers in 1..5")
+    pool = {x["key"]: x for x in HVOCAB.get(r["domain"], [])}
+    meta = HARD_META.get(r["domain"], {})
+    for key in prio:
+        d = pool.get(key)
+        if d is None:
+            err(rid, f"{key} is not in the hard pool")
+            continue
+        nums = [lead_number(v) for v in d["vals"]]
+        if len(d["vals"]) != 6 or None in nums:
+            err(rid, f"{key}: value mapping needs 6 numeric values")
+            continue
+        inc = all(x < y for x, y in zip(nums, nums[1:]))
+        dec = all(x > y for x, y in zip(nums, nums[1:]))
+        if not ((meta.get(key) == "up" and inc) or (meta.get(key) == "down" and dec)):
+            err(rid, f"{key}: values {nums} not monotone in the direction '{meta.get(key)}' (score 5 must be best)")
+        if d["topics"][0] + f" {prio[key]}" not in r["prompts"]["base"]:
+            err(rid, f"numeric importance '{d['topics'][0]} {prio[key]}' not in base prompt")
+    if "Importance to" not in r["prompts"]["base"] or "from 1 (low) to 5 (high)" not in r["prompts"]["base"]:
+        err(rid, "numeric importance sentence missing from base prompt")
+    for a in r["attributes"]:
+        if a["weight"] > 0 and a["key"] in pool:
+            vals = pool[a["key"]]["vals"]
+            if a["values"] != {"A": vals[a["levels"]["A"]], "B": vals[a["levels"]["B"]]}:
+                err(rid, f"attributes table values for {a['key']} do not follow the value mapping")
+    if lvl == 3:
+        eq = [k for k, (a, b) in attr.items() if a == b]
+        if len(eq) < 2:
+            err(rid, "level 3 needs at least 2 equal-valued attributes")
+        heavy = [(a, b) for k, (a, b) in attr.items() if prio.get(k, 0) >= HARD_HEAVY and a != b]
+        if not (any(a > b for a, b in heavy) and any(b > a for a, b in heavy)):
+            err(rid, f"level 3 needs a trade-off among attributes of weight >= {HARD_HEAVY}")
 
 
 def check_record(r, tau, rids):
@@ -170,9 +226,12 @@ def check_record(r, tau, rids):
     m = Fraction(bn, S * bW)
     if abs(float(m) - r["margin"]) > 1e-5:
         err(rid, f"margin {r['margin']} != recomputed {float(m):.6f}")
+    hard = r.get("hard_level", 0)
+    if hard:
+        check_hard(r, rid, attr, prio)
     # fact values appear in the prompt text (sanity, uses generator vocab)
     for key, (la, lb) in attr.items():
-        d = next((x for x in VOCAB.get(r["domain"], []) if x["key"] == key), None)
+        d = next((x for x in (HVOCAB if hard else VOCAB).get(r["domain"], []) if x["key"] == key), None)
         if d is None:
             err(rid, f"unknown attribute key {key}")
         elif d["vals"][la] not in r["prompts"]["base"] or d["vals"][lb] not in r["prompts"]["base"]:
@@ -187,8 +246,9 @@ def main():
     ap.add_argument("--sweep", default=None)
     ap.add_argument("--tau", type=float, default=None, help="override tau (default: the value stored in each record)")
     a = ap.parse_args()
-    sweep = a.sweep or os.path.join(os.path.dirname(os.path.abspath(a.path)), "sweep.jsonl")
     recs = [json.loads(l) for l in open(a.path) if l.strip()]
+    sweep = a.sweep or (None if any(r.get("hard_level") for r in recs)
+                        else os.path.join(os.path.dirname(os.path.abspath(a.path)), "sweep.jsonl"))
     rids, by_dom, by_bin, by_dom_bin = set(), collections.Counter(), collections.Counter(), collections.Counter()
     by_ru = collections.Counter()
     base_by_id = {}
@@ -203,7 +263,7 @@ def main():
             by_dom_bin[(r["domain"], b)] += 1
     # sweep file
     nsw = 0
-    if os.path.exists(sweep):
+    if sweep and os.path.exists(sweep):
         seen = set()
         for s in (json.loads(l) for l in open(sweep) if l.strip()):
             nsw += 1
@@ -231,7 +291,7 @@ def main():
             if len(set(s["facts"]["base"]) ^ set(base["facts"]["base"])) != 2:
                 err(sid, "sweep must change exactly one fact")
     else:
-        print(f"(no sweep file at {sweep})")
+        print(f"(no sweep check: {sweep or 'hard set'})")
     print(f"records: {len(recs)}   sweep records: {nsw}")
     print("per domain:", dict(sorted(by_dom.items())))
     width = float(MAXM) / NBINS
@@ -250,10 +310,13 @@ def main():
 # vocabulary for the value-in-text sanity check (imported lazily so the file also runs standalone)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
-    from gen_procedural import DOMAINS as _D
+    from gen_procedural import DOMAINS as _D, DOMAINS_H as _H, HARD_META, HARD_N, HARD_HEAVY
     VOCAB = {k: v["attrs"] for k, v in _D.items()}
+    HVOCAB = {k: v["attrs"] for k, v in _H.items()}
 except Exception:
     VOCAB = {}
+    HVOCAB = {}
+    HARD_META, HARD_N, HARD_HEAVY = {}, {1: 6, 2: 8, 3: 10}, 3
 
 if __name__ == "__main__":
     main()

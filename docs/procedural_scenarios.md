@@ -111,6 +111,35 @@ Fields: `base_id`, `k`, `prompt`, `expected_label`, `acceptable_label`, `margin_
 
 It exits with code 1 on any failure.
 
+## Hard sets (`--hard LEVEL`)
+
+The default set is easy: strong chat models are 95-99% accurate on its decisive base prompts. `--hard` builds
+scenarios where the answer is still the exact argmax of sum(weight * score) with the same band rule
+(`tau`, margin divided by 5 * total weight), but many weighted factors must be combined.
+
+    python3 scripts/data/gen_procedural.py --hard 2 --seed 7001 --n 100 --out data/scenarios/procedural/hard_calib.jsonl --no-sweep
+    python3 scripts/data/validate_procedural.py data/scenarios/procedural/hard_calib.jsonl
+    python3 scripts/run/calibrate_difficulty.py --scenarios data/scenarios/procedural/hard_calib.jsonl --yes
+
+`--hard 0` (default) is exactly the original generator; the default files are byte-identical (md5 checked).
+
+| level | attributes | other changes |
+|---|---|---|
+| 1 | 6 | numeric importance, weights 1..5, 12-attribute pool per domain |
+| 2 | 8 | same |
+| 3 | 10 | 2-4 attributes have equal values for both options (stated, weight > 0, no contrast); the options trade off: each option wins on at least one attribute of weight >= 3 |
+
+- Importance is stated in numbers: "Importance to Omar, from 1 (low) to 5 (high): commute 5, salary 4, ...". The reframe uses a second wording ("rates how much each factor matters on a scale from 1 ... to 5 ...") and shuffles the sentences.
+- Pool: 12 attributes per domain (`HARD_RAW` in the generator), each with 3 phrasings and six concrete numeric values.
+- Value mapping rule (checked by the validator): the six values of an attribute, in order of score 0..5, are strictly monotone in their leading number. `better` is "up" (higher number is better) or "down" (lower is better), so score 5 is always the best value.
+- The zero-weight irrelevant-fact pool and all six variants are unchanged. No sweep or sample file is written for hard sets (`--no-sweep` is implied).
+- Extra fields: `hard_level`, `n_attrs`, `weights_numeric` (true), `target_bin`. `margin_bin` is the achieved bin; if a bin cannot be reached in 30,000 draws the generator falls back to the next lower bin (this did not happen at seed 7001, n 100: `target_bin == margin_bin` everywhere).
+- Margin strata: `|margin|` is uniform over the same 8 bins. With 25 scenarios per domain, bin 0 has 16 and bins 1-7 have 12 each at all three levels.
+- relevant_update: with 6 to 10 attributes one fact moves the margin little, so a decisive flip rarely exists. In the calibration sets `ru_possible` is true for 43 of 100 (level 1), 29 (level 2) and 28 (level 3) bases, almost all of them band bases (`from_band`). Treat the hard sets as base-prompt accuracy sets; do not rely on the relevant_update variant.
+- Validator: for hard records it checks weights 1..5, attribute counts (6/8/10), numeric importance in the prose, the attribute table against the value mapping, monotone value lists, and the level 3 equal-value and trade-off rules, besides the usual recomputation of `expected` and `acceptable` from the fact tags. Sweep files are not checked for hard sets.
+- `data/scenarios/procedural/hard_calib.jsonl` (level 2, seed 7001, n 100) is a calibration set: use it only to measure base-prompt accuracy (`scripts/run/calibrate_difficulty.py`). The evaluation set must use a different seed.
+- `scripts/run/calibrate_difficulty.py` sends only the base prompt (conversational, option order as in `run_second_look.py`), and reports decisive accuracy, the share of close calls answered `need_more_information`, and accuracy by margin bin. It needs `--yes` and the `CHAT_*` environment.
+
 ## Human labeling sheet
 
     python3 scripts/data/gen_procedural.py --labeling-sheet 100

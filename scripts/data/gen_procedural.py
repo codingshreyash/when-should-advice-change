@@ -13,6 +13,18 @@ is need_more_information (an expression of doubt), but NMI is not the only right
 Usage:
   python3 scripts/data/gen_procedural.py --seed 1684 --n 400
   python3 scripts/data/gen_procedural.py --labeling-sheet 100
+  python3 scripts/data/gen_procedural.py --hard 2 --seed 7001 --n 100 --out data/scenarios/procedural/hard_calib.jsonl --no-sweep
+
+--hard LEVEL (default 0 = the original set, byte-identical output):
+  1: 6 attributes, 2: 8 attributes, 3: 10 attributes. Weights are integers 1..5 and the importance is
+     stated numerically in the prose ("Importance to Omar, from 1 (low) to 5 (high): commute 5, ...").
+     Attributes come from a larger pool (HARD_RAW, 12 per domain) whose values are numeric facts.
+  3: additionally 2-4 attributes have EQUAL values for both options (stated, weight > 0, no contrast) and the
+     options trade off: both options win on at least one attribute of weight >= 3.
+  Value mapping rule (checked by the validator): the 6 values of an attribute, in order of score 0..5, are
+  strictly monotone in their leading number; `better` says whether a higher number ("up") or a lower number
+  ("down") is better for the person, so score 5 is always the best value. Utility, margin, tau and the
+  band rule are unchanged. Hard sets skip the sweep and sample files.
 """
 import argparse, collections, csv, json, os, random
 from fractions import Fraction
@@ -230,6 +242,86 @@ DOMAINS = {
 }
 DOMAIN_ORDER = ["career", "housing", "medical_choice", "purchase"]
 
+# ---------- hard pools: 12 numeric attributes per domain ----------
+# (key, what, better, six values ordered by score 0..5). better: "up" = higher number is better, "down" = lower is better.
+HARD_RAW = {
+    "career": [
+        ("salary", "base salary per year", "up", ["$78,000", "$84,000", "$90,000", "$96,000", "$103,000", "$110,000"]),
+        ("commute", "commute each way", "down", ["70 minutes", "55 minutes", "45 minutes", "35 minutes", "25 minutes", "15 minutes"]),
+        ("promo", "usual wait for a promotion", "down", ["6 years", "5 years", "4 years", "3 years", "2 years", "1 year"]),
+        ("remote", "remote work allowance per week", "up", ["0 days", "1 day", "2 days", "3 days", "4 days", "5 days"]),
+        ("runway", "secured funding runway", "up", ["3 months", "6 months", "12 months", "18 months", "24 months", "36 months"]),
+        ("training", "paid training time per year", "up", ["0 hours", "10 hours", "20 hours", "40 hours", "60 hours", "80 hours"]),
+        ("bonus", "target annual bonus", "up", ["0%", "3%", "6%", "9%", "12%", "15%"]),
+        ("vacation", "paid vacation per year", "up", ["10 days", "15 days", "20 days", "25 days", "30 days", "35 days"]),
+        ("match", "retirement plan match", "up", ["0%", "1%", "2%", "3%", "4%", "6%"]),
+        ("hours", "typical working week", "down", ["55 hours", "50 hours", "47 hours", "44 hours", "40 hours", "37 hours"]),
+        ("equity", "yearly equity grant", "up", ["$0", "$5,000", "$10,000", "$20,000", "$35,000", "$50,000"]),
+        ("premium", "monthly health insurance premium", "down", ["$320", "$260", "$200", "$150", "$100", "$50"]),
+    ],
+    "housing": [
+        ("rent", "monthly rent", "down", ["$2,100", "$1,900", "$1,750", "$1,600", "$1,450", "$1,300"]),
+        ("commute", "trip to work", "down", ["60 minutes", "50 minutes", "40 minutes", "30 minutes", "20 minutes", "10 minutes"]),
+        ("size", "floor area", "up", ["480 square feet", "560 square feet", "650 square feet", "740 square feet", "850 square feet", "950 square feet"]),
+        ("grocery", "walk to the nearest grocery store", "down", ["25 minutes", "20 minutes", "15 minutes", "10 minutes", "6 minutes", "3 minutes"]),
+        ("lease", "minimum lease", "down", ["24 months", "18 months", "12 months", "9 months", "6 months", "3 months"]),
+        ("noise", "night-time noise level", "down", ["68 dB", "62 dB", "56 dB", "50 dB", "44 dB", "38 dB"]),
+        ("sun", "direct sunlight per day", "up", ["1 hour", "2 hours", "3 hours", "4 hours", "5 hours", "6 hours"]),
+        ("deposit", "security deposit", "down", ["$3,000", "$2,400", "$1,800", "$1,200", "$800", "$500"]),
+        ("utilities", "typical monthly utility bill", "down", ["$260", "$220", "$180", "$140", "$110", "$80"]),
+        ("age", "age of the building", "down", ["60 years", "45 years", "30 years", "20 years", "10 years", "3 years"]),
+        ("crime", "reported crime per 1,000 residents per year", "down", ["48 incidents", "38 incidents", "28 incidents", "20 incidents", "12 incidents", "6 incidents"]),
+        ("internet", "home internet download speed", "up", ["50 Mbps", "100 Mbps", "300 Mbps", "500 Mbps", "1,000 Mbps", "2,000 Mbps"]),
+    ],
+    "medical_choice": [
+        ("wait", "wait for a routine appointment", "down", ["42 days", "28 days", "21 days", "14 days", "7 days", "2 days"]),
+        ("copay", "copay per visit", "down", ["$80", "$60", "$45", "$35", "$25", "$15"]),
+        ("distance", "travel time from home", "down", ["40 minutes", "30 minutes", "25 minutes", "20 minutes", "12 minutes", "5 minutes"]),
+        ("continuity", "share of visits with the same doctor", "up", ["20%", "40%", "60%", "75%", "90%", "100%"]),
+        ("hours", "weekday closing time", "up", ["4 pm", "5 pm", "6 pm", "7 pm", "8 pm", "9 pm"]),
+        ("rating", "average patient rating", "up", ["3.2 out of 5", "3.6 out of 5", "3.9 out of 5", "4.2 out of 5", "4.5 out of 5", "4.8 out of 5"]),
+        ("sameday", "same-day sick slots per day", "up", ["0 slots", "1 slot", "2 slots", "4 slots", "6 slots", "8 slots"]),
+        ("referral", "wait for a specialist referral", "down", ["30 days", "21 days", "14 days", "10 days", "5 days", "2 days"]),
+        ("callback", "time to a returned phone call", "down", ["48 hours", "36 hours", "24 hours", "12 hours", "6 hours", "2 hours"]),
+        ("visit", "typical visit length", "up", ["8 minutes", "10 minutes", "13 minutes", "16 minutes", "20 minutes", "25 minutes"]),
+        ("premium", "monthly premium", "down", ["$140", "$115", "$90", "$70", "$50", "$30"]),
+        ("parking", "parking cost per visit", "down", ["$12", "$9", "$6", "$4", "$2", "$0"]),
+    ],
+    "purchase": [
+        ("price", "price", "down", ["$1,400", "$1,250", "$1,100", "$950", "$800", "$700"]),
+        ("battery", "battery life on a charge", "up", ["5 hours", "7 hours", "9 hours", "11 hours", "14 hours", "18 hours"]),
+        ("weight", "weight", "down", ["2.6 kg", "2.2 kg", "1.9 kg", "1.6 kg", "1.3 kg", "1.0 kg"]),
+        ("display", "peak screen brightness", "up", ["250 nits", "300 nits", "350 nits", "400 nits", "500 nits", "600 nits"]),
+        ("warranty", "warranty length", "up", ["3 months", "12 months", "18 months", "24 months", "36 months", "48 months"]),
+        ("speed", "time to export a standard 10-minute video", "down", ["12 minutes", "9 minutes", "7 minutes", "5 minutes", "4 minutes", "3 minutes"]),
+        ("storage", "built-in storage", "up", ["128 GB", "256 GB", "512 GB", "1,000 GB", "2,000 GB", "4,000 GB"]),
+        ("ram", "memory", "up", ["4 GB", "8 GB", "12 GB", "16 GB", "32 GB", "64 GB"]),
+        ("fan", "fan noise under load", "down", ["46 dB", "42 dB", "38 dB", "34 dB", "30 dB", "26 dB"]),
+        ("ports", "number of ports", "up", ["1 port", "2 ports", "3 ports", "4 ports", "5 ports", "6 ports"]),
+        ("resale", "share of the price recovered on resale after two years", "up", ["30%", "38%", "45%", "52%", "60%", "68%"]),
+        ("charge", "time to charge to 80%", "down", ["120 minutes", "95 minutes", "75 minutes", "60 minutes", "45 minutes", "30 minutes"]),
+    ],
+}
+
+
+def _hard_tpls(what):
+    return [f"The {what} is {{va}} for {{A}} and {{vb}} for {{B}}.",
+            f"For {{B}}, the {what} is {{vb}}; for {{A}}, it is {{va}}.",
+            f"On {what}, {{A}} comes in at {{va}} and {{B}} at {{vb}}."]
+
+
+HARD_META = {d: {k: better for k, _, better, _ in rows} for d, rows in HARD_RAW.items()}
+DOMAINS_H = {d: {**DOMAINS[d], "attrs": [A(k, [w, w], vals, _hard_tpls(w)) for k, w, _, vals in rows]}
+             for d, rows in HARD_RAW.items()}
+HARD_N = {1: 6, 2: 8, 3: 10}
+HARD_HEAVY = 3                  # level 3: both options must win on an attribute of at least this weight
+HARD_TRIES = 30000              # sampling attempts per bin before relaxing to the next lower bin
+HARD_RU_TRIES = 60
+
+
+def get_dom(sc):
+    return DOMAINS_H[sc["domain"]] if sc.get("hard") else DOMAINS[sc["domain"]]
+
 
 # ---------- exact arithmetic ----------
 def tau_frac(tau):
@@ -284,6 +376,14 @@ def join_and(xs):
     return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
 
 
+def prio_text_numeric(person, attrs, dom, idx):
+    items = [(dom_attr(dom, a["key"])["topics"][0], a["weight"]) for a in attrs]
+    if idx % 2 == 0:
+        return f"Importance to {person}, from 1 (low) to 5 (high): " + ", ".join(f"{t} {w}" for t, w in items) + "."
+    return (f"{person} rates how much each factor matters on a scale from 1 (barely matters) to 5 (matters most): "
+            + "; ".join(f"{t} = {w}" for t, w in items) + ".")
+
+
 def prio_text(person, attrs, dom, idx):
     tiers = {4: [], 2: [], 1: []}
     for a in attrs:
@@ -314,15 +414,16 @@ def fact_tag(a):
 
 def build_units(sc, attrs, phr_map, prio_idx):
     """Ordered list of (unit_id, text, [tags]) excluding the intro."""
-    dom = DOMAINS[sc["domain"]]
-    units = [("prio", prio_text(sc["person"], attrs, dom, prio_idx), [f"prio:{a['key']}:{a['weight']}" for a in attrs])]
+    dom = get_dom(sc)
+    pt = prio_text_numeric if sc.get("hard") else prio_text
+    units = [("prio", pt(sc["person"], attrs, dom, prio_idx), [f"prio:{a['key']}:{a['weight']}" for a in attrs])]
     for a in attrs:
         units.append((a["key"], fact_text(dom, a, sc["names"], phr_map.get(a["key"], 0)), [fact_tag(a)]))
     return units
 
 
 def intro_text(sc, idx):
-    dom = DOMAINS[sc["domain"]]
+    dom = get_dom(sc)
     return dom["intros"][idx].format(P=sc["person"], A=sc["names"][0], B=sc["names"][1])
 
 
@@ -346,6 +447,35 @@ def new_attrs(rng, dom, sign, spread):
             la, lb = rng.randint(0, S), rng.randint(0, S)
         out.append({"key": dom["attrs"][i]["key"], "weight": w, "la": la, "lb": lb})
     return out
+
+
+def new_attrs_hard(rng, dom, level):
+    """Sample attributes for hard level 1..3: weights 1..5, a random direction bias, and (level 3) equal-valued attributes."""
+    n = HARD_N[level]
+    idxs = rng.sample(range(len(dom["attrs"])), n)
+    sign = rng.choice([1, -1])
+    q = rng.choice([0.5, 0.65, 0.8, 0.9, 1.0])
+    gmin = rng.choice([0, 1, 2, 3]) if level < 3 else rng.choice([1, 2, 3])
+    n_eq = rng.choice([2, 3, 4]) if level == 3 else 0
+    eq = set(rng.sample(range(n), n_eq))
+    out = []
+    for j, i in enumerate(idxs):
+        w = rng.randint(1, 5)
+        if j in eq:
+            la = lb = rng.randint(0, S)
+        else:
+            g = rng.randint(max(gmin, 1 if level == 3 else 0), S)
+            lo = rng.randint(0, S - g)
+            hi = lo + g
+            d = sign if rng.random() < q else -sign
+            la, lb = (hi, lo) if d > 0 else (lo, hi)
+        out.append({"key": dom["attrs"][i]["key"], "weight": w, "la": la, "lb": lb})
+    return out
+
+
+def tradeoff_ok(attrs):
+    heavy = [a for a in attrs if a["weight"] >= HARD_HEAVY and a["la"] != a["lb"]]
+    return any(a["la"] > a["lb"] for a in heavy) and any(a["lb"] > a["la"] for a in heavy)
 
 
 def flip_candidates(attrs, tau):
@@ -381,7 +511,49 @@ def choose_flip(rng, attrs, tau):
     return rng.choice([x for x in c if x["k"] == kmin])
 
 
-def make_scenario(domain, idx, seed, tau, target_bin):
+def make_scenario_hard(domain, idx, seed, tau, target_bin, level):
+    """Hard sampler. If no base lands in target_bin within HARD_TRIES, relax to the next lower bin."""
+    dom = DOMAINS_H[domain]
+    rng = random.Random(f"{seed}:h{level}:{domain}:{idx}")
+    attrs, ru_possible, tb = None, True, target_bin
+    while tb >= 0 and attrs is None:
+        cand, in_bin = None, 0
+        for _ in range(HARD_TRIES):
+            at = new_attrs_hard(rng, dom, level)
+            if level == 3 and not tradeoff_ok(at):
+                continue
+            W = sum(a["weight"] for a in at)
+            num = margin_num(at)
+            if abs(Fraction(num, S * W)) > MAXM or bin_of(num, S * W) != tb:
+                continue
+            in_bin += 1
+            cand = at
+            if choose_flip(rng, at, tau) is not None:
+                ru_possible = True
+                break
+            ru_possible = False
+            if in_bin >= HARD_RU_TRIES:
+                break
+        if cand is not None:
+            attrs = cand
+        else:
+            tb -= 1
+    if attrs is None:
+        raise RuntimeError(f"could not sample any base for {domain} {idx}")
+    rng.shuffle(attrs)
+    names = dom["pairs"][0] if dom["pairs"] else tuple(rng.sample(dom["names"], 2))
+    if "codes" in dom:
+        codes, labels = dom["codes"], dom["labels"]
+    else:
+        codes = (f"choose_{dom['noun']}_a", f"choose_{dom['noun']}_b")
+        labels = tuple(f"{dom['verb']} {n}" for n in names)
+    return rng, {"domain": domain, "person": rng.choice(PEOPLE), "names": names, "codes": codes, "labels": labels,
+                 "attrs": attrs, "ru_possible": ru_possible, "hard": level, "target_bin": target_bin}
+
+
+def make_scenario(domain, idx, seed, tau, target_bin, hard=0):
+    if hard:
+        return make_scenario_hard(domain, idx, seed, tau, target_bin, hard)
     dom = DOMAINS[domain]
     rng = random.Random(f"{seed}:{domain}:{idx}")
     in_bin = 0
@@ -417,7 +589,7 @@ def make_scenario(domain, idx, seed, tau, target_bin):
 
 # ---------- record construction ----------
 def attr_table(sc, extra_irr):
-    dom = DOMAINS[sc["domain"]]
+    dom = get_dom(sc)
     W = sum(a["weight"] for a in sc["attrs"])
     rows = []
     for a in sc["attrs"]:
@@ -436,8 +608,8 @@ def code_of(sc, lab):
     return NMI if lab == NMI else sc["codes"][0 if lab == "A" else 1]
 
 
-def make_record(domain, idx, seed, tau, target_bin):
-    rng, sc = make_scenario(domain, idx, seed, tau, target_bin)
+def make_record(domain, idx, seed, tau, target_bin, hard=0):
+    rng, sc = make_scenario(domain, idx, seed, tau, target_bin, hard)
     dom = DOMAINS[domain]
     attrs = sc["attrs"]
     W = sum(a["weight"] for a in attrs)
@@ -535,6 +707,8 @@ def make_record(domain, idx, seed, tau, target_bin):
         "attributes": attr_table(sc, {"key": ikey, "opt": iopt}),
         "facts": {v: facts[v] for v in vs}, "variant_meta": meta, "seed": seed,
     }
+    if hard:
+        rec.update({"hard_level": hard, "n_attrs": len(attrs), "weights_numeric": True, "target_bin": target_bin})
     return rec, sc
 
 
@@ -605,6 +779,8 @@ def main():
     ap.add_argument("--tau", type=float, default=0.15, help="decision threshold on |margin| (weight-normalised)")
     ap.add_argument("--K", type=int, default=5, help="max sweep steps")
     ap.add_argument("--sweep-bases", type=int, default=25, help="sweep bases per domain (|margin| < 0.3 only)")
+    ap.add_argument("--hard", type=int, default=0, choices=[0, 1, 2, 3], help="difficulty level (0 = original set)")
+    ap.add_argument("--no-sweep", action="store_true", help="do not write sweep.jsonl / sample20.jsonl (always on for --hard)")
     ap.add_argument("--labeling-sheet", type=int, default=0, metavar="N",
                     help="also write a shuffled CSV of N items without labels, plus a private key (git-ignored)")
     ap.add_argument("--labeling-dir", default=os.path.join(root, "data/labeling"),
@@ -614,23 +790,29 @@ def main():
     outdir = os.path.dirname(os.path.abspath(a.out))
     per = a.n // len(DOMAIN_ORDER)
     recs, sweeps, scs = [], [], {}
+    nosweep = a.no_sweep or a.hard > 0
     for d in DOMAIN_ORDER:
         bins = [i % NBINS for i in range(per)]
         random.Random(f"{a.seed}:{d}:bins").shuffle(bins)
         nsw = 0
         for i in range(per):
-            rec, sc = make_record(d, i, a.seed, tau, bins[i])
+            rec, sc = make_record(d, i, a.seed, tau, bins[i], a.hard)
             recs.append(rec)
-            if nsw < a.sweep_bases and abs(rec["margin"]) < 0.3:
+            if not nosweep and nsw < a.sweep_bases and abs(rec["margin"]) < 0.3:
                 sweeps += make_sweep(rec, sc, a.K, tau)
                 nsw += 1
     write_jsonl(a.out, recs)
-    write_jsonl(os.path.join(outdir, "sweep.jsonl"), sweeps)
-    sample = [r for d in DOMAIN_ORDER for r in [x for x in recs if x["domain"] == d][:5]]
-    write_jsonl(os.path.join(outdir, "sample20.jsonl"), sample)
-    print(f"wrote {len(recs)} scenarios, {len(sweeps)} sweep records, {len(sample)} sample records to {outdir}")
+    if nosweep:
+        print(f"wrote {len(recs)} scenarios to {a.out} (hard level {a.hard}; no sweep/sample files)")
+    else:
+        write_jsonl(os.path.join(outdir, "sweep.jsonl"), sweeps)
+        sample = [r for d in DOMAIN_ORDER for r in [x for x in recs if x["domain"] == d][:5]]
+        write_jsonl(os.path.join(outdir, "sample20.jsonl"), sample)
+        print(f"wrote {len(recs)} scenarios, {len(sweeps)} sweep records, {len(sample)} sample records to {outdir}")
     band = [r for r in recs if abs(r["margin"]) < float(tau)]
     kinds = collections.Counter(r["variant_meta"]["relevant_update"]["ru_kind"] for r in recs if r["ru_possible"])
+    if a.hard:
+        print("target bin != achieved bin:", sum(r["target_bin"] != r["margin_bin"] for r in recs), "of", len(recs))
     print(f"band bases: {len(band)}; relevant_update kinds: {dict(kinds)}; no relevant_update possible: "
           f"{sum(not r['ru_possible'] for r in recs)}")
     print("per bin (bases / with relevant_update):", " ".join(
