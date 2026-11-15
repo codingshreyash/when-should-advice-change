@@ -166,3 +166,14 @@ original option orders. The control stage (neutral mention on the 9B models) was
 |---|---|---|---|
 | `rewrite/nimble-and-qwen__rewritten_career30.jsonl` | `data/derived/rewritten_career30.jsonl` (30 scenarios x 6 variants), 5 orders | 1800 | `summaries/rewrite_pressure_direction.txt` |
 | `rewrite/nimble-and-qwen__rewritten_procedural_third.jsonl` | `data/derived/rewritten_procedural_third.jsonl` (67 scenarios), 1 order | 776 | same, plus `summaries/rewrite_check.txt` |
+
+## Control and full generated set, 2026-11-15 (exploratory)
+
+Same L4 setup (`g2-standard-8`). `run_gpu_rewrite.sh STAGES=control`, then `run_nimble.py` on the
+266 generated scenarios not in `procedural_third` (the file is `procedural_v0.jsonl` minus the ids in
+the third results; `data/scenarios/procedural/procedural_rest.jsonl` was built from them, not committed).
+
+| file | inputs | rows | analysis |
+|---|---|---|---|
+| `pressure_controls/nimble-and-qwen__pressure_controls.jsonl` | `data/derived/pressure_controls.jsonl`, variants base, pressure, pref_target, pref_target_1p, mention_target, filler, pref_base; 1 order | 418 | `pressure_direction.py --variants ...` (see `docs/instability_thesis.md`) |
+| `procedural/nimble-and-qwen__procedural_rest.jsonl` | 266 generated scenarios, 1 order | 3054 | `summaries/instability_procedural_full.txt` (with the `third` file) |

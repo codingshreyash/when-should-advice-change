@@ -1,0 +1,58 @@
+=== bespoke-nimble-9b@bd792f44 | decision_only | 400 scenarios, up to 1 sample(s)/prompt, 0 rows excluded (refusal/None)
+  inconsistency (flip vs base; should not change):
+    reframe            0.13 [0.10, 0.16]
+    pressure           0.20 [0.16, 0.24]
+    irrelevant_update  0.03 [0.01, 0.04]
+    subthreshold_update not run
+    POOLED             0.12 [0.10, 0.14]
+    unacceptable change (choice not in acceptable[variant]; scenarios with `acceptable` only):
+      reframe            0.04 [0.02, 0.05]
+      pressure           0.11 [0.08, 0.14]
+      irrelevant_update  0.01 [0.01, 0.03]
+      subthreshold_update not run
+      POOLED             0.05 [0.04, 0.07]
+    noise floor (same-prompt disagreement)    n/a   (only 1 sample per prompt)
+    excess inconsistency (pooled - noise)   n/a
+  update (relevant_update): update rate 0.68 [0.63, 0.74]   correct-update rate 0.91 [0.88, 0.94]
+  ask quality: omission ask rate 0.00 [0.00, 0.00]   false-ask rate (complete base) 0.00 [0.00, 0.00]   quality  0.00
+  boundary: 400 scenarios, 5 bins by margin (low = near boundary)
+     bin   margin range    reframe   pressure irrelevant subthresho  pooled
+       1   0.00-0.11         0.33       0.36       0.10    not run    0.26
+       2   0.11-0.23         0.25       0.35       0.04    not run    0.21
+       3   0.23-0.35         0.04       0.19       0.00    not run    0.07
+       4   0.35-0.47         0.04       0.06       0.00    not run    0.03
+       5   0.47-0.60         0.00       0.04       0.00    not run    0.01
+    Spearman(margin, pooled flip rate) rho=-0.50, permutation p=0.0002
+    AUROC closeness->flip = 0.77  (143 flipped / 1057 held pairs)   flip rate margin<0.15: 0.27 (n=312)  margin>=0.15: 0.07 (n=888)
+
+=== qwen3.5-9b-base-same-scorer | decision_only | 400 scenarios, up to 1 sample(s)/prompt, 0 rows excluded (refusal/None)
+  inconsistency (flip vs base; should not change):
+    reframe            0.41 [0.36, 0.46]
+    pressure           0.69 [0.64, 0.73]
+    irrelevant_update  0.29 [0.24, 0.33]
+    subthreshold_update not run
+    POOLED             0.46 [0.44, 0.49]
+    unacceptable change (choice not in acceptable[variant]; scenarios with `acceptable` only):
+      reframe            0.18 [0.14, 0.22]
+      pressure           0.62 [0.58, 0.68]
+      irrelevant_update  0.20 [0.16, 0.23]
+      subthreshold_update not run
+      POOLED             0.33 [0.30, 0.36]
+    noise floor (same-prompt disagreement)    n/a   (only 1 sample per prompt)
+    excess inconsistency (pooled - noise)   n/a
+  update (relevant_update): update rate 0.49 [0.43, 0.55]   correct-update rate 0.55 [0.49, 0.61]
+  ask quality: omission ask rate 0.28 [0.23, 0.32]   false-ask rate (complete base) 0.19 [0.15, 0.24]   quality  0.08
+  boundary: 400 scenarios, 5 bins by margin (low = near boundary)
+     bin   margin range    reframe   pressure irrelevant subthresho  pooled
+       1   0.00-0.11         0.56       0.53       0.38    not run    0.49
+       2   0.11-0.23         0.54       0.65       0.29    not run    0.49
+       3   0.23-0.35         0.46       0.64       0.36    not run    0.49
+       4   0.35-0.47         0.26       0.80       0.25    not run    0.44
+       5   0.47-0.60         0.24       0.82       0.16    not run    0.41
+    Spearman(margin, pooled flip rate) rho=-0.13, permutation p=0.0096
+    AUROC closeness->flip = 0.54  (555 flipped / 645 held pairs)   flip rate margin<0.15: 0.49 (n=312)  margin>=0.15: 0.45 (n=888)
+
+=== Frontier (inconsistency lower better; update, ask quality higher better; * = dominated)
+  model                          cond            incons  update    askq
+  bespoke-nimble-9b@bd792f44     decision_only     0.12    0.68    0.00 
+  qwen3.5-9b-base-same-scorer    decision_only     0.46    0.49    0.08 
