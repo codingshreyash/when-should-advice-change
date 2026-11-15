@@ -134,3 +134,61 @@ small one.
   control from the 9B work was not repeated here).
 - Provider sampling defaults are not controlled. The gateway and date are 2026-11-15
   (`inference-api.nvidia.com`).
+
+## Difficulty calibration (2026-11-15): making the scenarios longer did not make capable models fail
+
+`gen_procedural.py --hard 1..3` builds scenarios with 6, 8 and 10 attributes and numeric importance
+(1 to 5); the truth is still computed. Calibration used turn-1 accuracy only, on a separate seed
+(7001, 100 scenarios per level), before any second-look run on a harder set. Files:
+`data/scenarios/procedural/hard_calib.jsonl` (level 2), `results/calibration/`.
+
+Decisive scenarios, share right at turn 1:
+
+| model | level 1 | level 2 | level 3 |
+|---|---|---|---|
+| Claude Haiku 5.5 | 0.944 | 0.986 | 0.986 |
+| GPT-5.4 Mini | 0.958 | 0.958 | 0.986 |
+| Gemma 4 31B | 1.000 | 1.000 | 0.986 |
+| Mistral 7B | 0.620 | 0.704 | 0.662 |
+
+Level 2 only: Gemma 2 9B 0.861, Llama 3.1 8B 0.662 (10 of 100 unparsed), Llama 3.2 1B 0.455 (8
+unparsed), Nemotron Nano 9B v2 0.906 (20 unparsed, dropped). The strong models' few errors sit in
+the first band above the close-call threshold (Haiku 31/36, GPT 34/36 in bin 2). **Result: more
+attributes do not create errors in capable models**, so no hard set was run through the second-look
+test. The planned hard evaluation set was not generated.
+
+Instead, three weaker models with headroom were added on the same frozen 200-scenario set and the
+same protocol: Llama 3.1 8B, Gemma 2 9B, Llama 3.2 1B (`results/summaries/second_look_7models.txt`).
+
+## Results for the weaker models (same protocol, same 200 scenarios)
+
+Decisive scenarios; net = change in share correct, 95% bootstrap interval.
+
+| model (accuracy at turn 1) | look_again revise / net | nudge net | irrelevant net | resample revise |
+|---|---|---|---|---|
+| Gemma 2 9B (0.95) | **0.67 / -0.620 [-0.707, -0.527]** | **-0.893 [-0.947, -0.833]** | -0.080 [-0.127, -0.033] | 0.03 |
+| Llama 3.1 8B (0.87) | 0.26 / -0.091 [-0.174, -0.008] | -0.466 [-0.557, -0.374] | -0.007 | 0.19 |
+| Llama 3.2 1B (0.37) | 0.41 / +0.052 [-0.052, +0.157] | -0.144 [-0.261, -0.036] | +0.079 [-0.018, +0.184] | 0.54 |
+
+- **Gemma 2 9B**: a plain "take another look" turns 96 of 142 correct answers into wrong ones (3 wrong
+  become right). It revises 67% of the time against 3% for a plain resample. The nudge flips 94%.
+  The model treats "look again" as "your first answer was wrong".
+- **Llama 3.1 8B**: a smaller harm from a plain re-ask (-9 points); a relevant fact moves it to the new
+  best answer only 72% of the time (net -12 points).
+- **Llama 3.2 1B**: near chance (37% right). Its answers change as often under a resample (54%) as
+  under "look again" (41%), and it uses a relevant fact only 32% of the time. A "second look" here is
+  noise, so there is no reliable gain or loss.
+- Unparsed answers are excluded: Llama 3.1 8B 18-41 pairs per branch, Llama 3.2 1B 30-48. They may be
+  more common on hard items, so these two models' accuracy changes carry extra bias risk.
+
+## Answer to the title question (7 models, 1B to 31B, one set of scenarios)
+
+**Asking an AI to look again never reliably made its advice better.** Capable models mostly ignore it (3
+of 3, no change). Mid-size and small models often get worse (Mistral 7B -13, Llama 3.1 8B -9, Gemma 2 9B
+-62 points). A model at chance (Llama 3.2 1B) changes at random. Where models were wrong at turn 1 and
+had headroom, wrong-to-right changes were about as common as right-to-wrong only for the 1B model.
+Telling the model which answer you hoped for lowers accuracy in six of seven models (not Haiku).
+
+Open: whether this holds on real, human-written advice questions; whether other wordings of "look
+again" avoid the harm (Gemma 2 9B suggests the phrase reads as a challenge); and whether the nudge works
+through naming or preference (the neutral-mention control was not run on these models).
