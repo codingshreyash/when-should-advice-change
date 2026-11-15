@@ -294,3 +294,48 @@ asked to re-examine (revise 0.7 to 0.9 under both seeds), so it repairs and brea
 - Unparsed answers are excluded and uneven: Llama 3.1 8B lost 28 are_you_sure and 6 double_check pairs,
   Mistral 7 neutral/wrong. This may bias those two models.
 - Templated scenarios, one phrasing per wording, one run, no human check. Intervals are over 100 scenarios.
+
+## Experiment 4: the model's own mistakes (design fixed 2026-11-15, before any run)
+
+Motivation. In experiments 2 and 3 the wrong first answers were planted, so a strong model's near-perfect
+recovery may only mean it ignores the planted answer and solves the problem again. Prior work (Huang et al.,
+Kamoi et al.) says models do not fix their own reasoning mistakes this way. This experiment uses the
+**model's own** wrong answers, with a plain resample as the fair comparison.
+
+Design. Pool of decisive scenarios: all decisive items of `procedural_v0.jsonl` plus three new hard sets
+(`hard_pool_L1..L3.jsonl`, seeds 8101 to 8103, 200 each; about 720 decisive items). For every model:
+1. **turn 1:** the model writes its own advice on every pool item. An item is own-wrong if the code differs
+   from the expected answer (need_more_information counts as wrong).
+2. **resample:** for every own-wrong item and for a control sample of own-right items (100, random, seed
+   1684) an independent fresh turn 1 with the same prompt. This is the baseline: how often is the model right
+   on a second independent try?
+3. **re-ask:** for the same items, the conversation [prompt, the model's own advice verbatim, re-ask] with
+   three wordings: neutral ("Please give me your final recommendation."), look_again ("Please take another
+   look at this and give me your final recommendation."), review ("Please review your answer for any mistakes
+   and give me your final recommendation.").
+
+Models (6): Claude Haiku 5.5, GPT-5.4 Mini, Gemma 4 31B, Gemma 2 9B, Llama 3.1 8B, Mistral 7B.
+
+Outcomes (fixed now), with 95% bootstrap CIs over items (paired for differences):
+1. **Own recovery** = share right after a re-ask, among own-wrong items.
+2. **Resample recovery** = share right on an independent fresh try, among the same items.
+3. **Value-add** = own recovery minus resample recovery, per wording. This is the effect of asking again
+   as opposed to simply trying again.
+4. **Own loss** = share wrong after a re-ask among own-right items, and the same for a resample.
+5. **Break-even accuracy** = recovery / (recovery + loss), from the own-error numbers.
+6. Revise rate per wording.
+
+Hypotheses (may fail):
+- H1: for capable models own recovery is far below the planted-error recovery (0.98-0.99). In particular
+  most own errors persist after a re-ask.
+- H2: value-add is at most +0.10 for every model: a second look is not better than a plain resample at
+  fixing the model's own mistakes.
+- H3: the review wording revises more than neutral for every model.
+- H4: Gemma 2 9B keeps a large own loss (0.4 or more) under look_again and review.
+- H5: break-even accuracy from own errors is lower than the one from planted errors for the capable models.
+
+Known limits. Strong models may have few own errors (the warning "few own errors" is printed when fewer than
+15), so their intervals will be wide. Errors depend on the hard sets, which our calibration showed do not
+make capable models fail much; the pool is chosen for size, not for realism. Templated scenarios, one
+wording per condition, one run, no human check. The resample baseline uses the API's default sampling;
+a model run at temperature 0 would make resample recovery near zero by construction (we do not control this).
