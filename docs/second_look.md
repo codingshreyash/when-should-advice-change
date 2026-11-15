@@ -72,3 +72,65 @@ Each model is analysed alone. Decisive scenarios (one acceptable answer) and clo
 - "Correct" means the generator's answer, not a human judgment of the best advice.
 - Reasoning models may use hidden thinking tokens that change turn-2 behavior; record the model
   name and settings.
+
+## Results (2026-11-15, exploratory; analysis exactly as pre-specified above)
+
+Models through the NVIDIA inference hub: Claude Haiku 5.5, GPT-5.4 Mini, Gemma 4 31B, Mistral 7B
+Instruct v0.3. 200 generated scenarios (25 per margin bin; 150 decisive, 50 close calls), 1,143
+calls each. Raw rows: `results/second_look/`; tables: `results/summaries/second_look_full.txt`.
+Pilot: `results/second_look_pilot/` (12 scenarios, format check only).
+
+Decisive scenarios. Revise = turn-2 answer differs from turn 1. Net = change in share correct, with
+95% bootstrap interval over scenarios.
+
+| model (accuracy at turn 1) | look_again revise / net | nudge revise / net | irrelevant revise | resample revise |
+|---|---|---|---|---|
+| Claude Haiku 5.5 (0.98) | 0.02 / +0.013 [0.000, +0.033] | 0.014 / -0.007 [-0.020, 0.000] | 0.00 | 0.02 |
+| GPT-5.4 Mini (0.95) | 0.05 / +0.013 [-0.020, +0.053] | 0.087 / **-0.073 [-0.127, -0.033]** | 0.007 | 0.027 |
+| Gemma 4 31B (0.99) | 0.00 / 0.000 | 0.04 / **-0.040 [-0.073, -0.013]** | 0.00 | 0.00 |
+| Mistral 7B (0.74) | 0.33 / **-0.129 [-0.204, -0.048]** | 0.66 / **-0.595 [-0.669, -0.514]** | 0.19 | 0.33 |
+
+Relevant fact (decisive scenarios, of those right at turn 1): update accuracy 0.98 (Haiku), 1.00 (GPT,
+and net +0.075 [+0.022, +0.129]), 0.96 (Gemma), 0.77 (Mistral).
+
+**Against the pre-specified hypotheses**
+
+- **H-a (a re-ask changes the answer more than a resample): mostly not supported.** Revision rates
+  are about equal (Mistral 0.33 vs 0.33, Haiku 0.02 vs 0.02, Gemma 0 vs 0); GPT is higher (0.05 vs
+  0.03) but the difference is within noise.
+- **H-b (a plain second look does not help): consistent.** Three models change nothing measurable
+  (net +0.013, +0.013, 0.000, all intervals include 0). Mistral gets worse (-0.129): 30 right answers
+  become wrong, 11 wrong become right. Note that the three strong models are at 95-99% accuracy, so
+  there is almost no room to improve; this test cannot show a benefit for them.
+- **H-c (the nudge hurts more than a plain look): supported for GPT, Gemma and Mistral**, not for
+  Haiku. Mistral loses 60 points: 88 of 110 right answers move to the named option.
+- **H-d (a relevant fact helps, an irrelevant one does not): supported for GPT**, flat for Haiku and
+  Mistral, slightly negative but within noise for Gemma (4 right answers became wrong). Irrelevant
+  facts moved the three strong models 0-0.7% of the time and Mistral 19%.
+- **H-e (more re-ask revision goes with more nudge revision):** the ranking agrees (Mistral highest,
+  Gemma lowest on re-ask); 4 models cannot test it.
+
+**Where changes happen (look_again, all scenarios)**
+For Haiku, GPT and Gemma, revisions fall mostly in the three lowest margin bins (up to 0.48 for GPT in
+bin 0) and are near zero above bin 3. This matches the 9B boundary result. These are mostly close
+calls, where either answer is acceptable, so the revision is harmless. The nudge is different: GPT's
+loss sits in mid-margin bins (net -0.16 and -0.20 in bins 4 and 5), Gemma's in bin 2 (-0.24), and
+Mistral's in every bin. So nudge harm is **not** limited to the boundary.
+
+**Plain summary.** For capable chat models on these scenarios, asking "take another look" does little:
+it neither fixes nor breaks the answer, and changes mostly happen where the choice was a toss-up. Telling the
+model which answer you were hoping for is what moves it, in two of three strong models and badly in the
+small one.
+
+**Cautions**
+- Ceiling: the strong models are 95-99% correct on these templated scenarios, so a benefit of re-asking is
+  mostly unmeasurable. Harder scenarios are needed.
+- One wording per branch, one run, no human check of the scenarios. Templated prose from explicit
+  weights is easier than real advice questions.
+- Unparsed answers are excluded: Haiku 11 (truncated at 1,500 tokens), Mistral 8. GPT-5.4 Mini
+  crashed once on a network timeout; its 3 missing calls were filled by resuming. The retry code
+  now catches timeouts.
+- The nudge names the worse option, so priming and preference are not separated (the neutral-mention
+  control from the 9B work was not repeated here).
+- Provider sampling defaults are not controlled. The gateway and date are 2026-11-15
+  (`inference-api.nvidia.com`).

@@ -1,0 +1,168 @@
+==============================================================================
+MODEL azure/anthropic/claude-haiku-5-5: 200 scenarios, 1143 rows
+Excluded pairs (None choice; of which refusal): {'look_again': '3 (0)', 'nudge': '6 (0)', 'irrelevant': '2 (0)', 'relevant': '4 (0)', 'repeat': '4 (0)'}
+
+--- DECISIVE scenarios ---
+branch         n  revise  before   after  net accuracy change [95% CI]
+look_again   150   0.020   0.980   0.993  +0.013 [+0.000,+0.033]
+nudge        148   0.014   0.980   0.973  -0.007 [-0.020,+0.000]
+irrelevant   150   0.000   0.980   0.980  +0.000 [+0.000,+0.000]
+relevant      91   0.956   0.967   0.978  +0.011 [-0.033,+0.066]
+repeat       150   0.020   0.980   0.987  +0.007 [+0.000,+0.020]
+
+--- CLOSE scenarios ---
+branch         n  revise  before   after  net accuracy change [95% CI]
+look_again    47   0.149   1.000   1.000  +0.000 [+0.000,+0.000]
+nudge         46   0.087   1.000   1.000  +0.000 [+0.000,+0.000]
+irrelevant    48   0.000   1.000   1.000  +0.000 [+0.000,+0.000]
+relevant      48   0.271   1.000   0.979  -0.021 [-0.062,+0.000]
+repeat        46   0.065   1.000   1.000  +0.000 [+0.000,+0.000]
+
+--- TRANSITIONS (decisive only; before->after) ---
+branch       R->R  R->W  W->R  W->W
+look_again    147     0     2     1
+nudge         144     1     0     3
+irrelevant    147     0     0     3
+relevant       86     2     3     0
+repeat        147     0     1     2
+
+--- RELEVANT UPDATE (among scenarios right at turn 1) ---
+decisive  n= 88 update accuracy=0.977  failure to update=0.023  (kept turn-1 answer: 0.023)
+close     n= 48 update accuracy=0.979  failure to update=0.021  (kept turn-1 answer: 0.729)
+
+--- BY MARGIN BIN (all scenarios; revision rate / net accuracy change) ---
+bin |          look_again          |            nudge            
+  0 | n= 24 rev=0.21 net=+0.00     | n= 24 rev=0.12 net=+0.00    
+  1 | n= 23 rev=0.09 net=+0.00     | n= 22 rev=0.05 net=+0.00    
+  2 | n= 25 rev=0.12 net=+0.08     | n= 24 rev=0.08 net=-0.04    
+  3 | n= 25 rev=0.00 net=+0.00     | n= 24 rev=0.00 net=+0.00    
+  4 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+  5 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+  6 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+  7 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+==============================================================================
+MODEL azure/openai/gpt-5.4-mini: 200 scenarios, 1143 rows
+Excluded pairs (None choice; of which refusal): none
+
+--- DECISIVE scenarios ---
+branch         n  revise  before   after  net accuracy change [95% CI]
+look_again   150   0.053   0.953   0.967  +0.013 [-0.020,+0.053]
+nudge        150   0.087   0.953   0.880  -0.073 [-0.127,-0.033]
+irrelevant   150   0.007   0.953   0.960  +0.007 [+0.000,+0.020]
+relevant      93   0.925   0.925   1.000  +0.075 [+0.022,+0.129]
+repeat       150   0.027   0.953   0.967  +0.013 [-0.013,+0.040]
+
+--- CLOSE scenarios ---
+branch         n  revise  before   after  net accuracy change [95% CI]
+look_again    50   0.280   1.000   1.000  +0.000 [+0.000,+0.000]
+nudge         50   0.240   1.000   1.000  +0.000 [+0.000,+0.000]
+irrelevant    50   0.000   1.000   1.000  +0.000 [+0.000,+0.000]
+relevant      50   0.260   1.000   0.880  -0.120 [-0.220,-0.040]
+repeat        50   0.120   1.000   1.000  +0.000 [+0.000,+0.000]
+
+--- TRANSITIONS (decisive only; before->after) ---
+branch       R->R  R->W  W->R  W->W
+look_again    140     3     5     2
+nudge         131    12     1     6
+irrelevant    143     0     1     6
+relevant       86     0     7     0
+repeat        142     1     3     4
+
+--- RELEVANT UPDATE (among scenarios right at turn 1) ---
+decisive  n= 86 update accuracy=1.000  failure to update=0.000  (kept turn-1 answer: 0.000)
+close     n= 50 update accuracy=0.880  failure to update=0.120  (kept turn-1 answer: 0.740)
+
+--- BY MARGIN BIN (all scenarios; revision rate / net accuracy change) ---
+bin |          look_again          |            nudge            
+  0 | n= 25 rev=0.48 net=+0.00     | n= 25 rev=0.16 net=+0.00    
+  1 | n= 25 rev=0.08 net=+0.00     | n= 25 rev=0.32 net=+0.00    
+  2 | n= 25 rev=0.24 net=+0.00     | n= 25 rev=0.08 net=+0.00    
+  3 | n= 25 rev=0.08 net=+0.08     | n= 25 rev=0.04 net=-0.04    
+  4 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.16 net=-0.16    
+  5 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.20 net=-0.20    
+  6 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+  7 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.04 net=-0.04    
+==============================================================================
+MODEL nvidia/google/gemma-4-31b-it: 200 scenarios, 1143 rows
+Excluded pairs (None choice; of which refusal): none
+
+--- DECISIVE scenarios ---
+branch         n  revise  before   after  net accuracy change [95% CI]
+look_again   150   0.000   0.993   0.993  +0.000 [+0.000,+0.000]
+nudge        150   0.040   0.993   0.953  -0.040 [-0.073,-0.013]
+irrelevant   150   0.000   0.993   0.993  +0.000 [+0.000,+0.000]
+relevant      93   0.946   0.989   0.957  -0.032 [-0.075,+0.011]
+repeat       150   0.000   0.993   0.993  +0.000 [+0.000,+0.000]
+
+--- CLOSE scenarios ---
+branch         n  revise  before   after  net accuracy change [95% CI]
+look_again    50   0.060   1.000   1.000  +0.000 [+0.000,+0.000]
+nudge         50   0.220   1.000   1.000  +0.000 [+0.000,+0.000]
+irrelevant    50   0.000   1.000   1.000  +0.000 [+0.000,+0.000]
+relevant      50   0.300   1.000   1.000  +0.000 [+0.000,+0.000]
+repeat        50   0.040   1.000   1.000  +0.000 [+0.000,+0.000]
+
+--- TRANSITIONS (decisive only; before->after) ---
+branch       R->R  R->W  W->R  W->W
+look_again    149     0     0     1
+nudge         143     6     0     1
+irrelevant    149     0     0     1
+relevant       88     4     1     0
+repeat        149     0     0     1
+
+--- RELEVANT UPDATE (among scenarios right at turn 1) ---
+decisive  n= 92 update accuracy=0.957  failure to update=0.043  (kept turn-1 answer: 0.043)
+close     n= 50 update accuracy=1.000  failure to update=0.000  (kept turn-1 answer: 0.700)
+
+--- BY MARGIN BIN (all scenarios; revision rate / net accuracy change) ---
+bin |          look_again          |            nudge            
+  0 | n= 25 rev=0.08 net=+0.00     | n= 25 rev=0.16 net=+0.00    
+  1 | n= 25 rev=0.04 net=+0.00     | n= 25 rev=0.28 net=+0.00    
+  2 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.24 net=-0.24    
+  3 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+  4 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+  5 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+  6 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+  7 | n= 25 rev=0.00 net=+0.00     | n= 25 rev=0.00 net=+0.00    
+==============================================================================
+MODEL nvidia/mistralai/mistral-7b-instruct-v0.3: 200 scenarios, 1143 rows
+Excluded pairs (None choice; of which refusal): {'look_again': '4 (0)', 'nudge': '3 (0)', 'irrelevant': '3 (0)', 'relevant': '3 (0)', 'repeat': '4 (0)'}
+
+--- DECISIVE scenarios ---
+branch         n  revise  before   after  net accuracy change [95% CI]
+look_again   147   0.333   0.741   0.612  -0.129 [-0.204,-0.048]
+nudge        148   0.662   0.743   0.149  -0.595 [-0.669,-0.514]
+irrelevant   148   0.189   0.743   0.709  -0.034 [-0.095,+0.027]
+relevant      91   0.736   0.725   0.714  -0.011 [-0.121,+0.110]
+repeat       147   0.333   0.748   0.810  +0.061 [-0.027,+0.150]
+
+--- CLOSE scenarios ---
+branch         n  revise  before   after  net accuracy change [95% CI]
+look_again    49   0.490   1.000   1.000  +0.000 [+0.000,+0.000]
+nudge         49   0.490   1.000   1.000  +0.000 [+0.000,+0.000]
+irrelevant    49   0.184   1.000   1.000  +0.000 [+0.000,+0.000]
+relevant      49   0.469   1.000   0.551  -0.449 [-0.592,-0.306]
+repeat        49   0.429   1.000   1.000  +0.000 [+0.000,+0.000]
+
+--- TRANSITIONS (decisive only; before->after) ---
+branch       R->R  R->W  W->R  W->W
+look_again     79    30    11    27
+nudge          22    88     0    38
+irrelevant     95    15    10    28
+relevant       51    15    14    11
+repeat         92    18    27    10
+
+--- RELEVANT UPDATE (among scenarios right at turn 1) ---
+decisive  n= 66 update accuracy=0.773  failure to update=0.227  (kept turn-1 answer: 0.091)
+close     n= 49 update accuracy=0.551  failure to update=0.449  (kept turn-1 answer: 0.531)
+
+--- BY MARGIN BIN (all scenarios; revision rate / net accuracy change) ---
+bin |          look_again          |            nudge            
+  0 | n= 25 rev=0.52 net=+0.00     | n= 25 rev=0.48 net=+0.00    
+  1 | n= 24 rev=0.46 net=+0.00     | n= 24 rev=0.50 net=+0.00    
+  2 | n= 24 rev=0.46 net=-0.17     | n= 25 rev=0.64 net=-0.60    
+  3 | n= 25 rev=0.24 net=-0.12     | n= 25 rev=0.56 net=-0.52    
+  4 | n= 24 rev=0.58 net=-0.33     | n= 24 rev=0.71 net=-0.62    
+  5 | n= 25 rev=0.24 net=-0.08     | n= 25 rev=0.60 net=-0.52    
+  6 | n= 24 rev=0.33 net=+0.08     | n= 24 rev=0.62 net=-0.46    
+  7 | n= 25 rev=0.16 net=-0.16     | n= 25 rev=0.84 net=-0.84    

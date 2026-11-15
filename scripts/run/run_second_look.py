@@ -111,7 +111,7 @@ class OpenAICompat:
                 if e.code in (429, 500, 502, 503, 504) and attempt < 5:
                     time.sleep(min(60, 2 ** attempt * 3)); continue
                 raise RuntimeError(f"HTTP {e.code}: {e.read()[:300]!r}") from None
-            except urllib.error.URLError:
+            except (urllib.error.URLError, TimeoutError, OSError):
                 if attempt < 5: time.sleep(min(60, 2 ** attempt * 3)); continue
                 raise
         ch = r["choices"][0]; msg = ch.get("message", {})
