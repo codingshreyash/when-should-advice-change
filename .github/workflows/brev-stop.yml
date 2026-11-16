@@ -1,0 +1,41 @@
+# One-off: stop the running Brev instance (requested 2026-11-16). Runs on push to this branch
+# only. Lists instances first; stops only if exactly one exists, otherwise changes nothing.
+# Stop, not delete: the instance may still hold uncopied results. Delete by hand afterwards.
+name: brev stop (one-off)
+on:
+  push:
+    branches: [ops/brev-stop]
+permissions:
+  contents: read
+jobs:
+  stop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BREV_API_TOKEN: ${{ secrets.BREV_API_TOKEN }}
+    steps:
+      - name: Install Brev CLI and log in
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/brevdev/brev-cli/main/bin/install-latest.sh)"
+          brev --version
+          brev login --token "$BREV_API_TOKEN" > /dev/null
+      - name: List instances
+        run: |
+          brev ls | tee names.txt
+          echo "--- table (via script for a tty) ---"
+          script -qc "brev ls" /dev/null || true
+      - name: Stop the instance if exactly one exists
+        run: |
+          mapfile -t names < <(grep -v '^\s*$' names.txt)
+          echo "instances: ${#names[@]}"
+          if [ "${#names[@]}" -ne 1 ]; then
+            echo "BREV_STOP NOT DONE: ${#names[@]} instances listed; refusing to guess which to stop"
+            exit 1
+          fi
+          brev stop "${names[0]}"
+          echo "BREV_STOP requested for ${names[0]}"
+      - name: Status after stop
+        if: always()
+        run: |
+          sleep 30
+          script -qc "brev ls" /dev/null || brev ls || true
