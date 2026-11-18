@@ -107,7 +107,7 @@ Secondary claims:
 | Arm B is AI-drafted (60 items) | Labelers do not see the drafters' answers. Option order is shuffled. | Two blind human labels are missing. Arm B is not a result until they exist. R4 is untested. |
 | The resample baseline depends on API default sampling | We state the default and name the gateway and date. | At greedy decoding a resample would repeat the first answer, so value-add would grow. |
 | CommonsenseQA label noise | We report csqa and medqa apart and do not pool them in the headline. | The capable-model gain is mostly on csqa. A move to another answer can match the gold label by chance. |
-| Gemma 4 31B partly missing on real questions | We say so. Its generated-set results are complete. | Only 28 of 1,200 turn-1 calls finished. The real-question table has five models. |
+| Gemma 4 31B on real questions | It finished (163 own errors). It does not show the strong-model gain. | Two of three strong models gain; say which. |
 | No human labels yet | Labeling steps and a sheet are ready. | Needs two people, about 2 hours each. |
 | Unverified literature | Read depth is kept as in LIT. | Most entries are abstracts or snippets. Re-read each paper before citing. FRAGILE could not be found. |
 | Other | Gate: at least 40 own errors per model on real questions (met). Parse failures are reported per model. | Unparsed answers are at most 2.3% of turn-1 calls. One run, one wording per condition. |
@@ -132,7 +132,7 @@ Secondary claims:
 | --- | --- | --- |
 | Collect two blind human label sheets for Arm B (60 items) | A | M |
 | Compute agreement and compare with drafter proposals | A | S |
-| Finish or drop Gemma 4 31B on real questions (rerun with shorter prompts or a smaller sample) | B | M |
+| Harder Arm B items so strong models make enough errors to test R4 | B | M |
 | Re-read every cited paper; fix read-depth labels; find BeliefTrack and FRAGILE links | C | L |
 | Draw F1 and F2 from the summary files | D | S |
 | Test other wordings of "look again" on real questions | B | M |
@@ -152,5 +152,5 @@ Secondary claims:
 - Do not say instability marks close calls for all models. It holds for Nimble, not Qwen.
 - Do not claim the plain re-ask result, or flips near the boundary, as new. Prior work exists (FlipFlop, Anatomy).
 - Do not pool MedQA and CommonsenseQA in a headline number.
-- Do not cite any paper from LIT as verified. Do not use Gemma 4 31B in the real-question table.
+- Do not cite any paper from LIT as verified. Do not write "capable models gain" without naming which: Gemma 4 31B does not.
 - Do not call any result confirmatory. Keep exploratory and confirmatory results apart (`PROTOCOL.md`).

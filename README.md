@@ -33,7 +33,7 @@ Most results come from generated scenarios. The last two bullets also use 1,200 
 - **A planted wrong answer is easy to fix.** Capable models fix it 98% to 99% of the time.
 - **A model's own wrong answer is harder to fix.** It depends on the model.
   - Weaker models (Llama 3.1 8B, Mistral 7B) stay anchored. A fresh try in a new chat fixes more than a re-ask in the same chat.
-  - Stronger models (Haiku 5.5, GPT-5.4 Mini) fix more with "look again" than with a fresh try. They also break some right answers. Overall, accuracy goes down a little.
+  - Two strong models (Haiku 5.5, GPT-5.4 Mini) fix more with "look again" than with a fresh try. They also break some right answers, so accuracy goes down a little. A third (Gemma 4 31B) shows no gain and breaks almost nothing.
   - Gemma 2 9B fixes 38% of its errors and breaks 51% of its right answers. Asking it to double-check is a clear net loss.
 - **The plain wording is safe.** "Give me your final recommendation" changes almost nothing.
 
@@ -51,9 +51,9 @@ Details: [`docs/second_look.md`](docs/second_look.md) and [`docs/instability_the
 
 ## Real-world check
 
-We tested the second-look results on two public question sets (MedQA and CommonsenseQA). Five models finished. The weak-model result held. The strong-model result changed, as the bullets above show. Details: [`docs/real_world_check.md`](docs/real_world_check.md).
+We tested the second-look results on two public question sets (MedQA and CommonsenseQA). Six models finished. The weak-model result held. The strong-model result changed, as the bullets above show. Details: [`docs/real_world_check.md`](docs/real_world_check.md).
 
-Still open: 60 advice questions are drafted, but two people must label them blind. We cannot call them a human check before that. Gemma 4 31B did not finish.
+We also drafted 60 advice questions. Two AI labelers labeled them. The weak-model result and the Gemma 2 9B result held on them. Strong models made too few errors on these items to test. No human has labeled them, so this is not a human check.
 
 ## How we test
 
