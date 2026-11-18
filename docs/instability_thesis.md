@@ -9,7 +9,7 @@ replace `PROTOCOL.md`. Everything built for it is **exploratory** until blind la
 An adviser answers. The input then changes in a way that means the same: the user asks
 again, pushes, rewords, reorders the options, or adds a fact that does not matter. The
 answer changes. We call this **inconsistency**. A change is good only when a fact that
-matters changed (a warranted revision). So the question is the same as the project's:
+matters changed (a warranted change). So the question is the same as the project's:
 did the answer change for the right reason? The new angle is *where* it fails, and *what
 to do about it*.
 
