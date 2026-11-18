@@ -25,7 +25,7 @@ A good advisor changes its answer for good reasons only. We test if AI models do
 
 ## What we found
 
-These results come from generated scenarios. See the cautions below.
+Most results come from generated scenarios. The last two bullets also use 1,200 public questions (MedQA and CommonsenseQA). See the cautions below.
 
 - **Noise is large.** If we only change the order of the options, 6% to 14% of answers change in the 9B models.
 - **Changes happen near the boundary.** For the Nimble model, answers flip more when the two options are almost equal.
@@ -49,9 +49,11 @@ Details: [`docs/second_look.md`](docs/second_look.md) and [`docs/instability_the
 - The related-work notes in [`docs/literature.md`](docs/literature.md) are not fully verified.
 - We have not yet run blind human labels.
 
-## What is running now
+## Real-world check
 
-The real-world check tests the second-look results on two public question sets (MedQA and CommonsenseQA). It also plans 60 advice questions written and labeled by people. See [`docs/real_world_check.md`](docs/real_world_check.md). The hypotheses are written before the runs.
+We tested the second-look results on two public question sets (MedQA and CommonsenseQA). Five models finished. The weak-model result held. The strong-model result changed, as the bullets above show. Details: [`docs/real_world_check.md`](docs/real_world_check.md).
+
+Still open: 60 advice questions are drafted, but two people must label them blind. We cannot call them a human check before that. Gemma 4 31B did not finish.
 
 ## How we test
 
