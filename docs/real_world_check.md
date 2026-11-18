@@ -95,6 +95,25 @@ Gate (step 2 of "Order of work"): Mistral 7B, first 100 items of each set (200 i
 
 Next: step 3, all six models on the full 1,200 items. Expected size is about 3,000 to 4,000 calls per model, so about 20,000 calls in total. Not started.
 
+### 2026-11-19: Arm B items drafted (60 items, labels still missing)
+
+How the items were made. Four separate drafting agents each wrote 15 items for one domain (career, housing, medical choice, purchase) from public web sources. They paraphrased the sources and invented the names. The items are in `data/labeling/armb/*_items.jsonl`.
+- Per domain: 8 clear, 3 close, 4 missing-fact items. Each has 2 real options and `need_more_information`.
+- The drafters also proposed answers. These are in `data/labeling/armb/keys/` (kept local, git-ignored). They are **proposals, not labels**. Labelers must not see them.
+- Sources: 4 dead links were removed. 28 of 53 links opened for us. 22 more are blocked to scripts (BLS, CDC, Mayo and similar), so they are **unverified**. Each item has a `source_check` field. Numbers in housing and purchase items are illustrative, not real listings.
+- Known weak items (drafter's doubts): housing 10 and 15; purchase 13 and 14; medical 05, 09 and 13; career 05 and 12 to 15. Keep them. Disagreement between labelers is the filter.
+
+What this arm can and cannot show.
+- The items are AI-drafted. They are **not independent of AI models**. Only the blind human labels make this a human check. Without two agreeing human labels per item, Arm B is not reported as a result.
+- The listed order favored the first option in 23 of 32 clear items. The labeling sheet shuffles option order (seeded). The runner also randomizes it.
+- Medical items are hypothetical lay decisions. A person with health training should read them before use.
+
+Labeling steps for the team:
+1. Run `python3 scripts/data/build_armb_sheet.py` (or take `data/labeling/armb/labeling_sheet.csv`).
+2. Two people copy the sheet. Each fills `acceptable` alone, with the rules in `docs/labeling.md`. Use `|` between codes. Mark `unsure` if needed.
+3. Do not talk about answers until both finish.
+4. Send the two filled sheets back. We keep items where both agree and report the agreement rate. We then compare the agreed labels with the drafters' proposals as a side check.
+
 ---
 
 ## Arm A results (2026-11-19): five of six models

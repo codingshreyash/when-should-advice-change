@@ -30,3 +30,6 @@ report/*.synctex.gz
 report/*.toc
 report/*.nav
 report/*.snm
+
+# Arm B answer keys: hidden from labelers, never commit
+data/labeling/armb/keys/
