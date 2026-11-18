@@ -19,8 +19,7 @@ still means an abstract in most cases.
 
 BeliefTrack (EMNLP 2026) already measures fact-update sensitivity, so the two-sided
 "stay vs update" estimand is published. The team's negative-methods report says this
-(`research/warranted_revision/NEGATIVE_METHODS_REPORT.md` on branch
-`research/warranted-revision-v1`). We found no link; find and read it.
+(`research/negative_methods/NEGATIVE_METHODS_REPORT.md`). We found no link; find and read it.
 
 The midterm report cites FRAGILE (hwang2026framing). An agent searched and could not
 find it. Check that reference before the final paper.

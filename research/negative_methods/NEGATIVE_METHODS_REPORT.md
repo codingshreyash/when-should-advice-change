@@ -1,7 +1,7 @@
-# When should advice change? A negative methods report on measuring warranted revision
+# When should advice change? A negative methods report on measuring warranted decision updating
 
-**Status:** closing record of the warranted-revision / premise-search research direction
-(`research/warranted_revision/`, October 2026). It recommends ending that direction. All
+**Status:** closing record of the earlier premise-search research direction
+(October 2026; the full record is on branch `research/warranted-revision-v1`, under its old name). It recommends ending that direction. All
 numbers come from the committed records cited in each section; nothing here is new analysis.
 
 **Scope.** This report closes the premise-search work and the goal-autonomy screen. It does
@@ -9,7 +9,7 @@ numbers come from the committed records cited in each section; nothing here is n
 and Qwen comparisons, and the confirmatory protocol in `PROTOCOL.md`). Several of that
 project's questions remain open; see `docs/PROPOSAL_GAP.md` at the repository root.
 
-**Where the cited records are.** Paths under `research/warranted_revision/` and `results/warranted_revision/` refer to branch `research/warranted-revision-v1` of this repository, which holds the full research record and is not merged into `main`.
+**Where the cited records are.** Paths under `research/warranted_revision/` and `results/warranted_revision/` (the old project name, kept so the paths stay exact) refer to branch `research/warranted-revision-v1` of this repository, which holds the full research record and is not merged into `main`.
 
 **What is and isn't complete.**
 - Only one model, Qwen3.5-9B, completed the final screen. Mistral-NeMo stopped at its
