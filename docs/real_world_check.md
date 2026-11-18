@@ -162,3 +162,53 @@ Practical reading, replacing the earlier one: do not use "look again" on a model
 - The resample baseline depends on the API's default sampling. At greedy decoding it would repeat the first answer.
 - The "net accuracy change" numbers combine two separate samples and are rough.
 - Gemma 4 31B is missing. Arm B is not run. These are still multiple-choice questions, not open advice.
+
+### 2026-11-20: Arm B labeled by two AI labelers (NOT a human check)
+
+Two separate AI agents (different models) labeled the 60 items alone, from the blind sheet and `docs/labeling.md` only. They did not read the drafters' answers (each used about 4 tool calls: rules, sheet, write, check). Files: `data/labeling/armb/ai_labels_A.csv`, `ai_labels_B.csv`. Script: `scripts/analysis/armb_agreement.py`. Output: `results/summaries/armb_ai_agreement.txt`.
+
+- **Agreement between the two labelers:** identical sets on 53 of 60 items (0.88). They overlap on all 60. Cohen's kappa over item-by-option decisions is 0.92.
+- **Where they differ:** 7 items. Both labelers marked 15 rows unsure; they agree exactly on 8 of those 15 and on all 45 other rows. So the unsure flag works as a signal.
+- **Labeler style:** A gave more two-option labels (13, against 6 for B). Both gave "need more information" alone about as often (12 and 14). The drafters planned 16.
+- **Against the drafters' proposals** (proposals, not labels): A matches exactly on 53 of 60, B on 52 of 60. Of the 53 items where A and B agree, 50 equal the proposal, and all 53 overlap it.
+- **Items kept for Arm B if we used these labels:** the 53 with identical sets. The 7 with disagreement would be dropped.
+
+What this does and does not show.
+- The agreement is high, but it is **agreement among AI systems**. The drafters, the two labelers and the models we test share training habits. High agreement here proves less than the same agreement between two people. It shows the items are not broken or ambiguous to a careful reader, and that the labeling rules are usable. It does not show that people would label them the same way.
+- **R4 stays untested.** We have not run the models on Arm B. If we run them, the result must say "AI-labeled".
+- The human sheets are still needed. If two humans also agree with these labels, we can drop the "AI-labeled" tag.
+
+---
+
+## Update 2026-11-20: Gemma 4 31B finished on the real questions
+
+Files: `results/summaries/realworld_own_error_6models.txt`, `realworld_own_error_by_pool_6models.txt`. The model made 163 own errors (own accuracy 0.86), so it can be tested.
+- Fresh resample: recovery 0.24, loss 0.07. "Look again": recovery 0.20, loss 0.02. Value-add of "look again": **-0.04 [-0.12, +0.04]**, no clear difference. "Review": -0.13 [-0.20, -0.06]. Neutral: -0.21 [-0.28, -0.14].
+- It breaks almost no right answers (2% with "look again"). It does not show the gain that Haiku 5.5 and GPT-5.4 Mini show.
+- **Effect on the Arm A conclusions.** R1 is still not supported overall (Haiku 5.5 and GPT-5.4 Mini exceed the bound), but it holds for Gemma 4 31B. So "strong models gain from look again" is **not** a general result. It holds for two of the three strong models. Do not write "capable models" without naming which ones.
+
+## Arm B results (2026-11-20): AI-labeled items, six models
+
+Items: the 47 decisive items where both AI labelers agreed (35 with a concrete best option, 12 where "need more information" is right), in 5 copies each with a different option order (235 prompts per model). Same runner and wordings as Arm A. Analysis: `scripts/analysis/armb_own_error.py` (cluster bootstrap over original items; the copies are not independent). Output: `results/summaries/armb_own_error.txt`. Raw rows: `results/armb/`. 0 error rows.
+**All labels here are AI-made, so this is not a human check.**
+
+| Model | Own accuracy | Own errors (copies / distinct items) |
+|---|---|---|
+| Haiku 5.5 | 0.97 | 6 / 3 |
+| GPT-5.4 Mini | 0.96 | 9 / 4 |
+| Gemma 4 31B | 0.96 | 9 / 3 |
+| Gemma 2 9B | 0.94 | 14 / 7 |
+| Llama 3.1 8B | 0.75 | 55 / 26 |
+| Mistral 7B | 0.76 | 54 / 27 |
+
+**R4 verdict: not rejected, and mostly uninformative.**
+- Rule fixed before the run: R4 fails for a model and wording if the whole 95% interval of (re-ask recovery minus resample recovery) lies above 0.
+- It fails for **no** model and wording.
+- Only Llama 3.1 8B and Mistral 7B have at least 10 distinct items with an error. For them R4 holds. "Look again" is no better than a fresh try (Llama -0.07 [-0.21, +0.05], Mistral -0.09 [-0.27, +0.08]). The neutral and "review" wordings are clearly worse (Mistral -0.29 and -0.28; Llama -0.21 for neutral).
+- For the other four models the items are too easy. They have 3 to 7 items with an error, so no interval can fail. I added the "uninformative" flag **after** seeing these results. It does not change which wording passes or fails; it only stops "holds" from reading as evidence.
+- **One result is clear without the flag.** Gemma 2 9B breaks right answers when asked to look again: loss 0.74 against 0.03 for a fresh try (difference +0.71 [+0.59, +0.82]). With "review" the loss is 0.52. This repeats the generated-scenario and Arm A results on a third item set.
+
+What Arm B can and cannot show.
+- It shows the weak-model pattern and the Gemma 2 9B collapse again on items written to be readable by people, with a "need more information" answer in a quarter of them.
+- It does **not** test the capable-model gain, because those models almost never err here. To test it we would need harder Arm B items, or more of them.
+- The items and labels are AI-made. The labelers, drafters and models share training habits.

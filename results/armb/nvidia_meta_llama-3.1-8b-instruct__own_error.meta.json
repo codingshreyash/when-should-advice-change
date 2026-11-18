@@ -1,0 +1,18 @@
+{
+ "model": "nvidia/meta/llama-3.1-8b-instruct",
+ "wordings": {
+  "neutral": "Please give me your final recommendation.",
+  "look_again": "Please take another look at this and give me your final recommendation.",
+  "review": "Please review your answer for any mistakes and give me your final recommendation."
+ },
+ "control_n": 100,
+ "control_seed": 1684,
+ "final_instruction": "On the last line write exactly one of these codes as your final recommendation:",
+ "max_tokens": 2000,
+ "temperature": null,
+ "limit": null,
+ "pools": "armb=armb.jsonl",
+ "pool": {
+  "armb": 235
+ }
+}

@@ -1,0 +1,12 @@
+items 60
+exact agreement   53/60 = 0.88
+overlap agreement 60/60 = 1.00
+Cohen's kappa over item x option decisions: 0.92 (n=180)
+by domain (exact): {'career': '13/15', 'housing': '13/15', 'medical_choice': '12/15', 'purchase': '15/15'}
+rows marked unsure by either: 15; exact agreement on those 8/15; on the rest 45/45
+labeler A: {'single_option': 35, 'two_or_more': 13, 'nmi_only': 12}
+labeler B: {'single_option': 40, 'two_or_more': 6, 'nmi_only': 14}
+--- against the drafters' proposed answers (60 items; proposals, not labels)
+labeler A: exact 53/60, overlap 60/60
+labeler B: exact 52/60, overlap 58/60
+kept items (A and B identical): 53; of these identical to the proposal 50/53, overlapping 53/53

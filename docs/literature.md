@@ -133,3 +133,29 @@ Update).
 "double check", "review your answer", "take another look", a neutral restate); a size sweep inside one
 model family; and **seeding turn 1 with a wrong answer** to measure recovery against loss, which removes
 the ceiling problem.
+
+## Update 2026-11-19: mechanism leads for the second-look results
+
+Found by a search agent. **Read depth for every item: abstract only or search snippet only. No full text was read.** Treat each as a lead to check before citing. A teammate should read the first four in full.
+
+**No paper tests our exact findings.** We found no mechanistic study of "look again" on a model's own answer versus a planted one. Nothing covers the revise-on-challenge reflex of Gemma 2 9B specifically. The work below gives hypotheses, not an explanation.
+
+| Our finding | Lead | Read depth | What it offers |
+|---|---|---|---|
+| Naming an option moves the answer | Wang et al. 2025, "When Truth Is Overridden: Uncovering the Internal Origins of Sycophancy in Large Language Models", arXiv 2508.02087 | abstract only | A user's stated opinion shifts the output in late layers (logit lens, activation patching). Closest match. |
+| Naming an option moves the answer | Panickssery et al., "Steering Llama 2 via Contrastive Activation Addition", arXiv 2312.06681 | snippet only | A steering vector raises or lowers sycophancy. A causal direction exists. |
+| Models change right answers when challenged | Genadi et al. 2026, "Sycophancy Hides Linearly in the Attention Heads", arXiv 2601.16644 | abstract only | A few middle-layer heads attend to expressions of user doubt. A challenge turn is user doubt. |
+| Models change right answers when challenged | Pandey 2026, "LLMs Know They're Wrong and Agree Anyway: The Shared Sycophancy-Lying Circuit", arXiv 2604.19117 | abstract only | Heads detect a wrong claim. Silencing them changes sycophancy. Effect sizes not checked. |
+| Own mistakes are hard to fix | Yang and Jia 2025, "When Do LLMs Admit Their Mistakes? Understanding The Role Of Model Belief In Retraction", arXiv 2505.16170 | abstract only | A probe-measured belief predicts whether a model retracts its own answer. |
+| Revision after a challenge | Chen et al. 2025, "Persona Vectors", arXiv 2507.21509 | abstract only | Sycophancy is a linear direction that can be monitored and steered. |
+| Revision after a challenge | Sharma et al. 2023, "Towards Understanding Sycophancy in Language Models", arXiv 2310.13548 | snippet only | Human preference data sometimes favors agreeable answers. A training-data explanation. |
+| Self-correction hurts | Huang et al. 2023, "Large Language Models Cannot Self-Correct Reasoning Yet", arXiv 2310.01798 | snippet only | Without oracle labels, self-correction can turn right answers wrong. |
+| Challenge flips answers | Laban et al. 2023, "Are You Sure? Challenging LLMs Leads to Performance Drops in The FlipFlop Experiment", arXiv 2311.08596 | snippet only | About 46% of answers flip under challenge. The two versions give different numbers. Check which one to cite. |
+| Self-correction wavering | Zhang et al., "Understanding the Dark Side of LLMs' Intrinsic Self-Correction", arXiv 2412.14959 | abstract only | Self-correction makes models waver on correct answers. |
+| Self-correction as steering | Lee et al. 2025, "Explaining Intrinsic Moral Self-Correction with Mechanistic Interpretability", arXiv 2505.11924 | abstract only | Self-correction prompts shift hidden states. Moral tasks only. |
+
+**Two untitled leads (could not get title or authors; do not cite):** arXiv 2603.04582 (a self-attribution bias: models rate their own actions as better) and arXiv 2604.22193 (models prefer self-attributed assertions). Both would support a hypothesis for our planted-versus-own gap: a model may treat its own earlier answer as more credible. We have not tested this. "Prefill Awareness in Large Language Models" (arXiv 2606.12747, snippet only) is related.
+
+**How to write it in the paper:** "Prior work suggests X, and our results are consistent with it." Do not write "mechanistic interpretability shows X."
+
+**Correction to claim 2 above.** The neutral wording turned out to be the safe one. The harm comes from "look again" and "review for mistakes", not from the neutral re-ask. See `docs/real_world_check.md` (Arm A results).
