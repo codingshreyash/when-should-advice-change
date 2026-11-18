@@ -1,0 +1,18 @@
+==============================================================================
+MODEL nvidia/mistralai/mistral-7b-instruct-v0.3: pool 200 items, valid turn-1 195, own accuracy 0.564, E (own wrong) = 85, control sample (own right) = 100
+Excluded rows (unparsed/error): {'turn1': 5, 'resample': 3, 'look_again': 6, 'neutral': 1, 'review': 4}
+Own accuracy by pool: csqa=0.55 (n=99)  medqa=0.58 (n=96)
+
+--- RECOVERY, LOSS, BREAK-EVEN (95% bootstrap CI over items) ---
+condition             recovery               loss       revise|wrong       revise|right     break-even acc
+resample      0.25 [0.16,0.35]   0.16 [0.09,0.23]   0.54 [0.44,0.65]   0.16 [0.09,0.23]   0.61 [0.48,0.75]
+neutral       0.12 [0.05,0.19]   0.06 [0.02,0.11]   0.21 [0.13,0.31]   0.06 [0.02,0.11]   0.66 [0.42,0.88]
+look_again    0.19 [0.10,0.28]   0.15 [0.08,0.23]   0.38 [0.28,0.49]   0.15 [0.08,0.23]   0.55 [0.38,0.72]
+review        0.12 [0.06,0.19]   0.08 [0.03,0.14]   0.27 [0.17,0.36]   0.08 [0.03,0.14]   0.60 [0.37,0.80]
+
+--- VALUE-ADD vs plain resample (paired over the same items) ---
+wording            recovery diff            loss diff
+neutral      -0.13 [-0.25,-0.02]  -0.10 [-0.18,-0.02]
+look_again   -0.07 [-0.20,+0.06]  -0.01 [-0.11,+0.09]
+review       -0.13 [-0.26,-0.01]  -0.08 [-0.16,+0.01]
+(value-add: positive recovery diff = the wording fixes more own errors than just asking again; positive loss diff = it breaks more right answers)

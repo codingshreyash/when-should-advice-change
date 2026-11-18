@@ -1,0 +1,162 @@
+==============================================================================
+MODEL azure/anthropic/claude-haiku-5-5: 100 scenarios, 1000 rows
+Excluded rows (None / error): {'double_check/wrong': 1, 'look_again/wrong': 1}
+
+--- PER WORDING (95% bootstrap CI over scenarios, paired seeds) ---
+wording                rev|right          rev|wrong           recovery               loss         balanced net
+neutral         0.01 [0.00,0.03]   1.00 [1.00,1.00]   0.99 [0.97,1.00]   0.01 [0.00,0.03]  +0.49 [+0.47,+0.50]
+look_again      0.02 [0.00,0.05]   0.99 [0.97,1.00]   0.99 [0.97,1.00]   0.02 [0.00,0.05]  +0.48 [+0.46,+0.50]
+double_check    0.01 [0.00,0.03]   1.00 [1.00,1.00]   0.99 [0.97,1.00]   0.01 [0.00,0.03]  +0.49 [+0.47,+0.50]
+are_you_sure    0.01 [0.00,0.03]   0.99 [0.97,1.00]   0.99 [0.97,1.00]   0.01 [0.00,0.03]  +0.49 [+0.47,+0.50]
+review          0.02 [0.00,0.05]   0.99 [0.97,1.00]   0.98 [0.95,1.00]   0.02 [0.00,0.05]  +0.48 [+0.45,+0.50]
+
+--- REVISE-RATE DIFFERENCE vs neutral (paired) ---
+wording                 seed right           seed wrong
+look_again     +0.01 [+0.00,+0.03]  -0.01 [-0.03,+0.00]
+double_check   +0.00 [+0.00,+0.00]  +0.00 [+0.00,+0.00]
+are_you_sure   +0.00 [+0.00,+0.00]  -0.01 [-0.03,+0.00]
+review         +0.01 [+0.00,+0.03]  -0.01 [-0.03,+0.00]
+
+--- MARGIN SPLIT: near = bins 2-3, far = bins 4-7 (recovery / loss) ---
+wording            recovery near       recovery far          loss near           loss far
+neutral         0.97 [0.90,1.00]   1.00 [1.00,1.00]   0.03 [0.00,0.10]   0.00 [0.00,0.00]
+look_again      0.97 [0.90,1.00]   1.00 [1.00,1.00]   0.06 [0.00,0.15]   0.00 [0.00,0.00]
+double_check    0.97 [0.90,1.00]   1.00 [1.00,1.00]   0.03 [0.00,0.10]   0.00 [0.00,0.00]
+are_you_sure    0.97 [0.90,1.00]   1.00 [1.00,1.00]   0.03 [0.00,0.10]   0.00 [0.00,0.00]
+review          0.94 [0.85,1.00]   1.00 [1.00,1.00]   0.06 [0.00,0.15]   0.00 [0.00,0.00]
+(scenarios: near=34, far=66; CIs resample all scenarios, so the near/far n varies per draw)
+==============================================================================
+MODEL azure/openai/gpt-5.4-mini: 100 scenarios, 1000 rows
+Excluded rows (None / error): none
+
+--- PER WORDING (95% bootstrap CI over scenarios, paired seeds) ---
+wording                rev|right          rev|wrong           recovery               loss         balanced net
+neutral         0.00 [0.00,0.00]   0.73 [0.65,0.81]   0.73 [0.65,0.81]   0.00 [0.00,0.00]  +0.36 [+0.33,+0.41]
+look_again      0.00 [0.00,0.00]   0.90 [0.84,0.95]   0.90 [0.84,0.95]   0.00 [0.00,0.00]  +0.45 [+0.42,+0.47]
+double_check    0.00 [0.00,0.00]   0.80 [0.72,0.87]   0.80 [0.72,0.87]   0.00 [0.00,0.00]  +0.40 [+0.36,+0.43]
+are_you_sure    0.00 [0.00,0.00]   0.75 [0.67,0.83]   0.74 [0.66,0.82]   0.00 [0.00,0.00]  +0.37 [+0.33,+0.41]
+review          0.02 [0.00,0.05]   0.95 [0.90,0.99]   0.94 [0.89,0.98]   0.02 [0.00,0.05]  +0.46 [+0.43,+0.48]
+
+--- REVISE-RATE DIFFERENCE vs neutral (paired) ---
+wording                 seed right           seed wrong
+look_again     +0.00 [+0.00,+0.00]  +0.17 [+0.08,+0.26]
+double_check   +0.00 [+0.00,+0.00]  +0.07 [-0.03,+0.17]
+are_you_sure   +0.00 [+0.00,+0.00]  +0.02 [-0.06,+0.10]
+review         +0.02 [+0.00,+0.05]  +0.22 [+0.13,+0.31]
+
+--- MARGIN SPLIT: near = bins 2-3, far = bins 4-7 (recovery / loss) ---
+wording            recovery near       recovery far          loss near           loss far
+neutral         0.59 [0.42,0.75]   0.80 [0.71,0.89]   0.00 [0.00,0.00]   0.00 [0.00,0.00]
+look_again      0.76 [0.62,0.89]   0.97 [0.92,1.00]   0.00 [0.00,0.00]   0.00 [0.00,0.00]
+double_check    0.62 [0.45,0.77]   0.89 [0.82,0.97]   0.00 [0.00,0.00]   0.00 [0.00,0.00]
+are_you_sure    0.44 [0.29,0.59]   0.89 [0.82,0.97]   0.00 [0.00,0.00]   0.00 [0.00,0.00]
+review          0.85 [0.72,0.96]   0.98 [0.95,1.00]   0.03 [0.00,0.10]   0.02 [0.00,0.05]
+(scenarios: near=34, far=66; CIs resample all scenarios, so the near/far n varies per draw)
+==============================================================================
+MODEL nvidia/google/gemma-2-9b-it: 100 scenarios, 1000 rows
+Excluded rows (None / error): {'review/right': 1, 'review/wrong': 1}
+
+--- PER WORDING (95% bootstrap CI over scenarios, paired seeds) ---
+wording                rev|right          rev|wrong           recovery               loss         balanced net
+neutral         0.04 [0.01,0.08]   0.60 [0.51,0.69]   0.55 [0.45,0.65]   0.04 [0.01,0.08]  +0.26 [+0.21,+0.31]
+look_again      0.69 [0.60,0.78]   0.91 [0.85,0.96]   0.80 [0.72,0.88]   0.69 [0.60,0.78]  +0.06 [+0.00,+0.11]
+double_check    0.43 [0.33,0.52]   0.96 [0.92,0.99]   0.93 [0.88,0.98]   0.43 [0.33,0.52]  +0.25 [+0.20,+0.31]
+are_you_sure    0.73 [0.64,0.81]   0.86 [0.79,0.92]   0.75 [0.66,0.83]   0.73 [0.64,0.81]  +0.01 [-0.05,+0.07]
+review          0.68 [0.58,0.77]   0.98 [0.95,1.00]   0.97 [0.93,1.00]   0.68 [0.58,0.77]  +0.15 [+0.10,+0.20]
+
+--- REVISE-RATE DIFFERENCE vs neutral (paired) ---
+wording                 seed right           seed wrong
+look_again     +0.65 [+0.56,+0.75]  +0.31 [+0.19,+0.42]
+double_check   +0.39 [+0.29,+0.49]  +0.36 [+0.26,+0.46]
+are_you_sure   +0.69 [+0.60,+0.78]  +0.26 [+0.14,+0.38]
+review         +0.64 [+0.54,+0.73]  +0.38 [+0.29,+0.48]
+
+--- MARGIN SPLIT: near = bins 2-3, far = bins 4-7 (recovery / loss) ---
+wording            recovery near       recovery far          loss near           loss far
+neutral         0.41 [0.25,0.59]   0.62 [0.51,0.74]   0.03 [0.00,0.10]   0.05 [0.00,0.10]
+look_again      0.85 [0.72,0.97]   0.77 [0.67,0.88]   0.68 [0.52,0.83]   0.70 [0.58,0.81]
+double_check    0.94 [0.85,1.00]   0.92 [0.85,0.98]   0.41 [0.24,0.58]   0.44 [0.32,0.55]
+are_you_sure    0.76 [0.61,0.90]   0.74 [0.63,0.85]   0.76 [0.61,0.90]   0.71 [0.59,0.82]
+review          0.94 [0.85,1.00]   0.98 [0.95,1.00]   0.65 [0.48,0.81]   0.69 [0.58,0.80]
+(scenarios: near=34, far=66; CIs resample all scenarios, so the near/far n varies per draw)
+==============================================================================
+MODEL nvidia/google/gemma-4-31b-it: 100 scenarios, 1000 rows
+Excluded rows (None / error): {'are_you_sure/right': 2, 'look_again/wrong': 1}
+
+--- PER WORDING (95% bootstrap CI over scenarios, paired seeds) ---
+wording                rev|right          rev|wrong           recovery               loss         balanced net
+neutral         0.00 [0.00,0.00]   0.99 [0.97,1.00]   0.99 [0.97,1.00]   0.00 [0.00,0.00]  +0.49 [+0.48,+0.50]
+look_again      0.00 [0.00,0.00]   0.98 [0.95,1.00]   0.98 [0.95,1.00]   0.00 [0.00,0.00]  +0.49 [+0.47,+0.50]
+double_check    0.00 [0.00,0.00]   0.99 [0.97,1.00]   0.99 [0.97,1.00]   0.00 [0.00,0.00]  +0.49 [+0.48,+0.50]
+are_you_sure    0.01 [0.00,0.03]   1.00 [1.00,1.00]   1.00 [1.00,1.00]   0.01 [0.00,0.03]  +0.49 [+0.48,+0.50]
+review          0.01 [0.00,0.03]   0.99 [0.97,1.00]   0.99 [0.97,1.00]   0.01 [0.00,0.03]  +0.49 [+0.47,+0.50]
+
+--- REVISE-RATE DIFFERENCE vs neutral (paired) ---
+wording                 seed right           seed wrong
+look_again     +0.00 [+0.00,+0.00]  -0.01 [-0.03,+0.00]
+double_check   +0.00 [+0.00,+0.00]  +0.00 [+0.00,+0.00]
+are_you_sure   +0.01 [+0.00,+0.03]  +0.01 [+0.00,+0.03]
+review         +0.01 [+0.00,+0.03]  +0.00 [-0.03,+0.03]
+
+--- MARGIN SPLIT: near = bins 2-3, far = bins 4-7 (recovery / loss) ---
+wording            recovery near       recovery far          loss near           loss far
+neutral         0.97 [0.90,1.00]   1.00 [1.00,1.00]   0.00 [0.00,0.00]   0.00 [0.00,0.00]
+look_again      0.94 [0.85,1.00]   1.00 [1.00,1.00]   0.00 [0.00,0.00]   0.00 [0.00,0.00]
+double_check    0.97 [0.90,1.00]   1.00 [1.00,1.00]   0.00 [0.00,0.00]   0.00 [0.00,0.00]
+are_you_sure    1.00 [1.00,1.00]   1.00 [1.00,1.00]   0.03 [0.00,0.11]   0.00 [0.00,0.00]
+review          0.97 [0.90,1.00]   1.00 [1.00,1.00]   0.03 [0.00,0.10]   0.00 [0.00,0.00]
+(scenarios: near=34, far=66; CIs resample all scenarios, so the near/far n varies per draw)
+==============================================================================
+MODEL nvidia/meta/llama-3.1-8b-instruct: 100 scenarios, 1000 rows
+Excluded rows (None / error): {'are_you_sure/right': 10, 'are_you_sure/wrong': 18, 'double_check/right': 3, 'double_check/wrong': 3, 'look_again/right': 8, 'look_again/wrong': 1, 'neutral/right': 17, 'neutral/wrong': 16, 'review/right': 5, 'review/wrong': 2}
+
+--- PER WORDING (95% bootstrap CI over scenarios, paired seeds) ---
+wording                rev|right          rev|wrong           recovery               loss         balanced net
+neutral         0.20 [0.12,0.30]   0.30 [0.20,0.39]   0.25 [0.16,0.34]   0.20 [0.12,0.30]  +0.02 [-0.04,+0.08]
+look_again      0.20 [0.12,0.28]   0.59 [0.49,0.68]   0.59 [0.49,0.68]   0.20 [0.12,0.28]  +0.20 [+0.13,+0.26]
+double_check    0.36 [0.27,0.46]   0.52 [0.42,0.61]   0.49 [0.40,0.59]   0.36 [0.27,0.46]  +0.07 [-0.01,+0.14]
+are_you_sure    0.24 [0.16,0.33]   0.51 [0.40,0.62]   0.44 [0.33,0.55]   0.24 [0.16,0.33]  +0.10 [+0.03,+0.17]
+review          0.16 [0.09,0.24]   0.41 [0.31,0.51]   0.36 [0.26,0.46]   0.16 [0.09,0.24]  +0.10 [+0.03,+0.16]
+
+--- REVISE-RATE DIFFERENCE vs neutral (paired) ---
+wording                 seed right           seed wrong
+look_again     -0.03 [-0.15,+0.09]  +0.27 [+0.12,+0.40]
+double_check   +0.19 [+0.04,+0.33]  +0.21 [+0.06,+0.35]
+are_you_sure   +0.07 [-0.07,+0.20]  +0.28 [+0.15,+0.41]
+review         -0.04 [-0.16,+0.08]  +0.12 [-0.01,+0.25]
+
+--- MARGIN SPLIT: near = bins 2-3, far = bins 4-7 (recovery / loss) ---
+wording            recovery near       recovery far          loss near           loss far
+neutral         0.23 [0.09,0.37]   0.26 [0.16,0.39]   0.27 [0.11,0.45]   0.18 [0.08,0.28]
+look_again      0.59 [0.42,0.75]   0.58 [0.46,0.70]   0.28 [0.13,0.44]   0.15 [0.07,0.25]
+double_check    0.56 [0.39,0.74]   0.46 [0.34,0.58]   0.44 [0.27,0.61]   0.32 [0.21,0.44]
+are_you_sure    0.48 [0.29,0.68]   0.42 [0.29,0.55]   0.19 [0.06,0.33]   0.27 [0.16,0.39]
+review          0.36 [0.21,0.53]   0.35 [0.24,0.48]   0.13 [0.03,0.26]   0.17 [0.08,0.27]
+(scenarios: near=34, far=66; CIs resample all scenarios, so the near/far n varies per draw)
+==============================================================================
+MODEL nvidia/mistralai/mistral-7b-instruct-v0.3: 100 scenarios, 1000 rows
+Excluded rows (None / error): {'are_you_sure/wrong': 1, 'double_check/wrong': 1, 'look_again/wrong': 2, 'neutral/right': 2, 'neutral/wrong': 7, 'review/wrong': 3}
+
+--- PER WORDING (95% bootstrap CI over scenarios, paired seeds) ---
+wording                rev|right          rev|wrong           recovery               loss         balanced net
+neutral         0.01 [0.00,0.03]   0.03 [0.00,0.07]   0.02 [0.00,0.05]   0.01 [0.00,0.03]  +0.01 [-0.01,+0.02]
+look_again      0.20 [0.13,0.28]   0.58 [0.48,0.68]   0.44 [0.33,0.54]   0.20 [0.13,0.28]  +0.12 [+0.04,+0.19]
+double_check    0.02 [0.00,0.05]   0.27 [0.19,0.36]   0.20 [0.13,0.29]   0.02 [0.00,0.05]  +0.09 [+0.05,+0.14]
+are_you_sure    0.09 [0.04,0.15]   0.39 [0.30,0.49]   0.35 [0.26,0.45]   0.09 [0.04,0.15]  +0.13 [+0.07,+0.18]
+review          0.06 [0.02,0.11]   0.25 [0.17,0.34]   0.19 [0.11,0.27]   0.06 [0.02,0.11]  +0.06 [+0.02,+0.11]
+
+--- REVISE-RATE DIFFERENCE vs neutral (paired) ---
+wording                 seed right           seed wrong
+look_again     +0.19 [+0.11,+0.28]  +0.54 [+0.43,+0.65]
+double_check   +0.01 [-0.02,+0.05]  +0.25 [+0.16,+0.35]
+are_you_sure   +0.08 [+0.03,+0.14]  +0.38 [+0.28,+0.48]
+review         +0.05 [+0.00,+0.10]  +0.18 [+0.09,+0.27]
+
+--- MARGIN SPLIT: near = bins 2-3, far = bins 4-7 (recovery / loss) ---
+wording            recovery near       recovery far          loss near           loss far
+neutral         0.03 [0.00,0.11]   0.02 [0.00,0.05]   0.03 [0.00,0.10]   0.00 [0.00,0.00]
+look_again      0.38 [0.22,0.54]   0.47 [0.34,0.59]   0.38 [0.22,0.55]   0.11 [0.03,0.19]
+double_check    0.21 [0.08,0.34]   0.20 [0.11,0.31]   0.03 [0.00,0.10]   0.02 [0.00,0.05]
+are_you_sure    0.21 [0.08,0.35]   0.43 [0.31,0.55]   0.12 [0.03,0.24]   0.08 [0.02,0.14]
+review          0.09 [0.00,0.20]   0.23 [0.14,0.35]   0.09 [0.00,0.19]   0.05 [0.00,0.10]
+(scenarios: near=34, far=66; CIs resample all scenarios, so the near/far n varies per draw)

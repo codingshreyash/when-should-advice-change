@@ -1,0 +1,109 @@
+==============================================================================
+MODEL azure/anthropic/claude-haiku-5-5: pool 728 items, valid turn-1 727, own accuracy 0.971, E (own wrong) = 21, control sample (own right) = 100
+Excluded rows (unparsed/error): {'turn1': 1}
+Own accuracy by pool: L1=0.95 (n=144)  L2=0.97 (n=144)  L3=0.99 (n=143)  v0=0.98 (n=296)
+
+--- RECOVERY, LOSS, BREAK-EVEN (95% bootstrap CI over items) ---
+condition             recovery               loss       revise|wrong       revise|right     break-even acc
+resample      0.14 [0.00,0.29]   0.00 [0.00,0.00]   0.33 [0.14,0.52]   0.00 [0.00,0.00]   1.00 [1.00,1.00]
+neutral       0.00 [0.00,0.00]   0.00 [0.00,0.00]   0.05 [0.00,0.14]   0.00 [0.00,0.00]         n/a       
+look_again    0.10 [0.00,0.24]   0.00 [0.00,0.00]   0.24 [0.05,0.43]   0.00 [0.00,0.00]   1.00 [1.00,1.00]
+review        0.00 [0.00,0.00]   0.00 [0.00,0.00]   0.10 [0.00,0.24]   0.00 [0.00,0.00]         n/a       
+
+--- VALUE-ADD vs plain resample (paired over the same items) ---
+wording            recovery diff            loss diff
+neutral      -0.14 [-0.29,+0.00]  +0.00 [+0.00,+0.00]
+look_again   -0.05 [-0.19,+0.10]  +0.00 [+0.00,+0.00]
+review       -0.14 [-0.29,+0.00]  +0.00 [+0.00,+0.00]
+(value-add: positive recovery diff = the wording fixes more own errors than just asking again; positive loss diff = it breaks more right answers)
+==============================================================================
+MODEL azure/openai/gpt-5.4-mini: pool 728 items, valid turn-1 728, own accuracy 0.962, E (own wrong) = 28, control sample (own right) = 100
+Excluded rows (unparsed/error): none
+Own accuracy by pool: L1=0.94 (n=144)  L2=0.95 (n=144)  L3=0.97 (n=144)  v0=0.97 (n=296)
+
+--- RECOVERY, LOSS, BREAK-EVEN (95% bootstrap CI over items) ---
+condition             recovery               loss       revise|wrong       revise|right     break-even acc
+resample      0.32 [0.14,0.50]   0.01 [0.00,0.03]   0.32 [0.14,0.50]   0.01 [0.00,0.03]   0.97 [0.88,1.00]
+neutral       0.04 [0.00,0.11]   0.00 [0.00,0.00]   0.04 [0.00,0.11]   0.00 [0.00,0.00]   1.00 [1.00,1.00]
+look_again    0.29 [0.14,0.46]   0.05 [0.01,0.10]   0.29 [0.14,0.46]   0.05 [0.01,0.10]   0.85 [0.68,0.96]
+review        0.36 [0.18,0.54]   0.00 [0.00,0.00]   0.36 [0.18,0.54]   0.00 [0.00,0.00]   1.00 [1.00,1.00]
+
+--- VALUE-ADD vs plain resample (paired over the same items) ---
+wording            recovery diff            loss diff
+neutral      -0.29 [-0.46,-0.11]  -0.01 [-0.03,+0.00]
+look_again   -0.04 [-0.29,+0.18]  +0.04 [-0.01,+0.09]
+review       +0.04 [-0.25,+0.29]  -0.01 [-0.03,+0.00]
+(value-add: positive recovery diff = the wording fixes more own errors than just asking again; positive loss diff = it breaks more right answers)
+==============================================================================
+MODEL nvidia/google/gemma-2-9b-it: pool 728 items, valid turn-1 725, own accuracy 0.865, E (own wrong) = 98, control sample (own right) = 100
+Excluded rows (unparsed/error): {'turn1': 3, 'review': 6}
+Own accuracy by pool: L1=0.84 (n=143)  L2=0.78 (n=144)  L3=0.83 (n=144)  v0=0.93 (n=294)
+
+--- RECOVERY, LOSS, BREAK-EVEN (95% bootstrap CI over items) ---
+condition             recovery               loss       revise|wrong       revise|right     break-even acc
+resample      0.05 [0.01,0.10]   0.01 [0.00,0.03]   0.07 [0.03,0.12]   0.01 [0.00,0.03]   0.84 [0.51,1.00]
+neutral       0.09 [0.04,0.15]   0.02 [0.00,0.05]   0.16 [0.09,0.24]   0.02 [0.00,0.05]   0.82 [0.56,1.00]
+look_again    0.34 [0.24,0.43]   0.72 [0.63,0.81]   0.77 [0.67,0.85]   0.72 [0.63,0.81]   0.32 [0.25,0.38]
+review        0.72 [0.63,0.82]   0.77 [0.68,0.85]   0.93 [0.88,0.97]   0.77 [0.68,0.85]   0.49 [0.44,0.53]
+
+--- VALUE-ADD vs plain resample (paired over the same items) ---
+wording            recovery diff            loss diff
+neutral      +0.04 [-0.03,+0.11]  +0.01 [-0.02,+0.05]
+look_again   +0.29 [+0.18,+0.39]  +0.71 [+0.62,+0.80]
+review       +0.67 [+0.57,+0.77]  +0.76 [+0.67,+0.84]
+(value-add: positive recovery diff = the wording fixes more own errors than just asking again; positive loss diff = it breaks more right answers)
+==============================================================================
+MODEL nvidia/google/gemma-4-31b-it: pool 728 items, valid turn-1 728, own accuracy 0.993, E (own wrong) = 5, control sample (own right) = 100
+Excluded rows (unparsed/error): none
+WARNING: few own errors (E=5): wide intervals
+Own accuracy by pool: L1=0.99 (n=144)  L2=0.98 (n=144)  L3=1.00 (n=144)  v0=1.00 (n=296)
+
+--- RECOVERY, LOSS, BREAK-EVEN (95% bootstrap CI over items) ---
+condition             recovery               loss       revise|wrong       revise|right     break-even acc
+resample      0.40 [0.00,0.80]   0.00 [0.00,0.00]   0.40 [0.00,0.80]   0.00 [0.00,0.00]   1.00 [1.00,1.00]
+neutral       0.00 [0.00,0.00]   0.00 [0.00,0.00]   0.00 [0.00,0.00]   0.00 [0.00,0.00]         n/a       
+look_again    0.40 [0.00,0.80]   0.03 [0.00,0.07]   0.40 [0.00,0.80]   0.03 [0.00,0.07]   0.93 [0.00,1.00]
+review        0.20 [0.00,0.60]   0.01 [0.00,0.03]   0.40 [0.00,0.80]   0.01 [0.00,0.03]   0.95 [0.00,1.00]
+
+--- VALUE-ADD vs plain resample (paired over the same items) ---
+wording            recovery diff            loss diff
+neutral      -0.40 [-0.80,+0.00]  +0.00 [+0.00,+0.00]
+look_again   +0.00 [+0.00,+0.00]  +0.03 [+0.00,+0.07]
+review       -0.20 [-0.60,+0.00]  +0.01 [+0.00,+0.03]
+(value-add: positive recovery diff = the wording fixes more own errors than just asking again; positive loss diff = it breaks more right answers)
+==============================================================================
+MODEL nvidia/meta/llama-3.1-8b-instruct: pool 728 items, valid turn-1 633, own accuracy 0.747, E (own wrong) = 160, control sample (own right) = 100
+Excluded rows (unparsed/error): {'turn1': 95, 'resample': 27, 'neutral': 36, 'look_again': 3, 'review': 5}
+Own accuracy by pool: L1=0.73 (n=124)  L2=0.72 (n=123)  L3=0.61 (n=122)  v0=0.83 (n=264)
+
+--- RECOVERY, LOSS, BREAK-EVEN (95% bootstrap CI over items) ---
+condition             recovery               loss       revise|wrong       revise|right     break-even acc
+resample      0.52 [0.44,0.61]   0.15 [0.08,0.22]   0.57 [0.48,0.65]   0.15 [0.08,0.22]   0.78 [0.69,0.87]
+neutral       0.24 [0.17,0.31]   0.10 [0.04,0.17]   0.34 [0.26,0.43]   0.10 [0.04,0.17]   0.70 [0.55,0.86]
+look_again    0.39 [0.31,0.46]   0.16 [0.09,0.24]   0.49 [0.41,0.56]   0.16 [0.09,0.24]   0.70 [0.60,0.81]
+review        0.25 [0.18,0.31]   0.11 [0.06,0.17]   0.30 [0.23,0.37]   0.11 [0.06,0.17]   0.69 [0.57,0.82]
+
+--- VALUE-ADD vs plain resample (paired over the same items) ---
+wording            recovery diff            loss diff
+neutral      -0.28 [-0.39,-0.17]  -0.04 [-0.14,+0.05]
+look_again   -0.13 [-0.24,-0.03]  +0.02 [-0.09,+0.11]
+review       -0.28 [-0.37,-0.18]  -0.04 [-0.13,+0.06]
+(value-add: positive recovery diff = the wording fixes more own errors than just asking again; positive loss diff = it breaks more right answers)
+==============================================================================
+MODEL nvidia/mistralai/mistral-7b-instruct-v0.3: pool 728 items, valid turn-1 717, own accuracy 0.714, E (own wrong) = 205, control sample (own right) = 100
+Excluded rows (unparsed/error): {'turn1': 11, 'resample': 2, 'review': 2, 'neutral': 4, 'look_again': 2}
+Own accuracy by pool: L1=0.64 (n=140)  L2=0.69 (n=143)  L3=0.69 (n=143)  v0=0.78 (n=291)
+
+--- RECOVERY, LOSS, BREAK-EVEN (95% bootstrap CI over items) ---
+condition             recovery               loss       revise|wrong       revise|right     break-even acc
+resample      0.48 [0.41,0.54]   0.20 [0.13,0.29]   0.69 [0.63,0.75]   0.20 [0.13,0.29]   0.70 [0.62,0.79]
+neutral       0.19 [0.14,0.25]   0.04 [0.01,0.08]   0.31 [0.24,0.37]   0.04 [0.01,0.08]   0.83 [0.69,0.96]
+look_again    0.36 [0.30,0.43]   0.27 [0.18,0.36]   0.60 [0.53,0.67]   0.27 [0.18,0.36]   0.57 [0.49,0.67]
+review        0.20 [0.15,0.25]   0.15 [0.08,0.22]   0.32 [0.26,0.39]   0.15 [0.08,0.22]   0.57 [0.45,0.71]
+
+--- VALUE-ADD vs plain resample (paired over the same items) ---
+wording            recovery diff            loss diff
+neutral      -0.28 [-0.36,-0.20]  -0.16 [-0.25,-0.07]
+look_again   -0.11 [-0.20,-0.02]  +0.07 [-0.04,+0.18]
+review       -0.27 [-0.36,-0.19]  -0.05 [-0.16,+0.06]
+(value-add: positive recovery diff = the wording fixes more own errors than just asking again; positive loss diff = it breaks more right answers)

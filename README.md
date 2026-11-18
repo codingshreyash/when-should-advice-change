@@ -6,6 +6,12 @@ A useful advisor should be willing to reconsider its answer when the facts chang
 
 Warranted Revision studies that distinction. We evaluate whether models can tell a meaningful change in evidence or priorities from a change in wording, an irrelevant detail, or pressure to endorse a particular answer. We are also investigating whether making a model's assumptions explicit—and searching over them before reaching a conclusion—can make its decisions more reliable.
 
+> **Instability direction (proposal, exploratory).** A margin-controlled scenario generator
+> (`scripts/data/gen_procedural.py`, 400 items, see
+> [`docs/procedural_scenarios.md`](docs/procedural_scenarios.md)), an analysis of
+> inconsistency against a noise floor and margin (`scripts/analysis/instability.py`), and a
+> working thesis with its risks ([`docs/instability_thesis.md`](docs/instability_thesis.md)).
+
 ## The problem
 
 Consider someone choosing between two jobs. They care most about financial stability, and the new offer pays substantially more.

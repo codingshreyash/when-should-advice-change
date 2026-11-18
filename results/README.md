@@ -98,6 +98,7 @@ Saved stdout of the analysis scripts.
 | `discrimination_career30.txt` | relevant update vs. pressure/reframe: hit, false alarms, d′, AUROC, TV, movement ratio, pressure flips by base margin | the four `career/` files | an **older version** of `discrimination.py`; the current script prints different columns (`d_soc`, `auc_s`, no ratio) with the same values where they overlap | 2026-10-03 | legacy |
 | `pressure_controls_claude.txt` | per-control change and to-target rates | `pressure_controls/claude-opus-5__pressure_controls.jsonl` | `steering.py` | 2026-10-03 | exploratory |
 | `pushback_claude.txt` | per-branch change rates, escalation, turn-2 d′ | `pushback/claude-opus-5__pressure_controls.jsonl` | `pushback.py` | 2026-10-03 | exploratory |
+| `instability_existing.txt` | inconsistency vs. a noise floor (n/a: one sample), update rate, ask quality, flip rate by base margin, descriptive frontier | the four legacy `career/` files (`career_pilot`, `career_v2`; Nimble/Qwen at @bd792f44, Claude) | `instability.py` | 2026-11-11 | exploratory |
 | `artifact_probe.txt` | surface-cue probe, parts A–D | the scenario files, plus the two Nimble `career/` files for part D | `artifact_probe.py results/career/nimble-and-qwen__career_pilot.jsonl results/career/nimble-and-qwen__career_v2.jsonl` | 2026-10-14; regenerated 2026-10-21 with both factual negatives | exploratory |
 | `threshold_sweep_opus.txt` | accuracy, NMI rate, switch point, pressure shift per sweep | `threshold_sweep/claude-opus-5__threshold_sweep.jsonl` | `threshold.py` | 2026-10-21 | exploratory |
 
@@ -139,3 +140,40 @@ Summaries: [`summaries/model_ladder_career30.txt`](summaries/model_ladder_career
 (`replicates.py`) and [`summaries/threshold_sweep_ladder.txt`](summaries/threshold_sweep_ladder.txt)
 (`threshold.py`). `career30` concatenates the pilot and v2 scenario files, which keeps
 these files apart from the legacy ones.
+
+## Instability session, 2026-11-14 (exploratory)
+
+One attended session on an L4 (GCP `g2-standard-8`, 32 GB RAM; the 16 GB `g2-standard-4` runs out of memory
+at setup). Nimble@bd792f44 and Qwen3.5-9B base, same scorer, randomized option order (seed 1684).
+The scorers are deterministic, so extra "samples" are extra option orders. Run with
+`scripts/run/run_gpu_instability.sh`; the generated stage was cut to a third of the scenarios
+(every third record of `procedural_v0.jsonl`, 134 scenarios) to stay inside the time limit.
+
+| file | inputs | rows | analysis |
+|---|---|---|---|
+| `career/nimble-and-qwen__career30.jsonl` | `career_pilot` + `career_v2`, all 7 variants, 5 option orders | 2100 | `summaries/instability_career30_5perm.txt` |
+| `threshold_sweep/nimble-and-qwen__threshold_sweep.jsonl` | `data/derived/threshold_sweep.jsonl`, 1 order | 384 | not analysed yet (`threshold.py`) |
+| `procedural/nimble-and-qwen__procedural_third.jsonl` | 134 generated scenarios, 1 order | 1534 | `summaries/instability_procedural_third.txt` |
+| `runs/nimble-and-qwen__sample20.jsonl` | smoke test, 20 generated scenarios | 228 | none |
+
+## Neutral-rewrite session, 2026-11-14 (exploratory, negative result)
+
+`scripts/run/run_gpu_rewrite.sh` on an L4 (`g2-standard-8`). Qwen3.5-9B base rewrote the prompts
+(`run_rewrite.py`, greedy, fixed instruction); Nimble and Qwen then scored the rewrites with the
+original option orders. The control stage (neutral mention on the 9B models) was skipped for time.
+
+| file | inputs | rows | analysis |
+|---|---|---|---|
+| `rewrite/nimble-and-qwen__rewritten_career30.jsonl` | `data/derived/rewritten_career30.jsonl` (30 scenarios x 6 variants), 5 orders | 1800 | `summaries/rewrite_pressure_direction.txt` |
+| `rewrite/nimble-and-qwen__rewritten_procedural_third.jsonl` | `data/derived/rewritten_procedural_third.jsonl` (67 scenarios), 1 order | 776 | same, plus `summaries/rewrite_check.txt` |
+
+## Control and full generated set, 2026-11-15 (exploratory)
+
+Same L4 setup (`g2-standard-8`). `run_gpu_rewrite.sh STAGES=control`, then `run_nimble.py` on the
+266 generated scenarios not in `procedural_third` (the file is `procedural_v0.jsonl` minus the ids in
+the third results; `data/scenarios/procedural/procedural_rest.jsonl` was built from them, not committed).
+
+| file | inputs | rows | analysis |
+|---|---|---|---|
+| `pressure_controls/nimble-and-qwen__pressure_controls.jsonl` | `data/derived/pressure_controls.jsonl`, variants base, pressure, pref_target, pref_target_1p, mention_target, filler, pref_base; 1 order | 418 | `pressure_direction.py --variants ...` (see `docs/instability_thesis.md`) |
+| `procedural/nimble-and-qwen__procedural_rest.jsonl` | 266 generated scenarios, 1 order | 3054 | `summaries/instability_procedural_full.txt` (with the `third` file) |

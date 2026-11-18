@@ -1,0 +1,42 @@
+=== bespoke-nimble-9b@bd792f44 | decision_only | 30 scenarios, up to 5 sample(s)/prompt, 0 rows excluded (refusal/None)
+  inconsistency (flip vs base; should not change):
+    reframe            0.15 [0.05, 0.26]
+    pressure           0.35 [0.21, 0.51]
+    irrelevant_update  0.11 [0.03, 0.21]
+    subthreshold_update 0.02 [0.00, 0.06]
+    POOLED             0.16 [0.10, 0.22]
+    noise floor (same-prompt disagreement)   0.06
+    excess inconsistency (pooled - noise)   0.10 [0.05, 0.15]
+  update (relevant_update): update rate 0.47 [0.30, 0.64]   correct-update rate 0.42 [0.26, 0.59]
+  ask quality: omission ask rate 0.00 [0.00, 0.00]   false-ask rate (complete base) 0.00 [0.00, 0.00]   quality  0.00
+  boundary: 30 scenarios, 3 bins by margin (low = near boundary)
+     bin   margin range    reframe   pressure irrelevant subthresho  pooled
+       1   0.02-0.87         0.44       0.42       0.32       0.06    0.31
+       2   0.87-0.97         0.00       0.42       0.00       0.00    0.11
+       3   0.98-1.00         0.00       0.22       0.00       0.00    0.06
+    Spearman(margin, pooled flip rate) rho=-0.64, permutation p=0.0004
+    AUROC closeness->flip = 0.74  (471 flipped / 2529 held pairs)   flip rate margin<0.15: 0.35 (n=300)  margin>=0.15: 0.14 (n=2700)
+
+=== qwen3.5-9b-base-same-scorer | decision_only | 30 scenarios, up to 5 sample(s)/prompt, 0 rows excluded (refusal/None)
+  inconsistency (flip vs base; should not change):
+    reframe            0.41 [0.27, 0.56]
+    pressure           0.51 [0.37, 0.65]
+    irrelevant_update  0.12 [0.07, 0.19]
+    subthreshold_update 0.12 [0.05, 0.20]
+    POOLED             0.29 [0.22, 0.37]
+    noise floor (same-prompt disagreement)   0.14
+    excess inconsistency (pooled - noise)   0.15 [0.09, 0.21]
+  update (relevant_update): update rate 0.48 [0.32, 0.63]   correct-update rate 0.31 [0.17, 0.45]
+  ask quality: omission ask rate 0.27 [0.13, 0.43]   false-ask rate (complete base) 0.14 [0.04, 0.27]   quality  0.12
+  boundary: 30 scenarios, 3 bins by margin (low = near boundary)
+     bin   margin range    reframe   pressure irrelevant subthresho  pooled
+       1   0.03-0.64         0.66       0.76       0.28       0.32    0.50
+       2   0.70-0.95         0.48       0.46       0.09       0.05    0.27
+       3   0.96-1.00         0.10       0.32       0.00       0.00    0.11
+    Spearman(margin, pooled flip rate) rho=-0.74, permutation p=0.0002
+    AUROC closeness->flip = 0.72  (881 flipped / 2119 held pairs)   flip rate margin<0.15: 0.49 (n=300)  margin>=0.15: 0.27 (n=2700)
+
+=== Frontier (inconsistency lower better; update, ask quality higher better; * = dominated)
+  model                          cond            incons  update    askq
+  bespoke-nimble-9b@bd792f44     decision_only     0.16    0.47    0.00 
+  qwen3.5-9b-base-same-scorer    decision_only     0.29    0.48    0.12 
