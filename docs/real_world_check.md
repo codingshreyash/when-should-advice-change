@@ -113,3 +113,52 @@ Labeling steps for the team:
 2. Two people copy the sheet. Each fills `acceptable` alone, with the rules in `docs/labeling.md`. Use `|` between codes. Mark `unsure` if needed.
 3. Do not talk about answers until both finish.
 4. Send the two filled sheets back. We keep items where both agree and report the agreement rate. We then compare the agreed labels with the drafters' proposals as a side check.
+
+---
+
+## Arm A results (2026-11-19): five of six models
+
+Run: MedQA and CommonsenseQA, 600 items each, same runner and wordings as experiment 4. Models: Haiku 5.5, GPT-5.4 Mini, Gemma 2 9B, Llama 3.1 8B, Mistral 7B. **Gemma 4 31B is not in this table.** Its calls were very slow on the full prompts (28 of 1,200 turn-1 calls done after about an hour). We did not wait for it. This is a change from the plan of six models.
+Files: `results/summaries/realworld_own_error_5models.txt` (pooled), `results/summaries/realworld_own_error_by_pool.txt` (split), `scripts/analysis/own_error_by_pool.py`. Rows: no error rows after one resume pass. Unparsed answers are at most 2.3% of turn-1 calls per model (Llama 28, Gemma 2 18, Mistral 11, Haiku 8, GPT 0).
+
+### Own accuracy and number of own errors (E)
+| Model | Own accuracy | E |
+|---|---|---|
+| Haiku 5.5 | 0.91 | 110 |
+| GPT-5.4 Mini | 0.84 | 189 |
+| Gemma 2 9B | 0.70 | 359 |
+| Llama 3.1 8B | 0.59 | 476 |
+| Mistral 7B | 0.51 | 589 |
+The gate (at least 40 own errors) is met by every model. The capable models have many more own errors here than in experiment 4 (110 and 189, not 21 and 28). This is the first set that can test them.
+
+### Recovery and loss, pooled (95% CI over items)
+| Model | Fresh resample: recovery / loss | "Look again": recovery / loss | Value-add of "look again" (recovery) |
+|---|---|---|---|
+| Haiku 5.5 | 0.14 / 0.07 | 0.25 / 0.06 | +0.11 [+0.01, +0.20] |
+| GPT-5.4 Mini | 0.23 / 0.06 | 0.39 / 0.16 | +0.15 [+0.07, +0.24] |
+| Gemma 2 9B | 0.12 / 0.05 | 0.38 / 0.51 | +0.26 [+0.20, +0.31] |
+| Llama 3.1 8B | 0.33 / 0.19 | 0.18 / 0.10 | -0.15 [-0.20, -0.11] |
+| Mistral 7B | 0.25 / 0.22 | 0.19 / 0.20 | -0.06 [-0.10, -0.01] |
+The neutral wording ("give me your final recommendation") revises little and has about zero net effect for every model. "Review for mistakes" behaves like "look again" for Gemma 2 9B and like a resample or worse for the others.
+
+### Against the hypotheses fixed before the run
+- **R1 (re-ask recovery is at most resample + 0.10, except for one collapsing model): NOT SUPPORTED.** The capable models exceed the bound with "look again": Haiku +0.11, GPT-5.4 Mini +0.15 (pooled). By set: the gain is clear on CommonsenseQA (+0.17, +0.16, intervals above 0) and weaker on MedQA (Haiku -0.04 [-0.19, +0.11]; GPT +0.14 [0.00, +0.28]). It holds for Llama and Mistral.
+- **R2 (value-add is negative for Llama 3.1 8B and Mistral 7B): SUPPORTED.** Pooled intervals are below 0 for all three wordings. By set: all negative for Llama; for Mistral all negative except "look again" on CommonsenseQA (-0.01, no difference).
+- **R3 (Gemma 2 9B has break-even accuracy below its own accuracy): SUPPORTED.** Break-even 0.42 ("look again") and 0.46 ("review") against own accuracy 0.70. It fixes 38% of its errors and breaks 51% of its right answers.
+- **R4 (Arm B): NOT TESTED.** No labels yet.
+Replication call, by the rule written before the run: **partly replicated.** The direction holds for the weaker models (R2, R3). It does not hold for the capable models (R1).
+
+### What this changes
+1. **Our earlier headline was too broad.** In experiment 4 the capable models looked like a fresh resample. That set had too few errors (5 to 28). With 110 and 189 errors, "look again" fixes **more** of a capable model's own mistakes than a fresh try does.
+2. **The capable models revise selectively.** Haiku revises 31% of its wrong answers and 6% of its right ones. Of its revisions on wrong answers, about 80% end right. This is much better than chance, so the model uses the cue. GPT-5.4 Mini revises 53% of wrong and 16% of right answers.
+3. **A gain in fixes still costs right answers.** Using the point values, the expected accuracy change from a "look again" turn, against keeping the first answer, is about -0.03 for Haiku, -0.07 for GPT-5.4 Mini and -0.24 for Gemma 2 9B. It is near 0 for Llama 3.1 8B and Mistral 7B. These are rough, because the intervals are wide.
+4. **For the weaker models the anchoring result holds.** A fresh try beats a same-chat re-ask for Llama and Mistral.
+5. **No second try is free.** A fresh resample also has a net cost for the capable models (their own errors are few and their right answers are many).
+
+Practical reading, replacing the earlier one: do not use "look again" on a model that is probably right. The neutral wording is the safe one. If you do want a second try, a weak model does better in a fresh chat. A strong model fixes more with "look again", and pays for it.
+
+### Cautions
+- Pooling hides the set difference. The capable models' gain is mostly on CommonsenseQA, which has label noise. A move to a different answer there can reach the gold label by chance of ambiguity. MedQA is cleaner, and its capable-model intervals are wide.
+- The resample baseline depends on the API's default sampling. At greedy decoding it would repeat the first answer.
+- The "net accuracy change" numbers combine two separate samples and are rough.
+- Gemma 4 31B is missing. Arm B is not run. These are still multiple-choice questions, not open advice.

@@ -1,0 +1,55 @@
+=== azure/anthropic/claude-haiku-5-5
+  medqa: own accuracy 0.94, E=34, control=58
+    resample recovery 0.24  loss 0.07
+    neutral    recovery 0.06  loss 0.00  value-add -0.18 [-0.31,-0.06]
+    look_again recovery 0.21  loss 0.03  value-add -0.04 [-0.19,+0.11]
+    review     recovery 0.18  loss 0.02  value-add -0.06 [-0.24,+0.12]
+  csqa: own accuracy 0.87, E=76, control=42
+    resample recovery 0.09  loss 0.07
+    neutral    recovery 0.09  loss 0.02  value-add -0.00 [-0.08,+0.08]
+    look_again recovery 0.26  loss 0.10  value-add +0.17 [+0.06,+0.29]
+    review     recovery 0.17  loss 0.07  value-add +0.08 [-0.01,+0.17]
+=== azure/openai/gpt-5.4-mini
+  medqa: own accuracy 0.89, E=64, control=51
+    resample recovery 0.38  loss 0.02
+    neutral    recovery 0.09  loss 0.00  value-add -0.28 [-0.39,-0.16]
+    look_again recovery 0.52  loss 0.12  value-add +0.14 [+0.00,+0.28]
+    review     recovery 0.30  loss 0.00  value-add -0.08 [-0.20,+0.05]
+  csqa: own accuracy 0.79, E=125, control=49
+    resample recovery 0.16  loss 0.10
+    neutral    recovery 0.02  loss 0.02  value-add -0.14 [-0.21,-0.08]
+    look_again recovery 0.32  loss 0.20  value-add +0.16 [+0.06,+0.26]
+    review     recovery 0.18  loss 0.12  value-add +0.02 [-0.07,+0.11]
+=== nvidia/google/gemma-2-9b-it
+  medqa: own accuracy 0.65, E=210, control=49
+    resample recovery 0.12  loss 0.06
+    neutral    recovery 0.03  loss 0.00  value-add -0.09 [-0.13,-0.04]
+    look_again recovery 0.40  loss 0.59  value-add +0.28 [+0.21,+0.36]
+    review     recovery 0.49  loss 0.63  value-add +0.37 [+0.30,+0.45]
+  csqa: own accuracy 0.75, E=149, control=50
+    resample recovery 0.12  loss 0.04
+    neutral    recovery 0.12  loss 0.14  value-add +0.00 [-0.06,+0.07]
+    look_again recovery 0.34  loss 0.44  value-add +0.22 [+0.13,+0.30]
+    review     recovery 0.35  loss 0.42  value-add +0.23 [+0.15,+0.32]
+=== nvidia/meta/llama-3.1-8b-instruct
+  medqa: own accuracy 0.54, E=268, control=51
+    resample recovery 0.30  loss 0.22
+    neutral    recovery 0.05  loss 0.04  value-add -0.25 [-0.31,-0.18]
+    look_again recovery 0.14  loss 0.10  value-add -0.16 [-0.22,-0.10]
+    review     recovery 0.10  loss 0.02  value-add -0.20 [-0.25,-0.14]
+  csqa: own accuracy 0.64, E=208, control=44
+    resample recovery 0.37  loss 0.16
+    neutral    recovery 0.10  loss 0.02  value-add -0.27 [-0.35,-0.20]
+    look_again recovery 0.22  loss 0.11  value-add -0.15 [-0.22,-0.07]
+    review     recovery 0.15  loss 0.09  value-add -0.21 [-0.29,-0.14]
+=== nvidia/mistralai/mistral-7b-instruct-v0.3
+  medqa: own accuracy 0.46, E=320, control=47
+    resample recovery 0.25  loss 0.21
+    neutral    recovery 0.11  loss 0.11  value-add -0.14 [-0.20,-0.09]
+    look_again recovery 0.15  loss 0.19  value-add -0.10 [-0.16,-0.04]
+    review     recovery 0.10  loss 0.07  value-add -0.15 [-0.21,-0.11]
+  csqa: own accuracy 0.55, E=269, control=50
+    resample recovery 0.25  loss 0.22
+    neutral    recovery 0.11  loss 0.12  value-add -0.14 [-0.21,-0.08]
+    look_again recovery 0.25  loss 0.20  value-add -0.01 [-0.07,+0.06]
+    review     recovery 0.12  loss 0.08  value-add -0.13 [-0.18,-0.07]
