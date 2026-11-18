@@ -39,9 +39,9 @@ WORDINGS = {
 }
 CONTROL_N, CONTROL_SEED = 100, 1684
 
-def build_pool(scen_dir, limit=None):
+def build_pool(scen_dir, limit=None, files=FILES):
     pool = []
-    for name, fn in FILES:
+    for name, fn in files:
         rows = [r for r in load(os.path.join(scen_dir, fn)) if len(r["acceptable"]["base"]) == 1]
         for s in rows[:limit] if limit else rows:
             s = dict(s); s["_pool"] = name; s["_key"] = f"{name}:{s['id']}"
@@ -65,6 +65,7 @@ def control_keys(right_keys):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--scen-dir", default=SCEN_DIR)
+    ap.add_argument("--pools", default=None, help="TAG=file,TAG=file (files in --scen-dir); default is the four procedural pools")
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--max-tokens", type=int, default=2000)
     ap.add_argument("--temperature", type=float, default=None)
@@ -74,9 +75,10 @@ def main():
     a = ap.parse_args()
     model = os.environ.get("CHAT_MODEL", "claude-opus-5")
     resume = os.environ.get("RESUME") == "1"
-    pool = build_pool(a.scen_dir, a.limit)
+    files = [tuple(x.split("=", 1)) for x in a.pools.split(",")] if a.pools else FILES
+    pool = build_pool(a.scen_dir, a.limit, files)
     S = {s["_key"]: s for s in pool}
-    counts = {n: sum(s["_pool"] == n for s in pool) for n, _ in FILES}
+    counts = {n: sum(s["_pool"] == n for s in pool) for n, _ in files}
     formula = "(E + C) * (1 resample + %d wordings), E = own-wrong items, C = min(%d, #own-right)" % (len(WORDINGS), CONTROL_N)
 
     if a.dry_run:
@@ -110,7 +112,7 @@ def main():
     with open(path.replace(".jsonl", ".meta.json"), "w") as f:
         json.dump({"model": model, "wordings": WORDINGS, "control_n": CONTROL_N, "control_seed": CONTROL_SEED,
                    "final_instruction": "On the last line write exactly one of these codes as your final recommendation:",
-                   "max_tokens": a.max_tokens, "temperature": a.temperature, "limit": a.limit,
+                   "max_tokens": a.max_tokens, "temperature": a.temperature, "limit": a.limit, "pools": a.pools,
                    "pool": counts}, f, indent=1)
     client = Client(base, key, model, a.max_tokens, a.temperature)
     lock, errors = threading.Lock(), [0]

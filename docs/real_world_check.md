@@ -71,3 +71,26 @@ A hypothesis fails if the interval crosses the stated bound. We report failures.
 3. Run Arm A on all six models.
 4. Label Arm B in parallel. Run it after labels are final.
 5. Append results to this file. Do not edit the hypotheses above.
+
+---
+
+## Progress log
+
+### 2026-11-18: Arm A sets chosen, loader built, gate passed
+
+Sets (both checked for licence and a gold answer; raw files are not in the repo):
+- `medqa`: GBaker/MedQA-USMLE-4-options, test file, CC-BY-4.0, 4 options. Many items ask for the best next step in management, so it is advice-like. 1,273 items, 600 drawn.
+- `csqa`: tau/commonsense_qa, validation split (the test split has no labels), MIT, 5 options. 1,221 items, 600 drawn.
+Both drawn with `random.Random(1684)`. Lists: `data/scenarios/realworld/{medqa,csqa}.jsonl`. Converter: `scripts/data/gen_realworld.py`. For MedQA the gold text matches the raw answer text for all 600 items.
+Option codes are `choice_a`, `choice_b`, ... and there is no `need_more_information` option.
+`run_own_error_reask.py` got a `--pools TAG=file,...` flag. Default behaviour is unchanged.
+
+Known weakness of `csqa`: some questions have more than one defensible answer, so a model "own error" may be a label error. We report csqa and medqa separately and do not pool them in the headline.
+
+Gate (step 2 of "Order of work"): Mistral 7B, first 100 items of each set (200 items), live.
+- Own accuracy 0.56. Own errors E = 85 (needed at least 40). Gate passed.
+- 0 error rows. Unparsed turn-1 answers: 5 of 200 (2.5%).
+- Summary: `results/summaries/realworld_gate_mistral.txt`.
+- This is a gate check on a subset. It is **not** a result and we do not test R1 to R4 with it. The intervals are wide. It shows the same sign as experiment 4 for Mistral (re-ask below resample), but we do not count that.
+
+Next: step 3, all six models on the full 1,200 items. Expected size is about 3,000 to 4,000 calls per model, so about 20,000 calls in total. Not started.
