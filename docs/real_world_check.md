@@ -162,3 +162,18 @@ Practical reading, replacing the earlier one: do not use "look again" on a model
 - The resample baseline depends on the API's default sampling. At greedy decoding it would repeat the first answer.
 - The "net accuracy change" numbers combine two separate samples and are rough.
 - Gemma 4 31B is missing. Arm B is not run. These are still multiple-choice questions, not open advice.
+
+### 2026-11-20: Arm B labeled by two AI labelers (NOT a human check)
+
+Two separate AI agents (different models) labeled the 60 items alone, from the blind sheet and `docs/labeling.md` only. They did not read the drafters' answers (each used about 4 tool calls: rules, sheet, write, check). Files: `data/labeling/armb/ai_labels_A.csv`, `ai_labels_B.csv`. Script: `scripts/analysis/armb_agreement.py`. Output: `results/summaries/armb_ai_agreement.txt`.
+
+- **Agreement between the two labelers:** identical sets on 53 of 60 items (0.88). They overlap on all 60. Cohen's kappa over item-by-option decisions is 0.92.
+- **Where they differ:** 7 items. Both labelers marked 15 rows unsure; they agree exactly on 8 of those 15 and on all 45 other rows. So the unsure flag works as a signal.
+- **Labeler style:** A gave more two-option labels (13, against 6 for B). Both gave "need more information" alone about as often (12 and 14). The drafters planned 16.
+- **Against the drafters' proposals** (proposals, not labels): A matches exactly on 53 of 60, B on 52 of 60. Of the 53 items where A and B agree, 50 equal the proposal, and all 53 overlap it.
+- **Items kept for Arm B if we used these labels:** the 53 with identical sets. The 7 with disagreement would be dropped.
+
+What this does and does not show.
+- The agreement is high, but it is **agreement among AI systems**. The drafters, the two labelers and the models we test share training habits. High agreement here proves less than the same agreement between two people. It shows the items are not broken or ambiguous to a careful reader, and that the labeling rules are usable. It does not show that people would label them the same way.
+- **R4 stays untested.** We have not run the models on Arm B. If we run them, the result must say "AI-labeled".
+- The human sheets are still needed. If two humans also agree with these labels, we can drop the "AI-labeled" tag.
