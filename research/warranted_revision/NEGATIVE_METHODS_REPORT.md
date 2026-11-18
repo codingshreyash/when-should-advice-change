@@ -324,5 +324,5 @@ with deletion confirmed.
 | Novelty audit | `v2/ai_precalibration/novelty_belieftrack/NOVELTY_AUDIT.md` |
 | Screen design, corrections and amendment | `v2/ai_precalibration/screen_v1/` |
 | Screen results | `v2/ai_precalibration/screen_v1/RESULTS_REPORT.md`; `results/warranted_revision/goal-screen-qwen35-9b-v1/`, `goal-screen-mistral-nemo-v1/` |
-| GPU runs | [Qwen, run 40412442979](https://github.com/codingshreyash/when-should-advice-change/actions/runs/40412442979); [Mistral-NeMo, run 40416847278](https://github.com/codingshreyash/when-should-advice-change/actions/runs/40416847278) (raw outputs in artifacts, kept 90 days) |
+| GPU runs | [Qwen, run 40412442979](https://github.com/codingshreyash/are-you-sure-about-that/actions/runs/40412442979); [Mistral-NeMo, run 40416847278](https://github.com/codingshreyash/are-you-sure-about-that/actions/runs/40416847278) (raw outputs in artifacts, kept 90 days) |
 | Cost ledger | `results/warranted_revision/PROJECT_LEDGER.md` |

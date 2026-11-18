@@ -4,7 +4,7 @@
 # a 60-minute phone timer, delete the instance when done.
 #
 # On a fresh 24 GB box (L4/A10G), from a clone of the repo:
-#   git clone <repo url> && cd when-should-advice-change && git checkout instability-boundary
+#   git clone <repo url> && cd are-you-sure-about-that && git checkout instability-boundary
 #   bash scripts/run/run_gpu_instability.sh
 #
 # The scorers are deterministic, so "samples" here are option permutations
